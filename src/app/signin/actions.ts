@@ -51,3 +51,4 @@ export async function signInWithEmail(prevState: SignInFormState, formData: Form
   // This return is effectively unreachable due to redirect.
   // return { message: 'Sign in successful! Redirecting...', success: true };
 }
+
