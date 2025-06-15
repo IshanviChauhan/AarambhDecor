@@ -68,7 +68,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   return (
     <Card className={cn(
       "overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70",
-      "flex-1 min-w-[200px] max-w-[300px]", 
+      "min-w-[200px] max-w-[300px]", // Adjusted from previous state, keeps card flexible
       propClassName
     )}>
       <CardHeader
@@ -95,17 +95,19 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
           />
         </div>
       </CardHeader>
-      <CardContent className="p-4 flex-grow min-w-0">
-        <CardTitle className="font-headline text-xl mb-2 leading-tight break-words">
-           <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
-            {product.name}
-           </Link>
-        </CardTitle>
-        <CardDescription className="text-sm text-muted-foreground mb-2 line-clamp-3">{product.description}</CardDescription>
-        {product.price && <p className="font-semibold text-primary text-lg">{product.price}</p>}
+      <CardContent className="p-4 flex flex-col flex-grow min-w-0">
+        <div> {/* Wrapper for title and description */}
+          <CardTitle className="font-headline text-xl mb-2 leading-tight break-words">
+            <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
+              {product.name}
+            </Link>
+          </CardTitle>
+          <CardDescription className="text-sm text-muted-foreground mb-2 line-clamp-3">{product.description}</CardDescription>
+        </div>
+        {product.price && <p className="font-semibold text-primary text-lg mt-auto pt-2">{product.price}</p>}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex flex-col gap-2">
-        <Button variant="outline" className="w-full sm:flex-1" asChild>
+        <Button variant="outline" className="w-full" asChild>
           <Link href={`/product/${product.id}`}>View Details</Link>
         </Button>
         <Button
