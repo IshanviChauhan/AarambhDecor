@@ -19,8 +19,10 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
-import { parsePrice } from '@/lib/utils'; // Updated import
+import { parsePrice } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 
 const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = 10000;
@@ -40,6 +42,8 @@ export default function CollectionsPage() {
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -60,34 +64,39 @@ export default function CollectionsPage() {
 
   useEffect(() => {
     if (!isClient) return;
-    const storedWishlist = localStorage.getItem('aarambhWishlist');
-    if (storedWishlist) {
-       try {
-        setWishlist(new Set(JSON.parse(storedWishlist)));
-      } catch (e) {
-        console.error("Failed to parse wishlist from localStorage", e);
+    if (user) {
+      const storedWishlist = localStorage.getItem(`aarambhWishlist_${user.uid}`);
+      if (storedWishlist) {
+         try {
+          setWishlist(new Set(JSON.parse(storedWishlist)));
+        } catch (e) {
+          console.error("Failed to parse wishlist from localStorage", e);
+        }
       }
-    }
-    const storedCart = localStorage.getItem('aarambhCart');
-    if (storedCart) {
-       try {
-        setCartItems(JSON.parse(storedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
+      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
+      if (storedCart) {
+         try {
+          setCartItems(JSON.parse(storedCart));
+        } catch (e) {
+          console.error("Failed to parse cart from localStorage", e);
+        }
       }
+    } else {
+      setWishlist(new Set());
+      setCartItems([]);
     }
-  }, [isClient]);
+  }, [isClient, user]);
 
   useEffect(() => {
-    if (!isClient) return;
-    localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
-  }, [wishlist, isClient]);
+    if (!isClient || !user) return;
+    localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
+  }, [wishlist, isClient, user]);
 
   useEffect(() => {
-    if (!isClient) return;
-    localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
+    if (!isClient || !user) return;
+    localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-  }, [cartItems, isClient]);
+  }, [cartItems, isClient, user]);
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
@@ -110,6 +119,15 @@ export default function CollectionsPage() {
   }, [selectedCategory, allProducts, priceRange]);
 
   const handleToggleWishlist = (productId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to manage your wishlist.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
     setWishlist((prevWishlist) => {
       const newWishlist = new Set(prevWishlist);
       if (newWishlist.has(productId)) {
@@ -122,6 +140,15 @@ export default function CollectionsPage() {
   };
 
   const handleAddToCart = (product: Product) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to add items to your cart.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
     setCartItems((prevCartItems) => {
       const existingItem = prevCartItems.find(item => item.id === product.id);
       if (existingItem) {
@@ -138,7 +165,7 @@ export default function CollectionsPage() {
   };
 
   const isProductInCart = (productId: string) => {
-    if (!isClient) return false;
+    if (!isClient || !user) return false;
     return cartItems.some(item => item.id === productId);
   };
 
@@ -168,7 +195,7 @@ export default function CollectionsPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-4 md:gap-8">
           <aside className="md:col-span-1 mb-8 md:mb-0">
-            <Card className="p-4 shadow-md rounded-lg border-border/70 sticky top-24"> {/* Added sticky top for better UX */}
+            <Card className="p-4 shadow-md rounded-lg border-border/70 sticky top-24">
               <CardHeader className="p-0 mb-4">
                 <div className="flex items-center space-x-2">
                   <Filter className="h-5 w-5 text-primary" />
@@ -222,12 +249,12 @@ export default function CollectionsPage() {
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"> {/* Adjusted lg:grid-cols for better fit */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
-                    isWishlisted={isClient && wishlist.has(product.id)}
+                    isWishlisted={isClient && user ? wishlist.has(product.id) : false}
                     onToggleWishlist={handleToggleWishlist}
                     onAddToCart={handleAddToCart}
                     isProductInCart={isProductInCart(product.id)}
@@ -246,4 +273,3 @@ export default function CollectionsPage() {
     </div>
   );
 }
-

@@ -13,6 +13,8 @@ import { Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 
 
 const LATEST_PRODUCTS_COUNT = 3;
@@ -24,6 +26,8 @@ export default function HomePage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -42,36 +46,51 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!isClient) return;
-    const storedWishlist = localStorage.getItem('aarambhWishlist');
-    if (storedWishlist) {
-      try {
-        setWishlist(new Set(JSON.parse(storedWishlist)));
-      } catch (e) {
-        console.error("Failed to parse wishlist from localStorage", e);
+    if (user) {
+      const storedWishlist = localStorage.getItem(`aarambhWishlist_${user.uid}`);
+      if (storedWishlist) {
+        try {
+          setWishlist(new Set(JSON.parse(storedWishlist)));
+        } catch (e) {
+          console.error("Failed to parse wishlist from localStorage", e);
+        }
       }
-    }
-    const storedCart = localStorage.getItem('aarambhCart');
-    if (storedCart) {
-      try {
-        setCartItems(JSON.parse(storedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
+      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
+      if (storedCart) {
+        try {
+          setCartItems(JSON.parse(storedCart));
+        } catch (e) {
+          console.error("Failed to parse cart from localStorage", e);
+        }
       }
+    } else {
+      // Clear local cart/wishlist if user logs out or is not logged in
+      setWishlist(new Set());
+      setCartItems([]);
     }
-  }, [isClient]);
+  }, [isClient, user]);
 
   useEffect(() => {
-    if (!isClient) return;
-    localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
-  }, [wishlist, isClient]);
+    if (!isClient || !user) return;
+    localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
+  }, [wishlist, isClient, user]);
 
   useEffect(() => {
-    if (!isClient) return;
-    localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
+    if (!isClient || !user) return;
+    localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-  }, [cartItems, isClient]);
+  }, [cartItems, isClient, user]);
 
   const handleToggleWishlist = (productId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to manage your wishlist.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
     setWishlist((prevWishlist) => {
       const newWishlist = new Set(prevWishlist);
       if (newWishlist.has(productId)) {
@@ -84,6 +103,15 @@ export default function HomePage() {
   };
 
   const handleAddToCart = (product: Product) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to add items to your cart.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
     setCartItems((prevCartItems) => {
       const existingItem = prevCartItems.find(item => item.id === product.id);
       if (existingItem) {
@@ -100,7 +128,7 @@ export default function HomePage() {
   };
   
   const isProductInCart = (productId: string) => {
-    if (!isClient) return false;
+    if (!isClient || !user) return false;
     return cartItems.some(item => item.id === productId);
   };
 
@@ -137,7 +165,7 @@ export default function HomePage() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  isWishlisted={isClient && wishlist.has(product.id)}
+                  isWishlisted={isClient && user ? wishlist.has(product.id) : false}
                   onToggleWishlist={handleToggleWishlist}
                   onAddToCart={handleAddToCart}
                   isProductInCart={isProductInCart(product.id)}

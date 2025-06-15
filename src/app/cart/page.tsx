@@ -9,37 +9,59 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Image from 'next/image';
 import { Separator } from '@/components/ui/separator';
-import { Trash2, ShoppingBag, PlusCircle, MinusCircle } from 'lucide-react';
+import { Trash2, ShoppingBag, PlusCircle, MinusCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { parsePrice } from '@/lib/utils'; // Updated import
+import { parsePrice } from '@/lib/utils';
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
-    const storedCart = localStorage.getItem('aarambhCart');
-    if (storedCart) {
-      try {
-        setCartItems(JSON.parse(storedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
-        setCartItems([]);
-      }
-    }
   }, []);
 
   useEffect(() => {
-    if(isClient) {
-      localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
-      window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
+    if (isClient && user) {
+      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
+      if (storedCart) {
+        try {
+          setCartItems(JSON.parse(storedCart));
+        } catch (e) {
+          console.error("Failed to parse cart from localStorage", e);
+          setCartItems([]);
+        }
+      } else {
+        setCartItems([]);
+      }
+    } else if (isClient && !user && !authLoading) {
+      // If user is not logged in and auth is resolved, clear cart
+      setCartItems([]);
     }
-  }, [cartItems, isClient]);
+  }, [isClient, user, authLoading]);
+
+  useEffect(() => {
+    if(isClient && user) {
+      localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
+      window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
+    } else if (isClient && !user) {
+        // Ensure cart is cleared in localStorage too if user logs out
+        localStorage.removeItem('aarambhCart'); // Clear old general key if any
+        if (auth.currentUser?.uid) { // Clear specific user cart if somehow still there
+             localStorage.removeItem(`aarambhCart_${auth.currentUser.uid}`);
+        }
+        window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Notify header
+    }
+  }, [cartItems, isClient, user]);
 
   const handleRemoveFromCart = (productId: string) => {
+    if (!user) return; // Should not happen if cart is user-specific
     setCartItems((prevCartItems) => prevCartItems.filter(item => item.id !== productId));
     toast({
       title: "Item Removed",
@@ -49,6 +71,7 @@ export default function CartPage() {
   };
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+    if (!user) return; // Should not happen
     if (newQuantity < 1) {
       handleRemoveFromCart(productId);
       return;
@@ -64,13 +87,30 @@ export default function CartPage() {
     return total + parsePrice(item.price) * item.quantity;
   }, 0);
 
-  if (!isClient) {
+  if (!isClient || authLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow container mx-auto px-4 py-8 md:py-12 flex justify-center items-center">
           <ShoppingBag className="h-12 w-12 text-primary animate-pulse" />
            <p className="ml-4 text-lg text-muted-foreground">Loading your cart...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8 md:py-12 text-center">
+            <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
+            <h1 className="text-3xl font-headline text-primary mb-2">Authentication Required</h1>
+            <p className="text-muted-foreground mb-6">Please sign in to view your cart.</p>
+            <Button asChild size="lg">
+              <Link href="/signin">Sign In</Link>
+            </Button>
         </main>
         <Footer />
       </div>

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, type FormEvent } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import type { Product, CartItem, Review } from '@/lib/types';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import Header from '@/components/layout/header';
@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/auth-context';
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
@@ -37,6 +38,8 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => {
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
+  const router = useRouter();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +48,6 @@ export default function ProductDetailPage() {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
-  // State for new review form
   const [newReviewName, setNewReviewName] = useState('');
   const [newReviewRating, setNewReviewRating] = useState(0);
   const [newReviewComment, setNewReviewComment] = useState('');
@@ -55,7 +57,6 @@ export default function ProductDetailPage() {
     setIsClient(true);
     if (productId) {
       const foundProduct = MOCK_PRODUCTS.find(p => p.id === productId);
-      // Deep clone to allow modification of reviews for this session
       setProduct(foundProduct ? JSON.parse(JSON.stringify(foundProduct)) : null);
       setIsLoading(false);
     }
@@ -63,32 +64,46 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!isClient) return;
-    const storedWishlist = localStorage.getItem('aarambhWishlist');
-    if (storedWishlist) {
-      try {
-        setWishlist(new Set(JSON.parse(storedWishlist)));
-      } catch (e) { console.error("Failed to parse wishlist", e); }
+    if (user) {
+      const storedWishlist = localStorage.getItem(`aarambhWishlist_${user.uid}`);
+      if (storedWishlist) {
+        try {
+          setWishlist(new Set(JSON.parse(storedWishlist)));
+        } catch (e) { console.error("Failed to parse wishlist", e); }
+      }
+      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
+      if (storedCart) {
+         try {
+          setCartItems(JSON.parse(storedCart));
+        } catch (e) { console.error("Failed to parse cart", e); }
+      }
+    } else {
+      setWishlist(new Set());
+      setCartItems([]);
     }
-    const storedCart = localStorage.getItem('aarambhCart');
-    if (storedCart) {
-       try {
-        setCartItems(JSON.parse(storedCart));
-      } catch (e) { console.error("Failed to parse cart", e); }
-    }
-  }, [isClient]);
+  }, [isClient, user]);
 
   useEffect(() => {
-    if (!isClient) return;
-    localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
-  }, [wishlist, isClient]);
+    if (!isClient || !user) return;
+    localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
+  }, [wishlist, isClient, user]);
 
   useEffect(() => {
-    if (!isClient) return;
-    localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
+    if (!isClient || !user) return;
+    localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-  }, [cartItems, isClient]);
+  }, [cartItems, isClient, user]);
 
   const handleToggleWishlist = (id: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to manage your wishlist.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
     setWishlist(prev => {
       const newWishlist = new Set(prev);
       if (newWishlist.has(id)) newWishlist.delete(id);
@@ -98,6 +113,15 @@ export default function ProductDetailPage() {
   };
 
   const handleAddToCart = (p: Product) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to add items to your cart.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
     setCartItems(prev => {
       const existing = prev.find(item => item.id === p.id);
       if (existing) {
@@ -110,6 +134,16 @@ export default function ProductDetailPage() {
 
   const handleReviewSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to submit a review.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
+
     if (!newReviewName.trim() || newReviewRating === 0 || !newReviewComment.trim()) {
       toast({
         title: "Incomplete Review",
@@ -124,10 +158,9 @@ export default function ProductDetailPage() {
       reviewer: newReviewName,
       rating: newReviewRating,
       comment: newReviewComment,
-      date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
+      date: new Date().toISOString().split('T')[0], 
     };
 
-    // Simulate API call delay
     setTimeout(() => {
       setProduct(prevProduct => {
         if (!prevProduct) return null;
@@ -135,7 +168,6 @@ export default function ProductDetailPage() {
         return { ...prevProduct, reviews: updatedReviews };
       });
 
-      // Reset form
       setNewReviewName('');
       setNewReviewRating(0);
       setNewReviewComment('');
@@ -148,8 +180,8 @@ export default function ProductDetailPage() {
     }, 500);
   };
 
-  const isProductInCart = product ? cartItems.some(item => item.id === product.id) : false;
-  const isProductWishlisted = product ? wishlist.has(product.id) : false;
+  const isProductInCart = product && user ? cartItems.some(item => item.id === product.id) : false;
+  const isProductWishlisted = product && user ? wishlist.has(product.id) : false;
 
   if (isLoading || !isClient) {
     return (
@@ -267,7 +299,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Reviews Section */}
         <section id="reviews" className="mt-12 md:mt-16">
           <div className="flex items-center space-x-3 mb-6">
             <MessageCircle className="h-7 w-7 text-primary" />
@@ -299,79 +330,90 @@ export default function ProductDetailPage() {
           )}
         </section>
 
-        {/* Add Review Form Section */}
         <section id="add-review" className="mt-12 md:mt-16">
-           <Card className="shadow-lg rounded-lg border-border/70 p-6">
-            <CardHeader className="p-0 mb-4">
-              <CardTitle className="font-headline text-2xl text-primary">Write a Review</CardTitle>
-              <CardDescription>Share your experience with this product.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <form onSubmit={handleReviewSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="reviewerName" className="block text-sm font-medium text-foreground mb-1">Your Name</Label>
-                  <Input
-                    id="reviewerName"
-                    type="text"
-                    value={newReviewName}
-                    onChange={(e) => setNewReviewName(e.target.value)}
-                    placeholder="e.g., Priya S."
-                    required
-                    className="focus:ring-accent focus:border-accent"
-                  />
-                </div>
-                <div>
-                  <Label className="block text-sm font-medium text-foreground mb-2">Your Rating</Label>
-                  <div className="flex space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Button
-                        key={star}
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setNewReviewRating(star)}
-                        className={`h-8 w-8 p-0 ${
-                          star <= newReviewRating ? 'text-yellow-400' : 'text-muted-foreground'
-                        } hover:text-yellow-400`}
-                        aria-label={`Rate ${star} out of 5 stars`}
-                      >
-                        <Star className={`h-6 w-6 ${star <= newReviewRating ? 'fill-yellow-400' : ''}`} />
-                      </Button>
-                    ))}
+          {user ? (
+            <Card className="shadow-lg rounded-lg border-border/70 p-6">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle className="font-headline text-2xl text-primary">Write a Review</CardTitle>
+                <CardDescription>Share your experience with this product.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <form onSubmit={handleReviewSubmit} className="space-y-6">
+                  <div>
+                    <Label htmlFor="reviewerName" className="block text-sm font-medium text-foreground mb-1">Your Name</Label>
+                    <Input
+                      id="reviewerName"
+                      type="text"
+                      value={newReviewName}
+                      onChange={(e) => setNewReviewName(e.target.value)}
+                      placeholder="e.g., Priya S."
+                      required
+                      className="focus:ring-accent focus:border-accent"
+                    />
                   </div>
-                </div>
-                <div>
-                  <Label htmlFor="reviewComment" className="block text-sm font-medium text-foreground mb-1">Your Review</Label>
-                  <Textarea
-                    id="reviewComment"
-                    value={newReviewComment}
-                    onChange={(e) => setNewReviewComment(e.target.value)}
-                    placeholder="What did you like or dislike? How did you use this product?"
-                    rows={4}
-                    required
-                    className="focus:ring-accent focus:border-accent"
-                  />
-                </div>
-                <Button type="submit" disabled={isSubmittingReview} className="w-full sm:w-auto">
-                  {isSubmittingReview ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Submit Review
-                    </>
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  <div>
+                    <Label className="block text-sm font-medium text-foreground mb-2">Your Rating</Label>
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Button
+                          key={star}
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setNewReviewRating(star)}
+                          className={`h-8 w-8 p-0 ${
+                            star <= newReviewRating ? 'text-yellow-400' : 'text-muted-foreground'
+                          } hover:text-yellow-400`}
+                          aria-label={`Rate ${star} out of 5 stars`}
+                        >
+                          <Star className={`h-6 w-6 ${star <= newReviewRating ? 'fill-yellow-400' : ''}`} />
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="reviewComment" className="block text-sm font-medium text-foreground mb-1">Your Review</Label>
+                    <Textarea
+                      id="reviewComment"
+                      value={newReviewComment}
+                      onChange={(e) => setNewReviewComment(e.target.value)}
+                      placeholder="What did you like or dislike? How did you use this product?"
+                      rows={4}
+                      required
+                      className="focus:ring-accent focus:border-accent"
+                    />
+                  </div>
+                  <Button type="submit" disabled={isSubmittingReview} className="w-full sm:w-auto">
+                    {isSubmittingReview ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Submit Review
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          ) : (
+             <Card className="shadow-lg rounded-lg border-border/70 p-6 text-center">
+                <CardHeader className="p-0 mb-4">
+                    <CardTitle className="font-headline text-2xl text-primary">Write a Review</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <p className="text-muted-foreground">
+                        Please <Link href="/signin" className="text-primary hover:underline font-semibold">sign in</Link> to leave a review for this product.
+                    </p>
+                </CardContent>
+            </Card>
+          )}
         </section>
       </main>
       <Footer />
     </div>
   );
 }
-
