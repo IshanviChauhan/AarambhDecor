@@ -65,36 +65,36 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
 
   return (
     <Card className={cn(
-      "shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden", 
+      "shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden",
       "flex-1 min-w-[200px] max-w-[300px]",
       "transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl",
       "animate-pop-in",
       propClassName
     )}>
       <CardHeader
-        className="p-0 relative" 
+        className="p-0 relative"
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <div
-            className="relative w-full h-[13.5rem] rounded-t-lg" 
+            className="relative w-full aspect-square rounded-t-lg"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
             <div
               className="flex h-full transition-transform duration-500 ease-in-out"
               style={{
-                width: `${imagesToDisplay.length * 100}%`, 
+                width: `${imagesToDisplay.length * 100}%`,
                 transform: `translateX(-${(currentImageIndex / imagesToDisplay.length) * 100}%)`
               }}
             >
               {imagesToDisplay.map((image, index) => (
-                <div key={index} className="w-full h-full flex-shrink-0 relative" style={{ width: `${100 / imagesToDisplay.length}%`}}> 
+                <div key={index} className="w-full h-full flex-shrink-0 relative" style={{ width: `${100 / imagesToDisplay.length}%`}}>
                   <Image
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     layout="fill"
-                    objectFit="cover" 
-                    className="w-full h-full rounded-t-lg object-top" 
+                    objectFit="cover"
+                    className="w-full h-full rounded-t-lg object-top"
                     data-ai-hint={image.dataAiHint}
                   />
                 </div>
@@ -102,7 +102,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
             </div>
           </div>
         </Link>
-        <div className="absolute top-2 right-2 z-10"> 
+        <div className="absolute top-2 right-2 z-10">
           <WishlistIcon
             isWishlisted={isWishlisted}
             onClick={() => onToggleWishlist(product.id)}
