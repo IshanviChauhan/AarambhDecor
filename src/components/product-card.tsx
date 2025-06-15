@@ -18,17 +18,21 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart }: ProductCardProps) {
+  const firstImage = product.imageUrls && product.imageUrls.length > 0 
+    ? product.imageUrls[0] 
+    : { url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' };
+
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70">
       <CardHeader className="p-0 relative">
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <Image
-            src={product.imageUrl}
+            src={firstImage.url}
             alt={product.name}
             width={600}
             height={400}
             className="object-cover w-full h-64"
-            data-ai-hint={product.dataAiHint}
+            data-ai-hint={firstImage.dataAiHint}
           />
         </Link>
         <div className="absolute top-2 right-2">
@@ -39,8 +43,8 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
           />
         </div>
       </CardHeader>
-      <CardContent className="p-4 flex-grow min-w-0"> {/* Added min-w-0 */}
-        <CardTitle className="font-headline text-xl mb-2 leading-tight break-words"> {/* Added break-words */}
+      <CardContent className="p-4 flex-grow min-w-0">
+        <CardTitle className="font-headline text-xl mb-2 leading-tight break-words">
            <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
             {product.name}
            </Link>

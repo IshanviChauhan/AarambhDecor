@@ -3,7 +3,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import type { Product, CartItem, Review } from '@/lib/types';
+import type { Product, CartItem, Review, ProductImage } from '@/lib/types';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -21,6 +21,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/auth-context';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
@@ -215,6 +222,10 @@ export default function ProductDetailPage() {
       </div>
     );
   }
+  
+  const safeImageUrls = product.imageUrls && product.imageUrls.length > 0 
+    ? product.imageUrls 
+    : [{ url: 'https://placehold.co/800x600.png', dataAiHint: 'placeholder image' }];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -230,16 +241,31 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden shadow-lg border border-border/50">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              layout="fill"
-              objectFit="cover"
-              className="transition-transform duration-300 hover:scale-105"
-              data-ai-hint={product.dataAiHint}
-            />
-          </div>
+          <Carousel className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto" opts={{ loop: true }}>
+            <CarouselContent>
+              {safeImageUrls.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden border border-border/50 shadow-lg">
+                    <Image
+                      src={image.url}
+                      alt={`${product.name} - Image ${index + 1}`}
+                      layout="fill"
+                      objectFit="contain"
+                      className="transition-transform duration-300"
+                      data-ai-hint={image.dataAiHint}
+                      priority={index === 0} 
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {safeImageUrls.length > 1 && (
+              <>
+                <CarouselPrevious className="left-2 sm:-left-4 md:-left-10" />
+                <CarouselNext className="right-2 sm:-right-4 md:-right-10" />
+              </>
+            )}
+          </Carousel>
 
           <div className="flex flex-col space-y-4">
             {product.category && (
