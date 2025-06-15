@@ -12,11 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Trash2, ShoppingBag, PlusCircle, MinusCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-
-const parsePrice = (priceString?: string): number => {
-  if (!priceString) return 0;
-  return parseFloat(priceString.replace('₹', '').replace(',', ''));
-};
+import { parsePrice } from '@/lib/utils'; // Updated import
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);

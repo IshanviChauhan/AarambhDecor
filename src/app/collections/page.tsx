@@ -7,7 +7,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, LayoutGrid } from 'lucide-react';
+import { Loader2, LayoutGrid, Filter } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -17,7 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
+import { parsePrice } from '@/lib/utils'; // Updated import
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const MIN_PRICE_DEFAULT = 0;
+const MAX_PRICE_DEFAULT = 10000;
 
 
 export default function CollectionsPage() {
@@ -27,6 +33,11 @@ export default function CollectionsPage() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
+  const [minProductPrice, setMinProductPrice] = useState(MIN_PRICE_DEFAULT);
+  const [maxProductPrice, setMaxProductPrice] = useState(MAX_PRICE_DEFAULT);
+  const [priceRange, setPriceRange] = useState<[number, number]>([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
+
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
@@ -34,6 +45,14 @@ export default function CollectionsPage() {
     setIsClient(true);
     const timer = setTimeout(() => {
       setAllProducts(MOCK_PRODUCTS);
+      
+      const prices = MOCK_PRODUCTS.map(p => parsePrice(p.price)).filter(p => p > 0);
+      const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
+      const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
+      setMinProductPrice(minP);
+      setMaxProductPrice(maxP);
+      setPriceRange([minP, maxP]);
+
       setIsLoadingProducts(false);
     }, 500); 
     return () => clearTimeout(timer);
@@ -76,12 +95,19 @@ export default function CollectionsPage() {
   }, [allProducts]);
 
   useEffect(() => {
+    let products = allProducts;
+
     if (selectedCategory && selectedCategory !== 'All') {
-      setFilteredProducts(allProducts.filter(p => p.category === selectedCategory));
-    } else {
-      setFilteredProducts(allProducts);
+      products = products.filter(p => p.category === selectedCategory);
     }
-  }, [selectedCategory, allProducts]);
+
+    products = products.filter(p => {
+      const price = parsePrice(p.price);
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
+
+    setFilteredProducts(products);
+  }, [selectedCategory, allProducts, priceRange]);
 
   const handleToggleWishlist = (productId: string) => {
     setWishlist((prevWishlist) => {
@@ -120,6 +146,10 @@ export default function CollectionsPage() {
     setSelectedCategory(categoryValue === 'All' ? null : categoryValue);
   };
 
+  const handlePriceChange = (newRange: [number, number]) => {
+    setPriceRange(newRange);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -132,57 +162,88 @@ export default function CollectionsPage() {
             </h1>
           </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Browse through our diverse range of handcrafted decor items. Filter by category to find exactly what you're looking for.
+            Browse through our diverse range of handcrafted decor items. Filter by category and price to find exactly what you're looking for.
           </p>
         </section>
-
-        <section id="category-filters" className="mb-8 md:mb-10 flex justify-center">
-          <Select
-            onValueChange={handleCategoryFilter}
-            defaultValue={selectedCategory || 'All'}
-          >
-            <SelectTrigger className="w-full max-w-xs text-base">
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category} className="text-base">
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </section>
         
-        <Separator className="my-8 md:my-10" />
+        <div className="grid grid-cols-1 md:grid-cols-4 md:gap-8">
+          <aside className="md:col-span-1 mb-8 md:mb-0">
+            <Card className="p-4 shadow-md rounded-lg border-border/70 sticky top-24"> {/* Added sticky top for better UX */}
+              <CardHeader className="p-0 mb-4">
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-5 w-5 text-primary" />
+                  <CardTitle className="font-headline text-xl text-primary">Filters</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0 space-y-6">
+                <div>
+                  <h3 className="text-md font-semibold mb-2 text-foreground">Category</h3>
+                  <Select
+                    onValueChange={handleCategoryFilter}
+                    defaultValue={selectedCategory || 'All'}
+                  >
+                    <SelectTrigger className="w-full text-base">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category} className="text-base">
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <h3 className="text-md font-semibold mb-2 text-foreground">Price Range</h3>
+                  <Slider
+                    value={priceRange}
+                    onValueChange={handlePriceChange}
+                    min={minProductPrice}
+                    max={maxProductPrice}
+                    step={50}
+                    minStepsBetweenThumbs={1}
+                    className="my-4"
+                    aria-label="Price range slider"
+                  />
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>₹{priceRange[0].toLocaleString()}</span>
+                    <span>₹{priceRange[1].toLocaleString()}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </aside>
 
-        <section id="product-listing" aria-labelledby="product-listing-title">
-          {isLoadingProducts ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="h-12 w-12 text-primary animate-spin" />
-              <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
-            </div>
-          ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isWishlisted={isClient && wishlist.has(product.id)}
-                  onToggleWishlist={handleToggleWishlist}
-                  onAddToCart={handleAddToCart}
-                  isProductInCart={isProductInCart(product.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground text-lg py-10">
-              No products found for the selected category. Try a different filter!
-            </p>
-          )}
-        </section>
+          <section id="product-listing" aria-labelledby="product-listing-title" className="md:col-span-3">
+            {isLoadingProducts ? (
+              <div className="flex justify-center items-center h-64">
+                <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
+              </div>
+            ) : filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"> {/* Adjusted lg:grid-cols for better fit */}
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    isWishlisted={isClient && wishlist.has(product.id)}
+                    onToggleWishlist={handleToggleWishlist}
+                    onAddToCart={handleAddToCart}
+                    isProductInCart={isProductInCart(product.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground text-lg py-10">
+                No products found matching your filters. Try adjusting your selection!
+              </p>
+            )}
+          </section>
+        </div>
       </main>
       <Footer />
     </div>
   );
 }
+
