@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useActionState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/header';
@@ -11,13 +11,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, X } from 'lucide-react';
+import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile, Address } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, useFormField } from '@/components/ui/form';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +37,8 @@ import {
   deleteShippingAddress,
   type FormState
 } from './actions';
+import { useActionState } from 'react'; // Correct import for useActionState
+
 
 function ProfileSubmitButton({ pending, text = "Save Changes" }: { pending: boolean, text?: string }) {
   return (
@@ -57,21 +59,25 @@ export default function ProfilePage() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null); // Determines add/edit mode
 
-  const initialProfileFormState: FormState = { message: null, success: false };
+  const initialProfileFormState: FormState = { message: null, success: false, errors: undefined };
   const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialProfileFormState);
-
-  // We need a way to dynamically set the action for the address form
-  const [currentAddressAction, setCurrentAddressAction] = useState<'add' | 'update'>('add');
   
-  const addressFormActionToUse = currentAddressAction === 'add' ? addShippingAddress : updateShippingAddress;
-  const initialAddressFormState: FormState = { message: null, success: false };
-  const [addressFormState, addressFormAction, isAddressSubmitting] = useActionState(
-    addressFormActionToUse, 
+  const initialAddressFormState: FormState = { message: null, success: false, errors: undefined };
+  // We use one useActionState for addresses. The actual server action (add/update) will be determined inside onAddressSubmit
+  // and the formAction from useActionState will be called with the appropriate FormData.
+  // This approach is a bit of a hybrid: react-hook-form handles client validation and FormData creation,
+  // then passes it to the action function returned by useActionState.
+  const [currentAddressServerAction, setCurrentAddressServerAction] = useState<'add' | 'update'>('add');
+
+  const addressActionToUse = currentAddressServerAction === 'add' ? addShippingAddress : updateShippingAddress;
+  const [addressFormState, actualAddressFormAction, isAddressFormSubmitting] = useActionState(
+    addressActionToUse, // This is the server action useActionState will wrap
     initialAddressFormState
   );
   
+
   const profileForm = useForm<UserProfileInput>({
     resolver: zodResolver(UserProfileSchema),
     defaultValues: { name: '' },
@@ -80,16 +86,28 @@ export default function ProfilePage() {
   const addressForm = useForm<AddressInput>({
     resolver: zodResolver(AddressSchema),
     defaultValues: {
-      fullName: '',
-      addressLine1: '',
-      addressLine2: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      country: 'India', 
-      phoneNumber: '',
+      fullName: '', addressLine1: '', addressLine2: '', city: '',
+      state: '', postalCode: '', country: 'India', phoneNumber: '',
     },
   });
+
+  const fetchProfileAndAddresses = async () => {
+    if (!user) return;
+    setIsLoadingData(true);
+    try {
+      const profileData = await getUserProfile();
+      setUserProfile(profileData);
+      profileForm.reset({ name: profileData?.name || '' });
+
+      const addressesData = await getShippingAddresses();
+      setAddresses(addressesData);
+    } catch (error) {
+      console.error("Failed to load profile data:", error)
+      toast({ title: "Error", description: "Failed to load profile data.", variant: "destructive" });
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -100,26 +118,6 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
-  const fetchProfileAndAddresses = async () => {
-    if (!user) return;
-    setIsLoadingData(true);
-    try {
-      const profileData = await getUserProfile();
-      setUserProfile(profileData);
-      if (profileData?.name) {
-        profileForm.reset({ name: profileData.name });
-      } else if (profileData?.email) { // if name is empty, fallback to display name or empty string
-        profileForm.reset({ name: user.displayName || '' });
-      }
-
-      const addressesData = await getShippingAddresses();
-      setAddresses(addressesData);
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to load profile data.", variant: "destructive" });
-    } finally {
-      setIsLoadingData(false);
-    }
-  };
 
   useEffect(() => {
     if (profileFormState.message) {
@@ -128,22 +126,38 @@ export default function ProfilePage() {
         description: profileFormState.message,
         variant: profileFormState.success ? 'default' : 'destructive',
       });
-      if (profileFormState.success) fetchProfileAndAddresses(); 
+       if (profileFormState.errors) {
+        Object.entries(profileFormState.errors).forEach(([field, messages]) => {
+          if (messages && field !== '_form') { // _form errors are for generic messages
+            profileForm.setError(field as keyof UserProfileInput, { type: 'server', message: messages.join(', ') });
+          }
+        });
+      }
+      if (profileFormState.success) {
+        fetchProfileAndAddresses(); 
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileFormState, toast]);
+  }, [profileFormState]);
 
-  useEffect(() => {
+
+ useEffect(() => {
     if (addressFormState.message) {
       toast({
         title: addressFormState.success ? 'Success' : 'Error',
         description: addressFormState.message,
         variant: addressFormState.success ? 'default' : 'destructive',
       });
+      if (addressFormState.errors) {
+        Object.entries(addressFormState.errors).forEach(([field, messages]) => {
+          if (messages && field !== '_form') {
+             addressForm.setError(field as keyof AddressInput, { type: 'server', message: messages.join(', ') });
+          }
+        });
+      }
       if (addressFormState.success) {
-        fetchProfileAndAddresses(); 
+        fetchProfileAndAddresses();
         setIsAddressModalOpen(false);
-        setEditingAddress(null);
         addressForm.reset({
             fullName: '', addressLine1: '', addressLine2: '', city: '',
             state: '', postalCode: '', country: 'India', phoneNumber: ''
@@ -151,11 +165,12 @@ export default function ProfilePage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressFormState, toast]);
+  }, [addressFormState]);
+
 
   const handleOpenAddAddressModal = () => {
     setEditingAddress(null);
-    setCurrentAddressAction('add');
+    setCurrentAddressServerAction('add');
     addressForm.reset({ 
         fullName: '', addressLine1: '', addressLine2: '', city: '',
         state: '', postalCode: '', country: 'India', phoneNumber: ''
@@ -165,29 +180,42 @@ export default function ProfilePage() {
 
   const handleOpenEditAddressModal = (address: Address) => {
     setEditingAddress(address);
-    setCurrentAddressAction('update');
+    setCurrentAddressServerAction('update');
     addressForm.reset({ ...address }); 
     setIsAddressModalOpen(true);
   };
 
   const handleDeleteAddress = async (addressId?: string) => {
     if (!addressId) return;
-    // Using window.confirm for simplicity, consider a custom dialog for better UX
     const confirmed = window.confirm('Are you sure you want to delete this address?');
     if (!confirmed) return;
 
     const result = await deleteShippingAddress(addressId);
     toast({
       title: result.success ? 'Success' : 'Error',
-      description: result.message,
+      description: result.message || 'Operation status unknown',
       variant: result.success ? 'default' : 'destructive',
     });
     if (result.success) {
       fetchProfileAndAddresses();
     }
   };
+
+  const onAddressFormSubmit: SubmitHandler<AddressInput> = (data) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+             formData.append(key, String(value));
+        }
+    });
+
+    if (editingAddress && editingAddress.id && currentAddressServerAction === 'update') {
+        formData.append('id', editingAddress.id);
+    }
+    actualAddressFormAction(formData);
+  };
   
-  if (authLoading || (isLoadingData && !userProfile)) { // Adjusted loading condition
+  if (authLoading || (isLoadingData && !userProfile && user)) { 
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -200,7 +228,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) { // This check handles the case after loading and no user is found
+  if (!user) { 
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -208,6 +236,7 @@ export default function ProfilePage() {
           <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
           <h1 className="text-3xl font-headline text-primary mb-2">Access Denied</h1>
           <p className="text-muted-foreground mb-6">Please log in to view your profile.</p>
+           <Button asChild><Link href="/signin">Log In</Link></Button>
         </main>
         <Footer />
       </div>
@@ -280,7 +309,7 @@ export default function ProfilePage() {
               <DialogContent className="sm:max-w-lg">
                  <Form {...addressForm}>
                     <form 
-                        onSubmit={addressForm.handleSubmit(() => addressFormAction(new FormData(addressForm.control._formValues)))}
+                        onSubmit={addressForm.handleSubmit(onAddressFormSubmit)}
                         className="space-y-4"
                     >
                       <DialogHeader>
@@ -292,7 +321,7 @@ export default function ProfilePage() {
                         </DialogDescription>
                       </DialogHeader>
                       
-                      {editingAddress && <input type="hidden" {...addressForm.register("id")} defaultValue={editingAddress.id} />}
+                      {/* ID is handled in onAddressFormSubmit, not as a hidden field with register directly */}
 
                       <FormField control={addressForm.control} name="fullName" render={({ field }) => (
                         <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Priya Sharma" {...field} /></FormControl><FormMessage /></FormItem>
@@ -325,16 +354,11 @@ export default function ProfilePage() {
                        {addressFormState.errors?._form && (
                         <p className="text-sm font-medium text-destructive">{addressFormState.errors._form.join(', ')}</p>
                        )}
-                        {addressForm.formState.errors?.root?.serverError && (
-                           <p className="text-sm font-medium text-destructive">
-                             {addressForm.formState.errors.root.serverError.message}
-                           </p>
-                        )}
                       <DialogFooter>
                         <DialogClose asChild>
                             <Button type="button" variant="outline">Cancel</Button>
                         </DialogClose>
-                        <ProfileSubmitButton pending={isAddressSubmitting} text={editingAddress ? "Update Address" : "Add Address"} />
+                        <ProfileSubmitButton pending={isAddressFormSubmitting} text={editingAddress ? "Update Address" : "Add Address"} />
                       </DialogFooter>
                     </form>
                   </Form>

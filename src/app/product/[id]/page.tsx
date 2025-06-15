@@ -330,7 +330,7 @@ export default function ProductDetailPage() {
               {product.sizeAndDimensions && (
                 <AccordionItem value="size">
                   <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                    <Ruler className="mr-2 h-5 w-5 text-primary" /> Size & Dimensions
+                    <Ruler className="mr-2 h-5 w-5 text-primary" /> Dimensions
                   </AccordionTrigger>
                   <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
                     {product.sizeAndDimensions}

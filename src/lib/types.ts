@@ -33,17 +33,17 @@ export interface Address {
   id?: string; // Firestore document ID
   fullName: string;
   addressLine1: string;
-  addressLine2?: string;
+  addressLine2?: string | null; // Allow null for optional fields from Firestore
   city: string;
   state: string; // Or province/region
   postalCode: string;
   country: string;
-  phoneNumber?: string;
+  phoneNumber?: string | null; // Allow null
 }
 
 export interface UserProfile {
   uid: string;
   email: string; // From Firebase Auth
-  name?: string;
-  // addresses?: Address[]; // Addresses will be a subcollection
+  name?: string | null; // Allow null
+  // Addresses will be a subcollection in Firestore, not directly part of this type.
 }

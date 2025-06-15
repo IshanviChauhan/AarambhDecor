@@ -20,7 +20,7 @@ export const SignInSchema = z.object({
 export type SignInInput = z.infer<typeof SignInSchema>;
 
 export const UserProfileSchema = z.object({
-  name: z.string().min(1, { message: 'Name cannot be empty.' }).max(100, { message: 'Name is too long.' }).optional(),
+  name: z.string().min(1, { message: 'Name cannot be empty.' }).max(100, { message: 'Name is too long.' }).optional().or(z.literal('')),
   // Email is not part of the form for profile update, it's fixed.
 });
 
@@ -28,14 +28,14 @@ export type UserProfileInput = z.infer<typeof UserProfileSchema>;
 
 export const AddressSchema = z.object({
   id: z.string().optional(), // For identifying address to update/delete
-  fullName: z.string().min(1, 'Full name is required.').max(100),
-  addressLine1: z.string().min(1, 'Address line 1 is required.').max(200),
-  addressLine2: z.string().max(200).optional().or(z.literal('')),
-  city: z.string().min(1, 'City is required.').max(100),
-  state: z.string().min(1, 'State/Province is required.').max(100),
-  postalCode: z.string().min(1, 'Postal code is required.').max(20),
-  country: z.string().min(1, 'Country is required.').max(100),
-  phoneNumber: z.string().max(20).optional().or(z.literal('')),
+  fullName: z.string().min(1, 'Full name is required.').max(100, 'Full name is too long.'),
+  addressLine1: z.string().min(1, 'Address line 1 is required.').max(200, 'Address line 1 is too long.'),
+  addressLine2: z.string().max(200, 'Address line 2 is too long.').optional().or(z.literal('')), // Optional, can be empty string
+  city: z.string().min(1, 'City is required.').max(100, 'City name is too long.'),
+  state: z.string().min(1, 'State/Province is required.').max(100, 'State/Province is too long.'),
+  postalCode: z.string().min(1, 'Postal code is required.').max(20, 'Postal code is too long.'),
+  country: z.string().min(1, 'Country is required.').max(100, 'Country name is too long.'),
+  phoneNumber: z.string().max(20, 'Phone number is too long.').optional().or(z.literal('')), // Optional, can be empty string
 });
 
 export type AddressInput = z.infer<typeof AddressSchema>;
