@@ -258,7 +258,7 @@ export default function ProductDetailPage() {
                         src={image.url}
                         alt={`${product.name} - Image ${index + 1}`}
                         data-ai-hint={image.dataAiHint}
-                        // The Lens component's internal img styling will handle w-full h-full object-contain
+                        className="w-full h-full object-contain"
                       />
                     </Lens>
                   </div>
@@ -267,8 +267,8 @@ export default function ProductDetailPage() {
             </CarouselContent>
             {safeImageUrls.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 sm:-left-4 md:-left-10" />
-                <CarouselNext className="right-2 sm:-right-4 md:-right-10" />
+                <CarouselPrevious className="left-2 sm:-left-4 md:-left-10 hover:translate-y-0" />
+                <CarouselNext className="right-2 sm:-right-4 md:-right-10 hover:translate-y-0" />
               </>
             )}
           </Carousel>
