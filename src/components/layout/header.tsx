@@ -12,6 +12,14 @@ import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -124,29 +132,6 @@ export default function Header() {
             </Link>
           </Button>
           
-          {!authLoading && user ? (
-            <>
-              {user.email && (
-                <span className="text-sm text-muted-foreground hidden lg:inline-block mr-2">
-                  {user.email}
-                </span>
-              )}
-              <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
-                <LogOut className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-                Sign Out
-              </Button>
-            </>
-          ) : !authLoading && !user ? (
-            <>
-              <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
-                <Link href="/signin" aria-label="Log In">
-                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-                  Log In
-                </Link>
-              </Button>
-            </>
-          ) : null}
-
           <Button asChild variant="ghost" className="relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
@@ -157,14 +142,50 @@ export default function Header() {
               )}
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="icon">
-            <Link href="/profile" aria-label="User Profile">
-              <UserCircle className="h-5 w-5" />
-            </Link>
-          </Button>
+
+          {!authLoading && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="User menu">
+                  <UserCircle className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">My Account</p>
+                    {user.email && (
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer">
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : !authLoading && !user ? (
+              <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
+                <Link href="/signin" aria-label="Log In">
+                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                  Log In
+                </Link>
+              </Button>
+          ) : null}
+
         </nav>
       </div>
     </header>
   );
 }
-
