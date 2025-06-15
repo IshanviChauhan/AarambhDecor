@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link'; // Added missing import
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/header';
@@ -37,7 +38,7 @@ import {
   deleteShippingAddress,
   type FormState
 } from './actions';
-import { useActionState } from 'react'; 
+import { useActionState } from 'react';
 
 
 function ProfileSubmitButton({ pending, text = "Save Changes" }: { pending: boolean, text?: string }) {
