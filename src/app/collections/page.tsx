@@ -258,7 +258,6 @@ export default function CollectionsPage() {
                     onToggleWishlist={handleToggleWishlist}
                     onAddToCart={handleAddToCart}
                     isProductInCart={isProductInCart(product.id)}
-                    className="w-[300px]"
                   />
                 ))}
               </div>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from './wishlist-icon';
 import { ShoppingCart } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -16,9 +17,10 @@ interface ProductCardProps {
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product) => void;
   isProductInCart?: boolean;
+  className?: string;
 }
 
-export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart }: ProductCardProps) {
+export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart, className: propClassName }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -64,7 +66,11 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   const currentImage = imagesToDisplay[currentImageIndex];
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70 w-[300px]">
+    <Card className={cn(
+      "overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70",
+      "flex-1 min-w-[200px] max-w-[300px]", // Responsive width classes
+      propClassName
+    )}>
       <CardHeader
         className="p-0 relative"
         onMouseEnter={handleMouseEnter}
