@@ -253,7 +253,7 @@ function CollectionsPageContent() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
-        <section className="text-center mb-10 md:mb-12">
+        <section className="text-center mb-10 md:mb-12 animate-fade-in-down">
            <div className="flex items-center justify-center space-x-3 mb-4">
             <Filter className="h-10 w-10 text-primary" />
             <h1 className="text-4xl md:text-5xl font-headline text-primary">
@@ -266,7 +266,7 @@ function CollectionsPageContent() {
         </section>
         
         <div className="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-5 md:gap-8">
-          <aside className="md:col-span-1 xl:col-span-1 mb-8 md:mb-0">
+          <aside className="md:col-span-1 xl:col-span-1 mb-8 md:mb-0 animate-fade-in-down animation-delay-200">
             <Card className="p-4 shadow-md rounded-lg border-border/70 sticky top-24">
               <CardHeader className="p-0 mb-4">
                 <div className="flex items-center space-x-2">
@@ -314,7 +314,7 @@ function CollectionsPageContent() {
             </Card>
           </aside>
 
-          <section id="product-listing" aria-labelledby="product-listing-title" className="md:col-span-3 xl:col-span-4">
+          <section id="product-listing" aria-labelledby="product-listing-title" className="md:col-span-3 xl:col-span-4 animate-fade-in-up animation-delay-400">
             <div className="mb-8">
                 <SearchBar 
                   onSearch={handleCollectionSearch} 

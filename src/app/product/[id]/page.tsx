@@ -231,7 +231,7 @@ export default function ProductDetailPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
-        <div className="mb-6">
+        <div className="mb-6 animate-fade-in-down">
           <Button variant="outline" asChild size="sm">
             <Link href="/collections">
               <ChevronLeft className="mr-2 h-4 w-4" />
@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          <Carousel className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto" opts={{ loop: true }}>
+          <Carousel className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" opts={{ loop: true }}>
             <CarouselContent>
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
@@ -267,7 +267,7 @@ export default function ProductDetailPage() {
             )}
           </Carousel>
 
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
             {product.category && (
               <Badge variant="secondary" className="w-fit text-sm py-1 px-3">{product.category}</Badge>
             )}
@@ -325,7 +325,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <section id="reviews" className="mt-12 md:mt-16">
+        <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
             <MessageCircle className="h-7 w-7 text-primary" />
             <h2 className="text-2xl lg:text-3xl font-headline text-foreground">Customer Reviews</h2>
@@ -333,7 +333,7 @@ export default function ProductDetailPage() {
           {product.reviews && product.reviews.length > 0 ? (
             <div className="space-y-6">
               {product.reviews.map((review, index) => (
-                <Card key={index} className="shadow-md border-border/70">
+                <Card key={index} className="shadow-md border-border/70 animate-pop-in" style={{ animationDelay: `${index * 100}ms` }}>
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                       <CardTitle className="text-lg font-semibold">{review.reviewer}</CardTitle>
@@ -348,7 +348,7 @@ export default function ProductDetailPage() {
               ))}
             </div>
           ) : (
-            <Card className="py-8 px-4 text-center shadow-md border-border/70">
+            <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
               <Info className="h-8 w-8 text-primary mx-auto mb-3" />
               <p className="text-muted-foreground">No reviews yet for this product.</p>
               <p className="text-sm text-muted-foreground/80">Be the first to share your thoughts!</p>
@@ -356,7 +356,7 @@ export default function ProductDetailPage() {
           )}
         </section>
 
-        <section id="add-review" className="mt-12 md:mt-16">
+        <section id="add-review" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-400">
           {user ? (
             <Card className="shadow-lg rounded-lg border-border/70 p-6">
               <CardHeader className="p-0 mb-4">

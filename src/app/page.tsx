@@ -178,7 +178,7 @@ export default function HomePage() {
         <Separator className="my-12 md:my-16 border-border/70" />
 
         <section id="homepage-search" aria-labelledby="homepage-search-title" className="py-8 md:py-12">
-          <div className="flex flex-col items-center justify-center space-y-4 mb-10 md:mb-12">
+          <div className="flex flex-col items-center justify-center space-y-4 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
             <SearchIcon className="h-10 w-10 text-primary" />
             <h2 id="homepage-search-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
               Find Your Perfect Piece
@@ -198,7 +198,7 @@ export default function HomePage() {
         <Separator className="my-12 md:my-16 border-border/70" />
 
         <section id="latest-product-showcase" aria-labelledby="latest-product-showcase-title" className="py-8">
-          <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12">
+          <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
             <Sparkles className="h-10 w-10 text-accent" />
             <h2 id="latest-product-showcase-title" className="text-4xl font-headline text-center text-foreground">
               New Arrivals
@@ -210,7 +210,7 @@ export default function HomePage() {
               <p className="ml-4 text-lg text-muted-foreground">Loading newest treasures...</p>
             </div>
           ) : latestProducts.length > 0 ? (
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+            <div className="flex flex-wrap justify-center gap-6 md:gap-8 animate-fade-in-up animation-delay-400">
               {latestProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -225,7 +225,7 @@ export default function HomePage() {
           ) : (
             <p className="text-center text-muted-foreground text-lg">No new products to display at the moment. Please check back soon!</p>
           )}
-          <div className="text-center mt-12">
+          <div className="text-center mt-12 animate-fade-in-up">
             <Button asChild variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10">
               <Link href="/collections">View All Collections</Link>
             </Button>
@@ -235,12 +235,14 @@ export default function HomePage() {
         <Separator className="my-12 md:my-20 border-border/70" />
 
         <section id="style-suggestions" aria-labelledby="style-suggestions-title" className="py-8">
-           <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12">
+           <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
             <h2 id="style-suggestions-title" className="text-4xl font-headline text-center text-foreground">
               Need Inspiration?
             </h2>
           </div>
-          <StyleSuggester />
+          <div className="animate-fade-in-up animation-delay-400">
+            <StyleSuggester />
+          </div>
         </section>
       </main>
       <Footer />
