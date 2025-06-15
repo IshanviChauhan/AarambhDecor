@@ -46,6 +46,7 @@ export interface UserProfile {
   email: string; // From Firebase Auth
   firstName?: string | null;
   lastName?: string | null;
+  phoneNumber?: string | null;
 }
 
 // --- Order Related Types (for future implementation) ---
@@ -66,3 +67,4 @@ export interface Order {
   shippingAddress: Address;
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
 }
+

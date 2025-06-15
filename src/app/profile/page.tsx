@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info } from 'lucide-react';
+import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile, Address, Order } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
@@ -36,15 +36,14 @@ import {
   addShippingAddress,
   updateShippingAddress,
   deleteShippingAddress,
-  getOrderHistory, // Placeholder for order history
+  getOrderHistory,
   type FormState
 } from './actions';
-// Removed seedProductsToFirestore import, assuming it's handled or not needed on this page permanently
 
-function ProfileSubmitButton({ pending, text = "Save Changes" }: { pending: boolean, text?: string }) {
+function ProfileSubmitButton({ pending, text = "Save Changes", icon }: { pending: boolean, text?: string, icon?: React.ReactNode }) {
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (icon ? <span className="mr-2">{icon}</span> : null)}
       {text}
     </Button>
   );
@@ -57,27 +56,22 @@ export default function ProfilePage() {
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]); // For order history
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
-  const initialProfileFormState: FormState = { message: null, success: false, errors: undefined };
-  const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialProfileFormState);
+  const initialFormState: FormState = { message: null, success: false, errors: undefined };
+  const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialFormState);
   
-  const initialAddressFormState: FormState = { message: null, success: false, errors: undefined };
-  const [currentAddressServerAction, setCurrentAddressServerAction] = useState<'add' | 'update'>('add');
-
-  const addressActionToUse = currentAddressServerAction === 'add' ? addShippingAddress : updateShippingAddress;
-  const [addressFormState, actualAddressFormAction, isAddressFormSubmitting] = useActionState(
-    addressActionToUse, 
-    initialAddressFormState
-  );
+  // Separate action states for add and update address
+  const [addAddressState, addAddressAction, isAddingAddress] = useActionState(addShippingAddress, initialFormState);
+  const [updateAddressState, updateAddressAction, isUpdatingAddress] = useActionState(updateShippingAddress, initialFormState);
   
   const profileForm = useForm<UserProfileInput>({
     resolver: zodResolver(UserProfileSchema),
-    defaultValues: { firstName: '', lastName: '' },
+    defaultValues: { firstName: '', lastName: '', phoneNumber: '' },
   });
 
   const addressForm = useForm<AddressInput>({
@@ -95,13 +89,14 @@ export default function ProfilePage() {
       const [profileData, addressesData, ordersData] = await Promise.all([
         getUserProfile(),
         getShippingAddresses(),
-        getOrderHistory() // Fetch orders
+        getOrderHistory()
       ]);
       
       setUserProfile(profileData);
       profileForm.reset({ 
         firstName: profileData?.firstName || '', 
-        lastName: profileData?.lastName || '' 
+        lastName: profileData?.lastName || '',
+        phoneNumber: profileData?.phoneNumber || '',
       });
 
       setAddresses(addressesData);
@@ -146,36 +141,45 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState]);
 
-
- useEffect(() => {
-    if (addressFormState.message) {
+  const handleAddressFormSuccess = (state: FormState, formType: 'add' | 'update') => {
+     if (state.message) {
       toast({
-        title: addressFormState.success ? 'Success' : 'Error',
-        description: addressFormState.message,
-        variant: addressFormState.success ? 'default' : 'destructive',
+        title: state.success ? 'Success' : 'Error',
+        description: state.message,
+        variant: state.success ? 'default' : 'destructive',
       });
-      if (addressFormState.errors) {
-        Object.entries(addressFormState.errors).forEach(([field, messages]) => {
+      if (state.errors) {
+        Object.entries(state.errors).forEach(([field, messages]) => {
           if (messages && field !== '_form') {
              addressForm.setError(field as keyof AddressInput, { type: 'server', message: messages.join(', ') });
           }
         });
       }
-      if (addressFormState.success) {
+      if (state.success) {
         fetchProfileData();
         setIsAddressModalOpen(false);
+        setEditingAddress(null);
         addressForm.reset({
             fullName: '', addressLine1: '', addressLine2: '', city: '',
             state: '', postalCode: '', country: 'India', phoneNumber: ''
         });
       }
     }
+  }
+
+  useEffect(() => {
+    handleAddressFormSuccess(addAddressState, 'add');
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressFormState]);
+  }, [addAddressState]);
+
+  useEffect(() => {
+    handleAddressFormSuccess(updateAddressState, 'update');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateAddressState]);
+
 
   const handleOpenAddAddressModal = () => {
     setEditingAddress(null);
-    setCurrentAddressServerAction('add');
     addressForm.reset({ 
         fullName: '', addressLine1: '', addressLine2: '', city: '',
         state: '', postalCode: '', country: 'India', phoneNumber: ''
@@ -185,8 +189,7 @@ export default function ProfilePage() {
 
   const handleOpenEditAddressModal = (address: Address) => {
     setEditingAddress(address);
-    setCurrentAddressServerAction('update');
-    addressForm.reset({ ...address }); 
+    addressForm.reset({ ...address, phoneNumber: address.phoneNumber || '' }); 
     setIsAddressModalOpen(true);
   };
 
@@ -209,15 +212,17 @@ export default function ProfilePage() {
   const onAddressFormSubmit: SubmitHandler<AddressInput> = (data) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value !== undefined && value !== null) { // Allow empty string for optional fields
              formData.append(key, String(value));
         }
     });
 
-    if (editingAddress && editingAddress.id && currentAddressServerAction === 'update') {
+    if (editingAddress && editingAddress.id) {
         formData.append('id', editingAddress.id);
+        updateAddressAction(formData);
+    } else {
+        addAddressAction(formData);
     }
-    actualAddressFormAction(formData);
   };
   
   if (authLoading || (isLoadingData && !userProfile && user)) { 
@@ -292,6 +297,19 @@ export default function ProfilePage() {
                       )}
                     />
                   </div>
+                  <FormField
+                      control={profileForm.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number (Optional)</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="e.g. +911234567890" {...field} value={field.value || ''} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                 <div>
                   <Label>Email</Label>
                   <Input type="email" value={userProfile?.email || user.email || ''} disabled className="mt-1 bg-muted/50"/>
@@ -310,7 +328,10 @@ export default function ProfilePage() {
 
         <Card className="mb-8 shadow-lg rounded-lg border-border/70">
           <CardHeader className="flex flex-row justify-between items-center">
-            <CardTitle className="font-headline text-2xl text-primary">Shipping Addresses</CardTitle>
+            <div className="flex items-center space-x-2">
+                <Home className="h-6 w-6 text-primary" />
+                <CardTitle className="font-headline text-2xl text-primary">Shipping Addresses</CardTitle>
+            </div>
             <Dialog open={isAddressModalOpen} onOpenChange={(isOpen) => {
               setIsAddressModalOpen(isOpen);
               if (!isOpen) { 
@@ -326,7 +347,7 @@ export default function ProfilePage() {
                   <PlusCircle className="mr-2 h-4 w-4" /> Add New Address
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
+              <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
                  <Form {...addressForm}>
                     <form 
                         onSubmit={addressForm.handleSubmit(onAddressFormSubmit)}
@@ -363,20 +384,23 @@ export default function ProfilePage() {
                             <FormItem><FormLabel>Postal Code</FormLabel><FormControl><Input placeholder="400001" {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <FormField control={addressForm.control} name="country" render={({ field }) => (
-                            <FormItem><FormLabel>Country</FormLabel><FormControl><Input placeholder="India" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Country</FormLabel><FormControl><Input placeholder="India" {...field} value={field.value || 'India'} /></FormControl><FormMessage /></FormItem>
                         )}/>
                       </div>
                       <FormField control={addressForm.control} name="phoneNumber" render={({ field }) => (
-                        <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="+91 9876543210" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="e.g. +919876543210" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                       )}/>
-                       {addressFormState.errors?._form && (
-                        <p className="text-sm font-medium text-destructive">{addressFormState.errors._form.join(', ')}</p>
+                       {(addAddressState.errors?._form && !editingAddress) && (
+                        <p className="text-sm font-medium text-destructive">{addAddressState.errors._form.join(', ')}</p>
+                       )}
+                       {(updateAddressState.errors?._form && editingAddress) && (
+                        <p className="text-sm font-medium text-destructive">{updateAddressState.errors._form.join(', ')}</p>
                        )}
                       <DialogFooter>
                         <DialogClose asChild>
                             <Button type="button" variant="outline">Cancel</Button>
                         </DialogClose>
-                        <ProfileSubmitButton pending={isAddressFormSubmitting} text={editingAddress ? "Update Address" : "Add Address"} />
+                        <ProfileSubmitButton pending={editingAddress ? isUpdatingAddress : isAddingAddress} text={editingAddress ? "Update Address" : "Add Address"} />
                       </DialogFooter>
                     </form>
                   </Form>
@@ -409,7 +433,7 @@ export default function ProfilePage() {
                         <p className="text-sm text-muted-foreground">{address.country}</p>
                         {address.phoneNumber && <p className="text-sm text-muted-foreground">Phone: {address.phoneNumber}</p>}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-shrink-0">
                         <Button variant="outline" size="icon" onClick={() => handleOpenEditAddressModal(address)}>
                           <Edit3 className="h-4 w-4" />
                            <span className="sr-only">Edit Address</span>
@@ -431,7 +455,10 @@ export default function ProfilePage() {
 
         <Card className="shadow-lg rounded-lg border-border/70">
            <CardHeader>
-            <CardTitle className="font-headline text-2xl text-primary">Order History</CardTitle>
+            <div className="flex items-center space-x-2">
+                <ShoppingBag className="h-6 w-6 text-primary" />
+                <CardTitle className="font-headline text-2xl text-primary">Order History</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingData ? (
@@ -449,26 +476,31 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Placeholder for displaying orders - This will be expanded later */}
                 {orders.map((order) => (
-                  <Card key={order.id} className="p-4 border-border/50 shadow-sm">
-                    <div className="flex justify-between items-start">
-                      <div>
+                  <Card key={order.id} className="p-4 border-border/50 shadow-sm animate-pop-in">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3">
+                      <div className="flex-grow">
                         <p className="font-semibold text-foreground">Order ID: {order.id.substring(0,8)}...</p>
                         <p className="text-sm text-muted-foreground">Date: {new Date(order.orderDate).toLocaleDateString()}</p>
                         <p className="text-sm text-muted-foreground">Total: Rs. {order.totalAmount.toFixed(2)}</p>
                         <p className="text-sm text-muted-foreground">Status: <span className="font-medium">{order.status}</span></p>
+                         <div className="mt-2 text-xs text-muted-foreground">
+                            {order.items.map(item => item.productName).join(', ')}
+                        </div>
                       </div>
-                       <Button variant="outline" size="sm" asChild>
+                       {/* This link will be non-functional until order detail page is created */}
+                       <Button variant="outline" size="sm" asChild disabled> 
                           <Link href={`/profile/orders/${order.id}`}>View Details</Link>
                        </Button>
                     </div>
                   </Card>
                 ))}
-                 <div className="text-center py-6 text-muted-foreground border-t mt-6 pt-6">
-                     <Info className="mx-auto h-8 w-8 mb-3 opacity-50" />
-                    <p>Full order history display is coming soon!</p>
-                 </div>
+                 {orders.length > 0 && (
+                    <div className="text-center py-6 text-muted-foreground border-t mt-6 pt-6">
+                        <Info className="mx-auto h-8 w-8 mb-3 opacity-50" />
+                        <p>Full order details page is coming soon!</p>
+                    </div>
+                 )}
               </div>
             )}
           </CardContent>
@@ -478,3 +510,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

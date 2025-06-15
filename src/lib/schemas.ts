@@ -24,7 +24,9 @@ export type SignInInput = z.infer<typeof SignInSchema>;
 export const UserProfileSchema = z.object({
   firstName: z.string().min(1, { message: 'First name cannot be empty.' }).max(50, { message: 'First name is too long.' }).optional().or(z.literal('')),
   lastName: z.string().min(1, { message: 'Last name cannot be empty.' }).max(50, { message: 'Last name is too long.' }).optional().or(z.literal('')),
-  // Email is not part of the form for profile update, it's fixed.
+  phoneNumber: z.string().max(20, { message: 'Phone number must be 20 characters or less.' })
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" }) // Allows empty or E.164 format
+    .optional().or(z.literal('')),
 });
 
 export type UserProfileInput = z.infer<typeof UserProfileSchema>;
@@ -33,12 +35,15 @@ export const AddressSchema = z.object({
   id: z.string().optional(), // For identifying address to update/delete
   fullName: z.string().min(1, 'Full name is required.').max(100, 'Full name is too long.'),
   addressLine1: z.string().min(1, 'Address line 1 is required.').max(200, 'Address line 1 is too long.'),
-  addressLine2: z.string().max(200, 'Address line 2 is too long.').optional().or(z.literal('')), // Optional, can be empty string
+  addressLine2: z.string().max(200, 'Address line 2 is too long.').optional().or(z.literal('')),
   city: z.string().min(1, 'City is required.').max(100, 'City name is too long.'),
   state: z.string().min(1, 'State/Province is required.').max(100, 'State/Province is too long.'),
   postalCode: z.string().min(1, 'Postal code is required.').max(20, 'Postal code is too long.'),
   country: z.string().min(1, 'Country is required.').max(100, 'Country name is too long.'),
-  phoneNumber: z.string().max(20, 'Phone number is too long.').optional().or(z.literal('')), // Optional, can be empty string
+  phoneNumber: z.string().max(20, 'Phone number must be 20 characters or less.')
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
+    .optional().or(z.literal('')),
 });
 
 export type AddressInput = z.infer<typeof AddressSchema>;
+
