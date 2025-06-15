@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useParams } from 'next/navigation';
 import type { Product, CartItem, Review } from '@/lib/types';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
@@ -10,15 +10,18 @@ import Footer from '@/components/layout/footer';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from '@/components/wishlist-icon';
-import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck } from 'lucide-react';
+import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
-const StarRating = ({ rating }: { rating: number }) => {
+const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center">
       {[...Array(5)].map((_, i) => (
@@ -42,11 +45,18 @@ export default function ProductDetailPage() {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
+  // State for new review form
+  const [newReviewName, setNewReviewName] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(0);
+  const [newReviewComment, setNewReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
   useEffect(() => {
     setIsClient(true);
     if (productId) {
       const foundProduct = MOCK_PRODUCTS.find(p => p.id === productId);
-      setProduct(foundProduct || null);
+      // Deep clone to allow modification of reviews for this session
+      setProduct(foundProduct ? JSON.parse(JSON.stringify(foundProduct)) : null);
       setIsLoading(false);
     }
   }, [productId]);
@@ -96,6 +106,46 @@ export default function ProductDetailPage() {
       return [...prev, { ...p, quantity: 1 }];
     });
     toast({ title: "Added to Cart", description: `${p.name} has been added.` });
+  };
+
+  const handleReviewSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!newReviewName.trim() || newReviewRating === 0 || !newReviewComment.trim()) {
+      toast({
+        title: "Incomplete Review",
+        description: "Please fill in all fields and select a rating.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    const newReview: Review = {
+      reviewer: newReviewName,
+      rating: newReviewRating,
+      comment: newReviewComment,
+      date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
+    };
+
+    // Simulate API call delay
+    setTimeout(() => {
+      setProduct(prevProduct => {
+        if (!prevProduct) return null;
+        const updatedReviews = [...(prevProduct.reviews || []), newReview];
+        return { ...prevProduct, reviews: updatedReviews };
+      });
+
+      // Reset form
+      setNewReviewName('');
+      setNewReviewRating(0);
+      setNewReviewComment('');
+      setIsSubmittingReview(false);
+
+      toast({
+        title: "Review Submitted",
+        description: "Thank you for your feedback! (Note: This review is temporary for this session)",
+      });
+    }, 500);
   };
 
   const isProductInCart = product ? cartItems.some(item => item.id === product.id) : false;
@@ -148,7 +198,6 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Image */}
           <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden shadow-lg border border-border/50">
             <Image
               src={product.imageUrl}
@@ -160,7 +209,6 @@ export default function ProductDetailPage() {
             />
           </div>
 
-          {/* Product Details */}
           <div className="flex flex-col space-y-4">
             {product.category && (
               <Badge variant="secondary" className="w-fit text-sm py-1 px-3">{product.category}</Badge>
@@ -220,19 +268,19 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Reviews Section */}
-        {product.reviews && product.reviews.length > 0 && (
-          <section id="reviews" className="mt-12 md:mt-16">
-            <div className="flex items-center space-x-3 mb-6">
-              <MessageCircle className="h-7 w-7 text-primary" />
-              <h2 className="text-2xl lg:text-3xl font-headline text-foreground">Customer Reviews</h2>
-            </div>
+        <section id="reviews" className="mt-12 md:mt-16">
+          <div className="flex items-center space-x-3 mb-6">
+            <MessageCircle className="h-7 w-7 text-primary" />
+            <h2 className="text-2xl lg:text-3xl font-headline text-foreground">Customer Reviews</h2>
+          </div>
+          {product.reviews && product.reviews.length > 0 ? (
             <div className="space-y-6">
               {product.reviews.map((review, index) => (
                 <Card key={index} className="shadow-md border-border/70">
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                       <CardTitle className="text-lg font-semibold">{review.reviewer}</CardTitle>
-                      <StarRating rating={review.rating} />
+                      <StarRatingDisplay rating={review.rating} />
                     </div>
                      <p className="text-xs text-muted-foreground">{new Date(review.date).toLocaleDateString()}</p>
                   </CardHeader>
@@ -242,19 +290,88 @@ export default function ProductDetailPage() {
                 </Card>
               ))}
             </div>
-          </section>
-        )}
-         {(!product.reviews || product.reviews.length === 0) && (
-          <section id="no-reviews" className="mt-12 md:mt-16 text-center">
-             <Card className="py-8 px-4 inline-block shadow-md border-border/70">
+          ) : (
+            <Card className="py-8 px-4 text-center shadow-md border-border/70">
               <Info className="h-8 w-8 text-primary mx-auto mb-3" />
               <p className="text-muted-foreground">No reviews yet for this product.</p>
               <p className="text-sm text-muted-foreground/80">Be the first to share your thoughts!</p>
             </Card>
-          </section>
-        )}
+          )}
+        </section>
+
+        {/* Add Review Form Section */}
+        <section id="add-review" className="mt-12 md:mt-16">
+           <Card className="shadow-lg rounded-lg border-border/70 p-6">
+            <CardHeader className="p-0 mb-4">
+              <CardTitle className="font-headline text-2xl text-primary">Write a Review</CardTitle>
+              <CardDescription>Share your experience with this product.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <form onSubmit={handleReviewSubmit} className="space-y-6">
+                <div>
+                  <Label htmlFor="reviewerName" className="block text-sm font-medium text-foreground mb-1">Your Name</Label>
+                  <Input
+                    id="reviewerName"
+                    type="text"
+                    value={newReviewName}
+                    onChange={(e) => setNewReviewName(e.target.value)}
+                    placeholder="e.g., Priya S."
+                    required
+                    className="focus:ring-accent focus:border-accent"
+                  />
+                </div>
+                <div>
+                  <Label className="block text-sm font-medium text-foreground mb-2">Your Rating</Label>
+                  <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Button
+                        key={star}
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setNewReviewRating(star)}
+                        className={`h-8 w-8 p-0 ${
+                          star <= newReviewRating ? 'text-yellow-400' : 'text-muted-foreground'
+                        } hover:text-yellow-400`}
+                        aria-label={`Rate ${star} out of 5 stars`}
+                      >
+                        <Star className={`h-6 w-6 ${star <= newReviewRating ? 'fill-yellow-400' : ''}`} />
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="reviewComment" className="block text-sm font-medium text-foreground mb-1">Your Review</Label>
+                  <Textarea
+                    id="reviewComment"
+                    value={newReviewComment}
+                    onChange={(e) => setNewReviewComment(e.target.value)}
+                    placeholder="What did you like or dislike? How did you use this product?"
+                    rows={4}
+                    required
+                    className="focus:ring-accent focus:border-accent"
+                  />
+                </div>
+                <Button type="submit" disabled={isSubmittingReview} className="w-full sm:w-auto">
+                  {isSubmittingReview ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Submit Review
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </section>
       </main>
       <Footer />
     </div>
   );
 }
+
