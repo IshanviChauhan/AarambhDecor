@@ -269,13 +269,17 @@ export default function ProductDetailPage() {
               className={cn(
                 "absolute left-3 top-1/2 -translate-y-1/2 z-10",
                 "h-10 w-10 rounded-full",
-                "bg-background/60 hover:bg-background/90 text-foreground/70 hover:text-foreground",
+                "bg-background/60 text-foreground/70", // Base appearance
+                "hover:bg-background/90 hover:text-foreground", // Custom hover appearance (overrides ghost variant hover)
                 "shadow-md",
                 "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                "transition-all duration-200 ease-in-out",
+                "transition-opacity duration-200 ease-in-out", // Opacity transition for group-hover
+                "transition-transform-none", // Disable transform transitions from base button
                 "flex items-center justify-center",
-                "border-none p-0",
-                "hover:scale-105 hover:translate-y-[-50%] active:scale-100"
+                "border-none p-0", // Override default ghost padding if any
+                // Ensure vertical position is maintained, overriding ghost variant's hover/active transforms
+                "hover:translate-y-[-50%]",
+                "active:translate-y-[-50%]"
               )}
             />
             <CarouselNext 
@@ -283,13 +287,17 @@ export default function ProductDetailPage() {
               className={cn(
                 "absolute right-3 top-1/2 -translate-y-1/2 z-10",
                 "h-10 w-10 rounded-full",
-                "bg-background/60 hover:bg-background/90 text-foreground/70 hover:text-foreground",
+                "bg-background/60 text-foreground/70", // Base appearance
+                "hover:bg-background/90 hover:text-foreground", // Custom hover appearance (overrides ghost variant hover)
                 "shadow-md",
                 "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                "transition-all duration-200 ease-in-out",
+                "transition-opacity duration-200 ease-in-out", // Opacity transition for group-hover
+                "transition-transform-none", // Disable transform transitions from base button
                 "flex items-center justify-center",
-                "border-none p-0",
-                "hover:scale-105 hover:translate-y-[-50%] active:scale-100"
+                "border-none p-0", // Override default ghost padding if any
+                // Ensure vertical position is maintained, overriding ghost variant's hover/active transforms
+                "hover:translate-y-[-50%]",
+                "active:translate-y-[-50%]"
               )}
             />
           </Carousel>
