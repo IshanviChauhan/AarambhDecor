@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useRef, type ChangeEvent } from 'react';
+import { useState, useRef, type ChangeEvent, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { recommendProductsFromImage, type RecommendProductsFromImageInput, type RecommendedProduct } from '@/ai/flows/recommend-products-from-image-flow';
-import { MOCK_PRODUCTS, type Product } from '@/lib/mock-data';
+import type { Product } from '@/lib/types'; // Changed from MOCK_PRODUCTS import
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Wand2, Loader2, FileImage, ImageUp, CheckCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getProducts } from '@/app/products/actions'; // Action to fetch products
 
 interface SimplifiedProductInfo {
   id: string;
@@ -28,8 +29,27 @@ export function ImageBasedProductRecommender() {
   const [recommendations, setRecommendations] = useState<RecommendedProduct[]>([]);
   const [overallFeedback, setOverallFeedback] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    async function fetchInitialProducts() {
+      setIsLoadingProducts(true);
+      try {
+        const productsFromDb = await getProducts();
+        setAvailableProducts(productsFromDb);
+      } catch (error) {
+        console.error("Failed to fetch products for recommender:", error);
+        toast({ title: "Error", description: "Could not load products for AI recommender.", variant: "destructive" });
+        setAvailableProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    }
+    fetchInitialProducts();
+  }, [toast]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -62,15 +82,24 @@ export function ImageBasedProductRecommender() {
       });
       return;
     }
+    if (isLoadingProducts || availableProducts.length === 0) {
+      toast({
+        title: "Products Not Loaded",
+        description: "Product information is still loading or unavailable. Please try again shortly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setRecommendations([]);
     setOverallFeedback(null);
 
     try {
-      const simplifiedProducts: SimplifiedProductInfo[] = MOCK_PRODUCTS.map(p => ({
+      const simplifiedProducts: SimplifiedProductInfo[] = availableProducts.map(p => ({
         id: p.id,
         name: p.name,
-        description: p.description.substring(0, 200) + (p.description.length > 200 ? '...' : ''), // Keep it concise
+        description: p.description.substring(0, 200) + (p.description.length > 200 ? '...' : ''),
         category: p.category,
       }));
 
@@ -111,7 +140,7 @@ export function ImageBasedProductRecommender() {
   };
 
   const getFullProductDetails = (productId: string): Product | undefined => {
-    return MOCK_PRODUCTS.find(p => p.id === productId);
+    return availableProducts.find(p => p.id === productId);
   };
 
   return (
@@ -164,13 +193,19 @@ export function ImageBasedProductRecommender() {
         )}
       </CardContent>
       <CardFooter className="flex flex-col items-stretch">
-        <Button onClick={handleSubmit} disabled={isLoading || !selectedFile} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button onClick={handleSubmit} disabled={isLoading || !selectedFile || isLoadingProducts} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Analyzing Your Space...
             </>
-          ) : (
+          ) : isLoadingProducts ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading Product Data...
+            </>
+          )
+          : (
             <>
               <Wand2 className="mr-2 h-4 w-4" />
               Get Product Recommendations
@@ -197,7 +232,7 @@ export function ImageBasedProductRecommender() {
             {recommendations.map((rec, index) => {
               const product = getFullProductDetails(rec.productId);
               if (!product) return null;
-              const displayImage = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : { url: 'https://placehold.co/300x300.png', dataAiHint: 'placeholder decor' };
+              const displayImage = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : { url: 'https://placehold.co/300x300.png?text=Decor', dataAiHint: 'placeholder decor' };
 
               return (
                 <Card key={index} className="overflow-hidden shadow-md border-border/70 animate-pop-in">

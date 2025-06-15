@@ -18,15 +18,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { parsePrice } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
+import { getProducts } from '@/app/products/actions';
+
 
 const MIN_PRICE_DEFAULT = 0;
-const MAX_PRICE_DEFAULT = 10000;
+const MAX_PRICE_DEFAULT = 10000; // Default max, will be updated from actual products
 
 function CollectionsPageContent() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
@@ -61,27 +62,44 @@ function CollectionsPageContent() {
     if (currentSearchFromUrl !== searchTerm) {
       setSearchTerm(currentSearchFromUrl);
     }
+
+    async function fetchAndSetProducts() {
+      setIsLoadingProducts(true);
+      try {
+        const productsFromDb = await getProducts();
+        setAllProducts(productsFromDb);
+        
+        if (productsFromDb.length > 0) {
+            const prices = productsFromDb.map(p => parsePrice(p.price)).filter(p => p > 0);
+            const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
+            const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
+            setMinProductPrice(minP);
+            setMaxProductPrice(maxP);
+
+            const urlMinPrice = searchParams.get('minPrice');
+            const urlMaxPrice = searchParams.get('maxPrice');
+            setPriceRange([
+                urlMinPrice ? parseInt(urlMinPrice) : minP,
+                urlMaxPrice ? parseInt(urlMaxPrice) : maxP
+            ]);
+        } else {
+             setMinProductPrice(MIN_PRICE_DEFAULT);
+             setMaxProductPrice(MAX_PRICE_DEFAULT);
+             setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
+        setAllProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    }
     
-    const timer = setTimeout(() => {
-      setAllProducts(MOCK_PRODUCTS);
-      
-      const prices = MOCK_PRODUCTS.map(p => parsePrice(p.price)).filter(p => p > 0);
-      const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
-      const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
-      setMinProductPrice(minP);
-      setMaxProductPrice(maxP);
-
-      const urlMinPrice = searchParams.get('minPrice');
-      const urlMaxPrice = searchParams.get('maxPrice');
-      setPriceRange([
-        urlMinPrice ? parseInt(urlMinPrice) : minP,
-        urlMaxPrice ? parseInt(urlMaxPrice) : maxP
-      ]);
-
-      setIsLoadingProducts(false);
-    }, 1000); 
-    return () => clearTimeout(timer);
-  }, [searchParams]); 
+    fetchAndSetProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]); // Re-fetch if searchParams change (e.g. URL-based filters might imply re-eval of price range)
 
   useEffect(() => {
     if (isLoadingProducts || !isClient) return;
@@ -281,6 +299,7 @@ function CollectionsPageContent() {
                   <Select
                     onValueChange={handleCategoryFilter}
                     value={selectedCategory || searchParams.get('category') || 'All'}
+                    disabled={isLoadingProducts || categories.length <=1}
                   >
                     <SelectTrigger className="w-full text-base">
                       <SelectValue placeholder="Select category" />
@@ -305,6 +324,7 @@ function CollectionsPageContent() {
                     minStepsBetweenThumbs={1}
                     className="my-4"
                     aria-label="Price range slider"
+                    disabled={isLoadingProducts || allProducts.length === 0}
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Rs. {priceRange[0].toLocaleString()}</span>
@@ -371,4 +391,3 @@ export default function CollectionsPage() {
     </Suspense>
   )
 }
-

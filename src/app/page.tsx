@@ -6,19 +6,17 @@ import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
-// import { StyleSuggester } from '@/components/style-suggester'; // Deprecated
-import { ImageBasedProductRecommender } from '@/components/image-based-product-recommender'; // New component
+import { ImageBasedProductRecommender } from '@/components/image-based-product-recommender';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, ImageUp } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
-
+import { getLatestProducts, getProducts } from '@/app/products/actions'; // MOCK_PRODUCTS removed
 
 const LATEST_PRODUCTS_COUNT = 3;
 
@@ -26,6 +24,7 @@ export default function HomePage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
+  const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -35,16 +34,26 @@ export default function HomePage() {
 
   useEffect(() => {
     setIsClient(true); 
-    const timer = setTimeout(() => {
-      const identifiedLatest = MOCK_PRODUCTS.filter(p => p.isLatest);
-      if (identifiedLatest.length > 0) {
-        setLatestProducts(identifiedLatest.slice(0, LATEST_PRODUCTS_COUNT));
-      } else {
-        setLatestProducts(MOCK_PRODUCTS.slice(0, LATEST_PRODUCTS_COUNT));
+    async function fetchInitialProducts() {
+      setIsLoadingProducts(true);
+      try {
+        const [latest, all] = await Promise.all([
+          getLatestProducts(LATEST_PRODUCTS_COUNT),
+          getProducts() // Fetch all products for search category matching
+        ]);
+        setLatestProducts(latest);
+        setAllProductsForSearch(all);
+      } catch (error) {
+        console.error("Failed to fetch products for homepage:", error);
+        toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
+        setLatestProducts([]);
+        setAllProductsForSearch([]);
+      } finally {
+        setIsLoadingProducts(false);
       }
-      setIsLoadingProducts(false);
-    }, 1000);
-    return () => clearTimeout(timer);
+    }
+    fetchInitialProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -160,7 +169,8 @@ export default function HomePage() {
     }
   
     const lowerSearchTerm = trimmedSearchTerm.toLowerCase();
-    const uniqueProductCategories = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category).filter(Boolean) as string[]));
+    // Use allProductsForSearch which is fetched from DB
+    const uniqueProductCategories = Array.from(new Set(allProductsForSearch.map(p => p.category).filter(Boolean) as string[]));
     
     const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
   
@@ -271,4 +281,3 @@ export default function HomePage() {
     </>
   );
 }
-

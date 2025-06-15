@@ -4,7 +4,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { Product, CartItem, Review, ProductImage } from '@/lib/types';
-import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Image from 'next/image';
@@ -29,6 +28,7 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
+import { getProductById } from '@/app/products/actions';
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
@@ -64,11 +64,22 @@ export default function ProductDetailPage() {
   useEffect(() => {
     setIsClient(true);
     if (productId) {
-      const foundProduct = MOCK_PRODUCTS.find(p => p.id === productId);
-      setProduct(foundProduct ? JSON.parse(JSON.stringify(foundProduct)) : null);
-      setIsLoading(false);
+      const fetchProduct = async () => {
+        setIsLoading(true);
+        try {
+          const fetchedProduct = await getProductById(productId);
+          setProduct(fetchedProduct);
+        } catch (error) {
+          console.error("Failed to fetch product:", error);
+          toast({ title: "Error", description: "Could not load product details.", variant: "destructive" });
+          setProduct(null);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchProduct();
     }
-  }, [productId]);
+  }, [productId, toast]);
 
   useEffect(() => {
     if (!isClient) return;
@@ -169,6 +180,7 @@ export default function ProductDetailPage() {
       date: new Date().toISOString().split('T')[0], 
     };
 
+    // TODO: Persist review to Firestore instead of local state
     setTimeout(() => {
       setProduct(prevProduct => {
         if (!prevProduct) return null;
@@ -182,8 +194,8 @@ export default function ProductDetailPage() {
       setIsSubmittingReview(false);
 
       toast({
-        title: "Review Submitted",
-        description: "Thank you for your feedback! (Note: This review is temporary for this session)",
+        title: "Review Submitted (Locally)",
+        description: "Thank you for your feedback! (Note: This review is temporary for this session. Firestore integration pending.)",
       });
     }, 500);
   };
@@ -226,7 +238,7 @@ export default function ProductDetailPage() {
   
   const safeImageUrls = product.imageUrls && product.imageUrls.length > 0 
     ? product.imageUrls 
-    : [{ url: 'https://placehold.co/800x600.png', dataAiHint: 'placeholder image' }];
+    : [{ url: 'https://placehold.co/800x600.png?text=No+Image', dataAiHint: 'placeholder image' }];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -315,6 +327,7 @@ export default function ProductDetailPage() {
               <Button 
                 className="flex-1 h-12 px-8 py-2 rounded-md text-sm font-medium" 
                 onClick={() => handleAddToCart(product)}
+                disabled={!product}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {isProductInCart ? 'Add Another' : 'Add to Cart'}
@@ -323,6 +336,7 @@ export default function ProductDetailPage() {
                 isWishlisted={isProductWishlisted}
                 onClick={() => handleToggleWishlist(product.id)}
                 className="w-full sm:w-auto h-12 px-4 border border-input hover:bg-red-100 dark:hover:bg-red-900/30 text-lg"
+                disabled={!product}
               />
             </div>
 
@@ -347,14 +361,16 @@ export default function ProductDetailPage() {
                   </AccordionContent>
                 </AccordionItem>
               )}
-              <AccordionItem value="care">
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                  <ShieldCheck className="mr-2 h-5 w-5 text-primary" /> Care Instructions
-                </AccordionTrigger>
-                <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
-                  {product.careInstructions}
-                </AccordionContent>
-              </AccordionItem>
+              {product.careInstructions && (
+                <AccordionItem value="care">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                    <ShieldCheck className="mr-2 h-5 w-5 text-primary" /> Care Instructions
+                    </AccordionTrigger>
+                    <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
+                    {product.careInstructions}
+                    </AccordionContent>
+                </AccordionItem>
+              )}
             </Accordion>
           </div>
         </div>
@@ -477,4 +493,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
