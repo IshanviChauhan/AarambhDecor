@@ -36,6 +36,8 @@ export default function SignUpPage() {
   const form = useForm<SignUpInput>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
+      firstName: '',
+      lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -44,19 +46,20 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (formState.errors) {
+      if (formState.errors.firstName) form.setError('firstName', { type: 'server', message: formState.errors.firstName.join(', ') });
+      if (formState.errors.lastName) form.setError('lastName', { type: 'server', message: formState.errors.lastName.join(', ') });
       if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });
       if (formState.errors.password) form.setError('password', { type: 'server', message: formState.errors.password.join(', ') });
       if (formState.errors.confirmPassword) {
           form.setError('confirmPassword', { type: 'server', message: formState.errors.confirmPassword.join(', ') });
       }
-      // Generic _form errors are handled by toast only
     }
 
-    if (formState.message) {
+    if (formState.message && !formState.success) { // Only show error toasts here, success is handled by redirect
       toast({
-        title: formState.success ? 'Success' : 'Error',
+        title: 'Error',
         description: formState.message,
-        variant: formState.success ? 'default' : 'destructive',
+        variant: 'destructive',
       });
     }
   }, [formState, toast, form]);
@@ -84,14 +87,40 @@ export default function SignUpPage() {
       </div>
 
       <div className="flex flex-col items-center justify-center min-h-screen p-2">
-        <Card className="w-full max-w-md shadow-xl mt-24 sm:mt-0"> {/* Added margin top for small screens if logo takes space */}
+        <Card className="w-full max-w-md shadow-xl mt-24 sm:mt-0">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-headline text-primary">Create an Account</CardTitle>
             <CardDescription>Enter your details to get started with Aarambh Decor.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form action={formAction} className="space-y-6">
+              <form action={formAction} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your first name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your last name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="email"

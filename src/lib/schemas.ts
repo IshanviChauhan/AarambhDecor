@@ -2,6 +2,8 @@
 import { z } from 'zod';
 
 export const SignUpSchema = z.object({
+  firstName: z.string().min(1, { message: 'First name is required.' }).max(50, { message: 'First name is too long.' }),
+  lastName: z.string().min(1, { message: 'Last name is required.' }).max(50, { message: 'Last name is too long.' }),
   email: z.string().email({ message: 'Invalid email address.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters long.' }),
   confirmPassword: z.string(),
@@ -20,7 +22,8 @@ export const SignInSchema = z.object({
 export type SignInInput = z.infer<typeof SignInSchema>;
 
 export const UserProfileSchema = z.object({
-  name: z.string().min(1, { message: 'Name cannot be empty.' }).max(100, { message: 'Name is too long.' }).optional().or(z.literal('')),
+  firstName: z.string().min(1, { message: 'First name cannot be empty.' }).max(50, { message: 'First name is too long.' }).optional().or(z.literal('')),
+  lastName: z.string().min(1, { message: 'Last name cannot be empty.' }).max(50, { message: 'Last name is too long.' }).optional().or(z.literal('')),
   // Email is not part of the form for profile update, it's fixed.
 });
 

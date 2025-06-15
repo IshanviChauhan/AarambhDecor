@@ -17,7 +17,7 @@ import type { UserProfile, Address } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, useFormField } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +37,7 @@ import {
   deleteShippingAddress,
   type FormState
 } from './actions';
-import { useActionState } from 'react'; // Correct import for useActionState
+import { useActionState } from 'react'; 
 
 
 function ProfileSubmitButton({ pending, text = "Save Changes" }: { pending: boolean, text?: string }) {
@@ -59,28 +59,24 @@ export default function ProfilePage() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<Address | null>(null); // Determines add/edit mode
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
   const initialProfileFormState: FormState = { message: null, success: false, errors: undefined };
   const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialProfileFormState);
   
   const initialAddressFormState: FormState = { message: null, success: false, errors: undefined };
-  // We use one useActionState for addresses. The actual server action (add/update) will be determined inside onAddressSubmit
-  // and the formAction from useActionState will be called with the appropriate FormData.
-  // This approach is a bit of a hybrid: react-hook-form handles client validation and FormData creation,
-  // then passes it to the action function returned by useActionState.
   const [currentAddressServerAction, setCurrentAddressServerAction] = useState<'add' | 'update'>('add');
 
   const addressActionToUse = currentAddressServerAction === 'add' ? addShippingAddress : updateShippingAddress;
   const [addressFormState, actualAddressFormAction, isAddressFormSubmitting] = useActionState(
-    addressActionToUse, // This is the server action useActionState will wrap
+    addressActionToUse, 
     initialAddressFormState
   );
   
 
   const profileForm = useForm<UserProfileInput>({
     resolver: zodResolver(UserProfileSchema),
-    defaultValues: { name: '' },
+    defaultValues: { firstName: '', lastName: '' },
   });
 
   const addressForm = useForm<AddressInput>({
@@ -97,7 +93,10 @@ export default function ProfilePage() {
     try {
       const profileData = await getUserProfile();
       setUserProfile(profileData);
-      profileForm.reset({ name: profileData?.name || '' });
+      profileForm.reset({ 
+        firstName: profileData?.firstName || '', 
+        lastName: profileData?.lastName || '' 
+      });
 
       const addressesData = await getShippingAddresses();
       setAddresses(addressesData);
@@ -128,7 +127,7 @@ export default function ProfilePage() {
       });
        if (profileFormState.errors) {
         Object.entries(profileFormState.errors).forEach(([field, messages]) => {
-          if (messages && field !== '_form') { // _form errors are for generic messages
+          if (messages && field !== '_form') { 
             profileForm.setError(field as keyof UserProfileInput, { type: 'server', message: messages.join(', ') });
           }
         });
@@ -259,19 +258,34 @@ export default function ProfilePage() {
           <CardContent>
             <Form {...profileForm}>
               <form action={profileFormAction} className="space-y-6">
-                <FormField
-                  control={profileForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Your full name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={profileForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your first name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your last name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 <div>
                   <Label>Email</Label>
                   <Input type="email" value={userProfile?.email || user.email || ''} disabled className="mt-1 bg-muted/50"/>
@@ -321,8 +335,6 @@ export default function ProfilePage() {
                         </DialogDescription>
                       </DialogHeader>
                       
-                      {/* ID is handled in onAddressFormSubmit, not as a hidden field with register directly */}
-
                       <FormField control={addressForm.control} name="fullName" render={({ field }) => (
                         <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Priya Sharma" {...field} /></FormControl><FormMessage /></FormItem>
                       )}/>

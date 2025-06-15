@@ -44,6 +44,6 @@ export interface Address {
 export interface UserProfile {
   uid: string;
   email: string; // From Firebase Auth
-  name?: string | null; // Allow null
-  // Addresses will be a subcollection in Firestore, not directly part of this type.
+  firstName?: string | null;
+  lastName?: string | null;
 }

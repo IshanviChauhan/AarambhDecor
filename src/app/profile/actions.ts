@@ -4,7 +4,7 @@
 import { auth, db } from '@/lib/firebase';
 import { UserProfileSchema, AddressSchema } from '@/lib/schemas';
 import type { UserProfile, Address } from '@/lib/types';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc, query, where, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 export interface FormState {
@@ -15,6 +15,18 @@ export interface FormState {
 }
 
 // --- User Profile Actions ---
+
+export async function createUserProfileDocument(uid: string, email: string, firstName: string, lastName: string): Promise<void> {
+  const profileDocRef = doc(db, 'userProfiles', uid);
+  const newProfileData = {
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+  };
+  await setDoc(profileDocRef, newProfileData, { merge: true }); // merge true in case some other process creates it
+}
+
+
 export async function getUserProfile(): Promise<UserProfile | null> {
   const user = auth.currentUser;
   if (!user) return null;
@@ -24,19 +36,40 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
   if (profileSnap.exists()) {
     const data = profileSnap.data();
-    // Ensure name is correctly set for mock user if it's missing or empty
-    let name = data.name;
-    if (user.email === 'ishanvi.chauhan@gmail.com' && !name) {
-      name = 'Ishanvi Chauhan';
+    let firstName = data.firstName;
+    let lastName = data.lastName;
+
+    if (user.email === 'ishanvi.chauhan@gmail.com') {
+      if (!firstName && !lastName && data.name === 'Ishanvi Chauhan') { // Legacy name field check
+        firstName = 'Ishanvi';
+        lastName = 'Chauhan';
+      } else {
+        firstName = firstName || 'Ishanvi';
+        lastName = lastName || 'Chauhan';
+      }
     }
-    return { uid: user.uid, email: user.email || '', ...data, name } as UserProfile;
+    
+    return { 
+        uid: user.uid, 
+        email: user.email || '', 
+        firstName: firstName || null, 
+        lastName: lastName || null 
+    } as UserProfile;
   } else {
     // Create a basic profile if it doesn't exist
-    let profileName = user.displayName || '';
+    // This case should be less common now with createUserProfileDocument on signup
+    let newFirstName = '';
+    let newLastName = '';
     if (user.email === 'ishanvi.chauhan@gmail.com') {
-      profileName = 'Ishanvi Chauhan';
+      newFirstName = 'Ishanvi';
+      newLastName = 'Chauhan';
+    } else if (user.displayName) {
+        const nameParts = user.displayName.split(' ');
+        newFirstName = nameParts[0] || '';
+        newLastName = nameParts.slice(1).join(' ') || '';
     }
-    const newProfileData = { email: user.email || '', name: profileName };
+    
+    const newProfileData = { email: user.email || '', firstName: newFirstName, lastName: newLastName };
     await setDoc(profileDocRef, newProfileData);
     return { uid: user.uid, ...newProfileData } as UserProfile;
   }
@@ -61,27 +94,33 @@ export async function updateUserProfile(prevState: FormState, formData: FormData
 
   try {
     const profileDocRef = doc(db, 'userProfiles', user.uid);
-    const dataToUpdate: { name?: string; email: string } = { email: user.email || '' }; // Always ensure email is present
+    const dataToUpdate: { email: string; firstName?: string; lastName?: string } = { 
+        email: user.email || '' 
+    };
 
-    let nameToSet = validation.data.name;
-    // Special handling for mock user if name is cleared
-    if (user.email === 'ishanvi.chauhan@gmail.com' && (nameToSet === '' || nameToSet === undefined)) {
-      nameToSet = 'Ishanvi Chauhan';
+    let firstNameToSet = validation.data.firstName;
+    let lastNameToSet = validation.data.lastName;
+
+    if (user.email === 'ishanvi.chauhan@gmail.com') {
+      firstNameToSet = firstNameToSet || 'Ishanvi'; // Default if empty
+      lastNameToSet = lastNameToSet || 'Chauhan';   // Default if empty
     }
     
-    if (nameToSet !== undefined) { // if name is explicitly set (even to empty string, unless mock user)
-        dataToUpdate.name = nameToSet;
-    }
-
+    dataToUpdate.firstName = firstNameToSet;
+    dataToUpdate.lastName = lastNameToSet;
 
     const profileSnap = await getDoc(profileDocRef);
     if (profileSnap.exists()) {
-        if (dataToUpdate.name !== undefined) { // Only update if name is actually changing
-             await updateDoc(profileDocRef, { name: dataToUpdate.name });
-        }
+        await updateDoc(profileDocRef, { 
+            firstName: dataToUpdate.firstName, 
+            lastName: dataToUpdate.lastName 
+        });
     } else {
-        // If profile doesn't exist, create it with the name (or default for mock user)
-        await setDoc(profileDocRef, { email: dataToUpdate.email, name: dataToUpdate.name || (user.email === 'ishanvi.chauhan@gmail.com' ? 'Ishanvi Chauhan' : user.displayName || '') });
+        await setDoc(profileDocRef, { 
+            email: dataToUpdate.email, 
+            firstName: dataToUpdate.firstName, 
+            lastName: dataToUpdate.lastName 
+        });
     }
 
     revalidatePath('/profile');
@@ -130,7 +169,7 @@ export async function addShippingAddress(prevState: FormState, formData: FormDat
     for (const key in addressData) {
         if (Object.prototype.hasOwnProperty.call(addressData, key)) {
             const typedKey = key as keyof typeof addressData;
-            if (addressData[typedKey] !== undefined) { // Ensure only defined values are sent
+            if (addressData[typedKey] !== undefined) { 
                  payload[typedKey] = addressData[typedKey];
             }
         }
@@ -175,7 +214,7 @@ export async function updateShippingAddress(prevState: FormState, formData: Form
     for (const key in addressData) {
         if (Object.prototype.hasOwnProperty.call(addressData, key)) {
             const typedKey = key as keyof typeof addressData;
-             if (addressData[typedKey] !== undefined) { // Ensure only defined values are sent
+             if (addressData[typedKey] !== undefined) { 
                  payload[typedKey] = addressData[typedKey];
             }
         }
