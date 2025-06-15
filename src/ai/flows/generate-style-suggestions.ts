@@ -1,11 +1,10 @@
+
 'use server';
 
 /**
- * @fileOverview AI-powered decor style suggestions based on the showcased products.
- *
- * - generateStyleSuggestions - A function that generates decor style suggestions.
- * - GenerateStyleSuggestionsInput - The input type for the generateStyleSuggestions function.
- * - GenerateStyleSuggestionsOutput - The return type for the generateStyleSuggestions function.
+ * @fileOverview This file is deprecated and no longer used.
+ * The AI style suggestion functionality has been replaced by an image-based product recommender.
+ * See recommend-products-from-image-flow.ts for the new implementation.
  */
 
 import {ai} from '@/ai/genkit';
@@ -34,18 +33,17 @@ export type GenerateStyleSuggestionsOutput = z.infer<
 export async function generateStyleSuggestions(
   input: GenerateStyleSuggestionsInput
 ): Promise<GenerateStyleSuggestionsOutput> {
-  return generateStyleSuggestionsFlow(input);
+  // This flow is deprecated.
+  // Consider removing calls to this function or updating them to the new flow.
+  console.warn("generateStyleSuggestionsFlow is deprecated and should not be used.");
+  return { styleSuggestions: "This feature is no longer available. Please use the image-based product recommender." };
 }
 
 const prompt = ai.definePrompt({
   name: 'generateStyleSuggestionsPrompt',
   input: {schema: GenerateStyleSuggestionsInputSchema},
   output: {schema: GenerateStyleSuggestionsOutputSchema},
-  prompt: `You are an interior design expert specializing in Aarambh Decor products.
-
-You will provide decor style suggestions based on the showcased products.
-
-Product Details: {{{productDetails}}}`,
+  prompt: `This prompt is deprecated.`,
 });
 
 const generateStyleSuggestionsFlow = ai.defineFlow(
@@ -55,7 +53,8 @@ const generateStyleSuggestionsFlow = ai.defineFlow(
     outputSchema: GenerateStyleSuggestionsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    // const {output} = await prompt(input);
+    // return output!;
+    return { styleSuggestions: "This feature is no longer available." };
   }
 );

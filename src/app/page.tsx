@@ -6,10 +6,11 @@ import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
-import { StyleSuggester } from '@/components/style-suggester';
+// import { StyleSuggester } from '@/components/style-suggester'; // Deprecated
+import { ImageBasedProductRecommender } from '@/components/image-based-product-recommender'; // New component
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react';
+import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, ImageUp } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
@@ -237,14 +238,15 @@ export default function HomePage() {
 
           <Separator className="my-12 md:my-20 border-border/70" />
 
-          <section id="style-suggestions" aria-labelledby="style-suggestions-title" className="py-8">
+          <section id="ai-decor-advisor" aria-labelledby="ai-decor-advisor-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
-              <h2 id="style-suggestions-title" className="text-4xl font-headline text-center text-foreground">
-                Need Inspiration?
+              <ImageUp className="h-10 w-10 text-primary" />
+              <h2 id="ai-decor-advisor-title" className="text-4xl font-headline text-center text-foreground">
+                Need Inspiration? Try Our AI Advisor!
               </h2>
             </div>
             <div className="animate-fade-in-up animation-delay-400">
-              <StyleSuggester />
+              <ImageBasedProductRecommender />
             </div>
           </section>
         </main>

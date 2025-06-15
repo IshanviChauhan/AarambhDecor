@@ -1,7 +1,10 @@
+// This component is deprecated and has been replaced by ImageBasedProductRecommender.tsx
+// You can safely delete this file: src/components/style-suggester.tsx
+
 'use client';
 
 import { useState } from 'react';
-import { generateStyleSuggestions, type GenerateStyleSuggestionsInput } from '@/ai/flows/generate-style-suggestions';
+// import { generateStyleSuggestions, type GenerateStyleSuggestionsInput } from '@/ai/flows/generate-style-suggestions'; // Deprecated flow
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,30 +19,11 @@ export function StyleSuggester() {
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    if (!productDetails.trim()) {
-      toast({
-        title: "Input Required",
-        description: "Please describe the products or your style preferences.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsLoading(true);
-    setSuggestions('');
-    try {
-      const input: GenerateStyleSuggestionsInput = { productDetails };
-      const result = await generateStyleSuggestions(input);
-      setSuggestions(result.styleSuggestions);
-    } catch (error) {
-      console.error('Error generating style suggestions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate style suggestions. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    toast({
+      title: "Feature Updated",
+      description: "This AI Style Advisor has been upgraded! Please use the new Image-Based Recommender.",
+      variant: "default",
+    });
   };
 
   return (
@@ -47,46 +31,28 @@ export function StyleSuggester() {
       <CardHeader>
         <div className="flex items-center space-x-3">
           <Wand2 className="h-8 w-8 text-primary" />
-          <CardTitle className="font-headline text-2xl">AI Style Advisor</CardTitle>
+          <CardTitle className="font-headline text-2xl">AI Style Advisor (Updated)</CardTitle>
         </div>
         <CardDescription className="pt-2">
-          Describe the Aarambh Decor products you're interested in, or your general decor preferences, and let our AI provide personalized style suggestions.
+          This feature has been updated. Try our new Image-Based Product Recommender to get suggestions by uploading a photo of your space!
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Textarea
-          placeholder="e.g., 'I love the Intricate Mandala Wall Art and the Bohemian Tasseled Mirror. I'm looking for a warm, eclectic style for my living room.'"
+          placeholder="e.g., 'I love the Intricate Mandala Wall Art and the Bohemian Tasseled Mirror...'"
           value={productDetails}
           onChange={(e) => setProductDetails(e.target.value)}
-          rows={5}
+          rows={3}
           className="focus:ring-accent focus:border-accent"
-          aria-label="Product details or style preferences for AI suggestions"
+          aria-label="Product details or style preferences for AI suggestions (Feature Updated)"
+          readOnly
         />
       </CardContent>
       <CardFooter className="flex flex-col items-stretch">
-        <Button onClick={handleSubmit} disabled={isLoading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Wand2 className="mr-2 h-4 w-4" />
-              Get Style Suggestions
-            </>
-          )}
+        <Button onClick={handleSubmit} disabled={true} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Wand2 className="mr-2 h-4 w-4" />
+          Get Style Suggestions (Feature Updated)
         </Button>
-        
-        {suggestions && !isLoading && (
-          <Alert className="mt-6 text-left bg-secondary/50 border-secondary">
-            <Wand2 className="h-5 w-5 text-primary" />
-            <AlertTitle className="font-headline text-lg text-primary">Your Style Suggestions</AlertTitle>
-            <AlertDescription className="mt-2 whitespace-pre-wrap font-body text-foreground">
-              {suggestions}
-            </AlertDescription>
-          </Alert>
-        )}
       </CardFooter>
     </Card>
   );
