@@ -159,7 +159,7 @@ export default function Header() {
             </>
           ) : null}
 
-          <Button asChild variant="ghost" className="text-foreground hover:text-primary relative" size="icon">
+          <Button asChild variant="ghost" className="text-foreground relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
               {isClient && user && cartItemCount > 0 && (
