@@ -17,7 +17,10 @@ const firebaseConfig = {
 if (typeof window !== 'undefined') { // Ensure this only runs on the client
   console.log("Firebase config being used by client-side SDK:", firebaseConfig);
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.error("Firebase API Key or Project ID is missing. Check your .env file and ensure it's loaded correctly for the client (NEXT_PUBLIC_ prefix).");
+    console.error("CRITICAL: Firebase API Key or Project ID is missing. Check your .env file and ensure it's loaded correctly for the client (NEXT_PUBLIC_ prefix).");
+  }
+  if (firebaseConfig.storageBucket && !firebaseConfig.storageBucket.endsWith('.appspot.com')) {
+    console.warn(`POTENTIAL CONFIG ISSUE: Your NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET value is "${firebaseConfig.storageBucket}". It typically should end with ".appspot.com" (e.g., "${firebaseConfig.projectId || 'your-project-id'}.appspot.com"). Please verify this in your .env file and Firebase project settings.`);
   }
 }
 
