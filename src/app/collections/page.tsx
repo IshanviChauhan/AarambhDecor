@@ -44,6 +44,7 @@ function CollectionsPageContent() {
   const [maxProductPrice, setMaxProductPrice] = useState(MAX_PRICE_DEFAULT);
   const [priceRange, setPriceRange] = useState<[number, number]>([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
   
+  // Initialize searchTerm from URL, but allow SearchBar to control its input value directly
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
 
   const { toast } = useToast();
@@ -57,9 +58,11 @@ function CollectionsPageContent() {
   
   useEffect(() => {
     setIsClient(true);
-    const currentSearch = searchParams.get('search') || '';
-    if (currentSearch !== searchTerm) {
-        setSearchTerm(currentSearch);
+    const currentSearchFromUrl = searchParams.get('search') || '';
+    if (currentSearchFromUrl !== searchTerm) {
+      // This keeps searchTerm in sync if URL changes externally (e.g. browser back/forward)
+      // SearchBar's initialValue will also pick this up.
+      setSearchTerm(currentSearchFromUrl);
     }
     
     const timer = setTimeout(() => {
@@ -70,12 +73,18 @@ function CollectionsPageContent() {
       const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
       setMinProductPrice(minP);
       setMaxProductPrice(maxP);
-      setPriceRange([minP, maxP]);
+      // Set initial price range from URL if present, otherwise default
+      const urlMinPrice = searchParams.get('minPrice');
+      const urlMaxPrice = searchParams.get('maxPrice');
+      setPriceRange([
+        urlMinPrice ? parseInt(urlMinPrice) : minP,
+        urlMaxPrice ? parseInt(urlMaxPrice) : maxP
+      ]);
 
       setIsLoadingProducts(false);
     }, 500); 
     return () => clearTimeout(timer);
-  }, [searchParams]);
+  }, [searchParams]); // Only re-run if searchParams object itself changes
 
   useEffect(() => {
     if (isLoadingProducts || !isClient) return;
@@ -91,6 +100,7 @@ function CollectionsPageContent() {
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
+        // If invalid category in URL, remove it
         const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
         currentParams.delete('category');
         router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
@@ -139,6 +149,7 @@ function CollectionsPageContent() {
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
   }, [cartItems, isClient, user]);
 
+  // This useEffect is responsible for filtering products based on state (searchTerm, selectedCategory, priceRange)
   useEffect(() => {
     let products = allProducts;
 
@@ -159,7 +170,6 @@ function CollectionsPageContent() {
         (p.category && p.category.toLowerCase().includes(lowerSearchTerm))
       );
     }
-
     setFilteredProducts(products);
   }, [selectedCategory, allProducts, priceRange, searchTerm]);
 
@@ -216,8 +226,10 @@ function CollectionsPageContent() {
 
   const handleCategoryFilter = (categoryValue: string) => {
     const newSelectedCategory = categoryValue === 'All' ? null : categoryValue;
-    setSelectedCategory(newSelectedCategory);
-  
+    // setSelectedCategory is not strictly needed here if URL drives the state,
+    // but can be useful for immediate optimistic UI updates if desired.
+    // For now, let's rely on the URL change to trigger the filter update via useEffect.
+
     const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
     if (newSelectedCategory) {
       currentParams.set('category', newSelectedCategory);
@@ -228,36 +240,26 @@ function CollectionsPageContent() {
   };
 
   const handlePriceChange = (newRange: [number, number]) => {
-    setPriceRange(newRange);
-  };
-
-  const handleCollectionSearch = (term: string) => {
-    setSearchTerm(term);
-    const currentParams = new URLSearchParams(Array.from(searchParams.entries())); 
-    if (term.trim()) {
-      currentParams.set('search', term.trim());
-    } else {
-      currentParams.delete('search');
-    }
+    // setPriceRange(newRange); // Optimistic update
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+    currentParams.set('minPrice', newRange[0].toString());
+    currentParams.set('maxPrice', newRange[1].toString());
     router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };
 
-  const fetchCollectionSuggestions = useCallback(async (query: string): Promise<string[]> => {
-    if (!query.trim() || allProducts.length === 0) return [];
-    const lowerQuery = query.toLowerCase();
+  // This function is called by SearchBar as user types (debounced)
+  const handleCollectionSearch = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm); // Update local state for filtering
     
-    const nameSuggestions = allProducts
-      .filter(product => product.name.toLowerCase().includes(lowerQuery))
-      .map(product => product.name);
-
-    // Could also add description suggestions if desired, but might be too noisy
-    // const descriptionSuggestions = allProducts
-    //   .filter(product => product.description.toLowerCase().includes(lowerQuery))
-    //   .map(product => `${product.name} (match in description)`); 
-      
-    const combined = Array.from(new Set([...nameSuggestions]));
-    return combined.slice(0, 7); // Limit suggestions
-  }, [allProducts]);
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries())); 
+    if (newSearchTerm.trim()) {
+      currentParams.set('search', newSearchTerm.trim());
+    } else {
+      currentParams.delete('search');
+    }
+    // Update URL without full page reload, useEffect for filtering will pick this up
+    router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
+  };
 
 
   return (
@@ -290,7 +292,7 @@ function CollectionsPageContent() {
                   <h3 className="text-md font-semibold mb-2 text-foreground">Category</h3>
                   <Select
                     onValueChange={handleCategoryFilter}
-                    value={selectedCategory || 'All'}
+                    value={selectedCategory || searchParams.get('category') || 'All'}
                   >
                     <SelectTrigger className="w-full text-base">
                       <SelectValue placeholder="Select category" />
@@ -307,8 +309,8 @@ function CollectionsPageContent() {
                 <div>
                   <h3 className="text-md font-semibold mb-2 text-foreground">Price Range</h3>
                   <Slider
-                    value={priceRange}
-                    onValueChange={handlePriceChange}
+                    value={priceRange} // Controlled by state which is synced with URL
+                    onValueChange={handlePriceChange} // This will update URL
                     min={minProductPrice}
                     max={maxProductPrice}
                     step={50}
@@ -329,9 +331,9 @@ function CollectionsPageContent() {
             <div className="mb-8">
                 <SearchBar 
                   onSearch={handleCollectionSearch} 
-                  fetchSuggestionsCallback={fetchCollectionSuggestions}
                   placeholder="Search products in this collection..."
-                  initialValue={searchTerm}
+                  initialValue={searchTerm} // Sync SearchBar's input with page's searchTerm state
+                  debounceDelay={300} // Debounce for live filtering
                 />
             </div>
             {isLoadingProducts && !allProducts.length ? (
@@ -357,8 +359,8 @@ function CollectionsPageContent() {
                  <Search className="h-12 w-12 text-primary mx-auto mb-4 opacity-70" />
                 <p className="font-semibold text-xl mb-2">No Products Found</p>
                 <p>
-                {(searchTerm || selectedCategory) ? 
-                  `Your filters for "${searchTerm || ''}${searchTerm && selectedCategory ? ' in ' : ''}${selectedCategory || ''}" did not match any products.`
+                {(searchTerm || selectedCategory || searchParams.get('minPrice') || searchParams.get('maxPrice')) ? 
+                  `Your filters did not match any products.`
                   : "There are no products in this collection yet."
                 }
                 </p>

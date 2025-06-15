@@ -135,8 +135,13 @@ export default function HomePage() {
     const trimmedSearchTerm = searchTerm.trim();
     
     if (!trimmedSearchTerm) {
-      // If search term is empty (e.g., after clearing), do not navigate.
-      // User stays on the homepage.
+      // If search term is empty (e.g., after clearing from SearchBar, or debounced empty),
+      // we check if the current page is already collections and has a search query.
+      // If so, navigate back to plain collections or homepage. For now, just don't navigate.
+      // If the user is on the homepage and clears the search, they should stay on the homepage.
+      if (window.location.pathname.includes('/collections') && window.location.search.includes('search=')) {
+        router.push('/collections'); // Go to base collections page if clearing search from collections
+      }
       return;
     }
   
@@ -145,29 +150,14 @@ export default function HomePage() {
     
     const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
   
+    // Navigate to collections page with the search term.
+    // The collections page will handle displaying the filtered results.
     if (matchedCategory) {
       router.push(`/collections?category=${encodeURIComponent(matchedCategory)}&search=${encodeURIComponent(trimmedSearchTerm)}`);
     } else {
       router.push(`/collections?search=${encodeURIComponent(trimmedSearchTerm)}`);
     }
   };
-
-  const fetchHomepageSuggestions = useCallback(async (query: string): Promise<string[]> => {
-    if (!query.trim()) return [];
-    const lowerQuery = query.toLowerCase();
-    
-    const productSuggestions = MOCK_PRODUCTS
-      .filter(product => product.name.toLowerCase().includes(lowerQuery))
-      .map(product => product.name);
-
-    const categorySuggestions = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category).filter(Boolean) as string[]))
-      .filter(category => category.toLowerCase().includes(lowerQuery))
-      .map(category => `${category} (Category)`);
-      
-    const combined = Array.from(new Set([...productSuggestions, ...categorySuggestions]));
-    return combined.slice(0, 7); 
-  }, []);
-
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -203,9 +193,9 @@ export default function HomePage() {
             </p>
             <SearchBar 
               onSearch={handleHomepageSearch} 
-              fetchSuggestionsCallback={fetchHomepageSuggestions}
               placeholder="Search products or categories..."
               className="mt-4"
+              debounceDelay={500} 
             />
           </div>
         </section>
