@@ -45,7 +45,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         clearInterval(intervalRef.current);
       }
     };
-  }, [isHovering, imagesToDisplay]);
+  }, [isHovering, imagesToDisplay.length]); // Updated dependency: imagesToDisplay.length
 
   const handleMouseEnter = () => {
     if (imagesToDisplay.length > 1) {
@@ -56,40 +56,53 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   const handleMouseLeave = () => {
     if (imagesToDisplay.length > 1) {
       setIsHovering(false);
-      setCurrentImageIndex(0); // Reset to the first image on mouse leave
+      setCurrentImageIndex(0); 
       if (intervalRef.current) {
-        clearInterval(intervalRef.current); // Ensure interval is cleared immediately
+        clearInterval(intervalRef.current); 
       }
     }
   };
 
-  const currentImage = imagesToDisplay[currentImageIndex];
-
   return (
     <Card className={cn(
       "overflow-hidden shadow-lg flex flex-col rounded-lg border-border/70",
-      "flex-1 min-w-[200px] max-w-[300px]",
+      "flex-1 min-w-[200px] max-w-[300px]", // Adjusted for potentially better flex behavior
       "transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl",
       "animate-pop-in", 
       propClassName
     )}>
       <CardHeader
-        className="p-0 relative"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        className="p-0 relative" // Keep relative for WishlistIcon positioning
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
-          <Image
-            key={currentImage.url} // Add key for smooth transitions
-            src={currentImage.url}
-            alt={product.name}
-            width={600}
-            height={400}
-            className="object-cover w-full h-64"
-            data-ai-hint={currentImage.dataAiHint}
-          />
+          <div 
+            className="relative w-full h-64 overflow-hidden" // Container for sliding images
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div
+              className="flex h-full transition-transform duration-500 ease-in-out"
+              style={{ 
+                width: `${imagesToDisplay.length * 100}%`, // Ensure filmstrip is wide enough
+                transform: `translateX(-${(currentImageIndex / imagesToDisplay.length) * 100}%)` 
+              }}
+            >
+              {imagesToDisplay.map((image, index) => (
+                <div key={index} className="w-full h-full flex-shrink-0 relative" style={{ width: `${100 / imagesToDisplay.length}%`}}> {/* Each image container */}
+                  <Image
+                    src={image.url}
+                    alt={`${product.name} image ${index + 1}`}
+                    layout="fill"
+                    objectFit="cover"
+                    className="w-full h-full" // Ensure image fills its container
+                    data-ai-hint={image.dataAiHint}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </Link>
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 right-2 z-10"> {/* Ensure wishlist icon is above images */}
           <WishlistIcon
             isWishlisted={isWishlisted}
             onClick={() => onToggleWishlist(product.id)}
@@ -98,7 +111,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         </div>
       </CardHeader>
       <CardContent className="p-4 flex flex-col flex-grow min-w-0">
-        <div> {/* Wrapper for title and description */}
+        <div> 
           <CardTitle className="font-headline text-xl mb-2 leading-tight break-words">
             <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
               {product.name}
