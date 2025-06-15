@@ -15,7 +15,7 @@ export const MOCK_PRODUCTS: Product[] = [
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'art closeup' },
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'art detail' },
     ],
-    price: '₹1850',
+    price: 'Rs. 1850',
     category: 'Wall Art',
     isLatest: true,
     sizeAndDimensions: 'Set of 3: 16 inches, 12 inches, & 8 inches',
@@ -35,7 +35,7 @@ export const MOCK_PRODUCTS: Product[] = [
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'decor lifestyle' },
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'decor hanging' },
     ],
-    price: '₹1299',
+    price: 'Rs. 1299',
     category: 'Wall Art',
     isLatest: true,
     sizeAndDimensions: 'Set of 3: 9 inches each',
@@ -55,7 +55,7 @@ export const MOCK_PRODUCTS: Product[] = [
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'rose detail' },
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'leaf accent' },
     ],
-    price: '₹1299',
+    price: 'Rs. 1299',
     category: 'Wall Art',
     isLatest: true,
     sizeAndDimensions: '32 inches x 0.5 inches x 8 inches',
@@ -75,7 +75,7 @@ export const MOCK_PRODUCTS: Product[] = [
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'flower set' },
       { url: 'https://placehold.co/600x400.png', dataAiHint: 'modern design' },
     ],
-    price: '₹1450',
+    price: 'Rs. 1450',
     category: 'Wall Art',
     isLatest: true,
     sizeAndDimensions: 'Set of 3: 12 inches, 10 inches, and 8 inches',
@@ -83,5 +83,3 @@ export const MOCK_PRODUCTS: Product[] = [
     reviews: [],
   },
 ];
-
-    

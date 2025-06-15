@@ -234,8 +234,8 @@ export default function CollectionsPage() {
                     aria-label="Price range slider"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>₹{priceRange[0].toLocaleString()}</span>
-                    <span>₹{priceRange[1].toLocaleString()}</span>
+                    <span>Rs. {priceRange[0].toLocaleString()}</span>
+                    <span>Rs. {priceRange[1].toLocaleString()}</span>
                   </div>
                 </div>
               </CardContent>
@@ -273,4 +273,3 @@ export default function CollectionsPage() {
     </div>
   );
 }
-

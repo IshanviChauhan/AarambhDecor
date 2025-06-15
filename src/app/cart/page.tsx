@@ -146,12 +146,12 @@ export default function CartPage() {
               {cartItems.map((item) => (
                 <Card key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-md rounded-lg border-border/70">
                   <Image
-                    src={item.imageUrl}
+                    src={item.imageUrls[0].url}
                     alt={item.name}
                     width={120}
                     height={120}
                     className="object-cover rounded-md w-full sm:w-32 sm:h-32"
-                    data-ai-hint={item.dataAiHint}
+                    data-ai-hint={item.imageUrls[0].dataAiHint}
                   />
                   <div className="flex-grow">
                     <CardTitle className="font-headline text-lg mb-1">{item.name}</CardTitle>
@@ -170,7 +170,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex flex-col items-end sm:ml-auto mt-2 sm:mt-0">
                      <p className="text-lg font-semibold text-primary mb-2 sm:mb-4">
-                       ₹{(parsePrice(item.price) * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                       Rs. {(parsePrice(item.price) * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                      </p>
                     <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive/80" onClick={() => handleRemoveFromCart(item.id)}>
                       <Trash2 className="mr-1 h-4 w-4" /> Remove
@@ -188,7 +188,7 @@ export default function CartPage() {
                 <CardContent className="p-0 space-y-3">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Subtotal</span>
-                    <span>₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span>Rs. {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Shipping</span>
@@ -197,7 +197,7 @@ export default function CartPage() {
                   <Separator className="my-3" />
                   <div className="flex justify-between font-bold text-xl text-foreground">
                     <span>Total</span>
-                    <span>₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span>Rs. {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 </CardContent>
                 <CardFooter className="p-0 mt-6">
