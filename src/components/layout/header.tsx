@@ -10,7 +10,7 @@ import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -26,6 +26,7 @@ export default function Header() {
   const [isClient, setIsClient] = useState(false);
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -68,7 +69,6 @@ export default function Header() {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
         } else if (!user && event.key && event.key.startsWith('aarambhCart_')) {
-            // This handles cases where user logs out on another tab
             calculateTotalItems();
         }
     };
@@ -97,6 +97,17 @@ export default function Header() {
       console.error("Error signing out: ", error);
       toast({ title: "Sign Out Error", description: "Failed to sign out. Please try again.", variant: "destructive" });
     }
+  };
+
+  const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === '/') {
+      e.preventDefault(); 
+      const section = document.getElementById('ai-decor-advisor');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    // If not on homepage, Link component's default behavior will navigate and scroll
   };
 
   return (
@@ -134,11 +145,11 @@ export default function Header() {
           </Button>
           
           <Button asChild variant="ghost">
-            <Link href="/#ai-advisor" aria-label="AI Advisor">
-              <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> 
+            <Link href="/#ai-decor-advisor" onClick={handleAiAdvisorClick} aria-label="AI Advisor">
+              <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
               AI Advisor
             </Link>
-          </Button> 
+          </Button>
          
 
           {!authLoading && user ? (
@@ -181,7 +192,6 @@ export default function Header() {
                 </Link>
               </Button>
           ) : (
-             // Placeholder for loading state to maintain layout consistency
              <div className="w-10 h-10"></div> 
           )}
 
@@ -200,3 +210,4 @@ export default function Header() {
     </header>
   );
 }
+
