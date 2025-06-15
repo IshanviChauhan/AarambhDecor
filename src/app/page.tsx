@@ -133,8 +133,10 @@ export default function HomePage() {
 
   const handleHomepageSearch = (searchTerm: string) => {
     const trimmedSearchTerm = searchTerm.trim();
+    
     if (!trimmedSearchTerm) {
-      router.push('/collections');
+      // If search term is empty (e.g., after clearing), do not navigate.
+      // User stays on the homepage.
       return;
     }
   
@@ -162,9 +164,8 @@ export default function HomePage() {
       .filter(category => category.toLowerCase().includes(lowerQuery))
       .map(category => `${category} (Category)`);
       
-    // Combine and limit suggestions
     const combined = Array.from(new Set([...productSuggestions, ...categorySuggestions]));
-    return combined.slice(0, 7); // Limit to 7 suggestions
+    return combined.slice(0, 7); 
   }, []);
 
 

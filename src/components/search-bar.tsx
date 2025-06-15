@@ -26,7 +26,7 @@ export function SearchBar({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1); // For keyboard navigation
+  const [activeIndex, setActiveIndex] = useState(-1); 
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +46,7 @@ export function SearchBar({
       const fetchedSuggestions = await fetchSuggestionsCallback(query);
       setSuggestions(fetchedSuggestions);
       setIsSuggestionsVisible(fetchedSuggestions.length > 0);
-      setActiveIndex(-1); // Reset active index
+      setActiveIndex(-1); 
     } catch (error) {
       console.error("Error fetching suggestions:", error);
       setSuggestions([]);
@@ -69,7 +69,7 @@ export function SearchBar({
 
     debounceTimeoutRef.current = setTimeout(() => {
       handleFetchSuggestions(inputValue);
-    }, 300); // 300ms debounce
+    }, 300); 
 
     return () => {
       if (debounceTimeoutRef.current) {
@@ -81,6 +81,9 @@ export function SearchBar({
   const handleSubmit = (event?: FormEvent<HTMLFormElement>, term?: string) => {
     event?.preventDefault();
     const searchTermToSubmit = term || inputValue;
+    // We only call onSearch if there's a term to submit.
+    // If searchTermToSubmit is empty, onSearch won't be called from here.
+    // The parent (e.g., homepage) handles what to do if onSearch receives an empty string from clear button.
     if (searchTermToSubmit.trim()) {
       onSearch(searchTermToSubmit.trim());
     }
@@ -94,14 +97,14 @@ export function SearchBar({
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
     setIsSuggestionsVisible(false);
-    onSearch(suggestion);
+    onSearch(suggestion); 
   };
 
   const handleClearSearch = () => {
     setInputValue('');
     setSuggestions([]);
     setIsSuggestionsVisible(false);
-    onSearch(''); // Notify parent that search is cleared
+    onSearch(''); 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -118,7 +121,7 @@ export function SearchBar({
       if (activeIndex >= 0 && activeIndex < suggestions.length) {
         handleSuggestionClick(suggestions[activeIndex]);
       } else {
-        handleSubmit(undefined, inputValue); // Submit current input value if no suggestion selected
+        handleSubmit(undefined, inputValue); 
       }
     } else if (e.key === 'Escape') {
       setIsSuggestionsVisible(false);
@@ -151,32 +154,33 @@ export function SearchBar({
               if (inputValue.trim() && suggestions.length > 0) {
                  setIsSuggestionsVisible(true);
               } else if (inputValue.trim()) {
-                // If input has value but no suggestions yet, try fetching
                 handleFetchSuggestions(inputValue);
               }
             }}
             onKeyDown={handleKeyDown}
-            className="pr-16" // Increased padding for clear and loading icon
+            className="pr-16" 
             aria-autocomplete="list"
             aria-expanded={isSuggestionsVisible}
             aria-controls="search-suggestions-list"
           />
-          {isLoadingSuggestions && (
-             <Loader2 className="absolute right-9 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground animate-spin" />
-          )}
-          {inputValue && !isLoadingSuggestions && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="absolute right-8 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
-              tabIndex={-1}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
+          <div className="absolute right-8 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center">
+            {isLoadingSuggestions && (
+              <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
+            )}
+            {inputValue && !isLoadingSuggestions && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon" // This prop might be redundant with explicit h/w
+                className="h-full w-full p-0 text-muted-foreground hover:text-foreground flex items-center justify-center"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+                tabIndex={-1}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
         <Button type="submit" aria-label="Search" variant="default">
           <Search className="h-5 w-5" />
