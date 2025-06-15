@@ -64,7 +64,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   const currentImage = imagesToDisplay[currentImageIndex];
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70">
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70 max-w-sm mx-auto w-full">
       <CardHeader
         className="p-0 relative"
         onMouseEnter={handleMouseEnter}
