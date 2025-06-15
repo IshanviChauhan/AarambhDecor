@@ -262,8 +262,8 @@ export default function ProductDetailPage() {
             </CarouselContent>
             {safeImageUrls.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 hover:translate-y-0" />
-                <CarouselNext className="right-2 hover:translate-y-0" />
+                <CarouselPrevious className="left-2 transition-none transform-none hover:transform-none" />
+                <CarouselNext className="right-2 transition-none transform-none hover:transform-none" />
               </>
             )}
           </Carousel>
