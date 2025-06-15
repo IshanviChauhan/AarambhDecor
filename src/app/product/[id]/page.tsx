@@ -249,7 +249,7 @@ export default function ProductDetailPage() {
             <CarouselContent>
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden shadow-lg bg-card">
+                  <div className="relative aspect-square md:aspect-[1/1] rounded-lg overflow-hidden shadow-lg bg-card">
                     <Image
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
@@ -267,7 +267,7 @@ export default function ProductDetailPage() {
              <CarouselPrevious
                 variant="ghost"
                 className={cn(
-                  "absolute left-3 top-1/2 -translate-y-1/2 z-10",
+                  "absolute left-2 top-1/2  z-10",
                   "h-10 w-10 rounded-full",
                   "bg-background/70 text-foreground/70",
                   "hover:bg-background/90 hover:text-primary",
@@ -283,7 +283,7 @@ export default function ProductDetailPage() {
               <CarouselNext
                 variant="ghost"
                 className={cn(
-                  "absolute right-3 top-1/2 -translate-y-1/2 z-10",
+                  "absolute right-2 top-1/2  z-10",
                   "h-10 w-10 rounded-full",
                   "bg-background/70 text-foreground/70",
                   "hover:bg-background/90 hover:text-primary",
