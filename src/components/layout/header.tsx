@@ -89,7 +89,7 @@ export default function Header() {
         localStorage.removeItem(`aarambhWishlist_${user.uid}`);
       }
       await signOut(auth);
-      window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
+      window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Update cart count in header
       router.push('/');
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
     } catch (error) {
@@ -131,17 +131,15 @@ export default function Header() {
               Collections
             </Link>
           </Button>
-
-          <Button asChild variant="ghost" className="relative" size="icon">
-            <Link href="/cart" aria-label="View Cart">
-              <ShoppingCart className="h-5 w-5" />
-              {isClient && user && cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-primary-foreground transform translate-x-1/2 -translate-y-1/2 bg-primary rounded-full min-w-[1.25rem] h-5">
-                  {cartItemCount}
-                </span>
-              )}
+          
+          {/* AI Advisor link can be added here if needed, e.g.
+          <Button asChild variant="ghost">
+            <Link href="/ai-advisor-page" aria-label="AI Advisor">
+              <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> 
+              AI Advisor
             </Link>
-          </Button>
+          </Button> 
+          */}
 
           {!authLoading && user ? (
             <DropdownMenu>
@@ -182,8 +180,21 @@ export default function Header() {
                   Log In
                 </Link>
               </Button>
-          ) : null} {/* This null is for the authLoading case where we show neither */}
+          ) : (
+             // Placeholder for loading state to maintain layout consistency if needed
+             <div className="w-10 h-10"></div> // Adjust size to match button/icon
+          )}
 
+          <Button asChild variant="ghost" className="relative" size="icon">
+            <Link href="/cart" aria-label="View Cart">
+              <ShoppingCart className="h-5 w-5" />
+              {isClient && user && cartItemCount > 0 && (
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-primary-foreground transform translate-x-1/2 -translate-y-1/2 bg-primary rounded-full min-w-[1.25rem] h-5">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+          </Button>
         </nav>
       </div>
     </header>
