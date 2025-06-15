@@ -2,7 +2,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom'; // Changed useFormStatus import back to react-dom
+import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignInSchema, type SignInInput } from '@/lib/schemas';
@@ -43,21 +43,29 @@ export default function SignInPage() {
   });
   
   useEffect(() => {
-    if (formState.message) {
-      toast({
-        title: formState.success ? 'Success' : 'Error',
-        description: formState.message,
-        variant: formState.success ? 'default' : 'destructive',
-      });
-    }
-    if (formState.success) {
-      // Redirect is handled by server action
-    }
-     if (formState.errors) {
+    let inlineErrorMessage: string | null = null;
+
+    if (formState.errors) {
       if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });
       if (formState.errors.password) form.setError('password', { type: 'server', message: formState.errors.password.join(', ') });
-      if (formState.errors._form) form.setError('root.serverError', { type: 'custom', message: formState.errors._form.join(', ')});
+      if (formState.errors._form) {
+        inlineErrorMessage = formState.errors._form.join(', ');
+        form.setError('root.serverError', { type: 'custom', message: inlineErrorMessage });
+      }
     }
+
+    if (formState.message) {
+      // If there's an inline error message and it's the same as the toast message, don't show the toast for the error.
+      // Always show success toasts.
+      if (formState.success || (!formState.success && formState.message !== inlineErrorMessage)) {
+        toast({
+          title: formState.success ? 'Success' : 'Error',
+          description: formState.message,
+          variant: formState.success ? 'default' : 'destructive',
+        });
+      }
+    }
+    // Redirect is handled by server action, so no client-side redirect needed here on formState.success
   }, [formState, toast, form, router]);
 
   return (
@@ -99,9 +107,13 @@ export default function SignInPage() {
               {form.formState.errors.root?.serverError && (
                 <p className="text-sm font-medium text-destructive">{form.formState.errors.root.serverError.message}</p>
               )}
-              {formState.errors?._form && (
+              {/* This explicit check for formState.errors._form is redundant if form.setError('root.serverError') is used correctly above.
+                  However, keeping it doesn't hurt and ensures the message is shown if form.setError somehow wasn't effective.
+                  But it's one of the sources of duplication if not handled. The logic above should handle it.
+              */}
+              {/* {formState.errors?._form && !form.formState.errors.root?.serverError && (
                 <p className="text-sm font-medium text-destructive">{formState.errors._form.join(', ')}</p>
-              )}
+              )} */}
               <SubmitButton />
             </form>
           </Form>
