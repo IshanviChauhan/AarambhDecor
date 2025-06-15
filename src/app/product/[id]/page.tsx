@@ -256,7 +256,7 @@ export default function ProductDetailPage() {
                       fill 
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                       style={{ objectFit: 'contain' }} 
-                      className="w-full h-full"
+                      className="w-full h-full rounded-lg"
                       data-ai-hint={image.dataAiHint}
                       priority={index === 0} 
                     />
@@ -264,40 +264,38 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious 
-              variant="ghost"
-              className={cn(
-                "absolute left-3 top-1/2 -translate-y-1/2 z-10",
-                "h-10 w-10 rounded-full",
-                "bg-background/60 text-foreground/70", 
-                "hover:bg-background/90 hover:text-foreground", 
-                "shadow-md",
-                "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                "transition-opacity duration-200 ease-in-out", 
-                "transition-transform-none", 
-                "flex items-center justify-center",
-                "border-none p-0", 
-                "hover:translate-y-[-50%]",
-                "active:translate-y-[-50%]"
-              )}
-            />
-            <CarouselNext 
-              variant="ghost"
-              className={cn(
-                "absolute right-3 top-1/2 -translate-y-1/2 z-10",
-                "h-10 w-10 rounded-full",
-                "bg-background/60 text-foreground/70", 
-                "hover:bg-background/90 hover:text-foreground", 
-                "shadow-md",
-                "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                "transition-opacity duration-200 ease-in-out", 
-                "transition-transform-none", 
-                "flex items-center justify-center",
-                "border-none p-0", 
-                "hover:translate-y-[-50%]",
-                "active:translate-y-[-50%]"
-              )}
-            />
+             <CarouselPrevious
+                variant="ghost"
+                className={cn(
+                  "absolute left-3 top-1/2 -translate-y-1/2 z-10",
+                  "h-10 w-10 rounded-full",
+                  "bg-background/70 text-foreground/70",
+                  "hover:bg-background/90 hover:text-primary",
+                  "shadow-md",
+                  "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                  "transition-opacity duration-200 ease-in-out",
+                  "flex items-center justify-center",
+                  "border-none p-0",
+                  "transition-transform-none",
+                  "hover:translate-y-[-50%] active:translate-y-[-50%]" 
+                )}
+              />
+              <CarouselNext
+                variant="ghost"
+                className={cn(
+                  "absolute right-3 top-1/2 -translate-y-1/2 z-10",
+                  "h-10 w-10 rounded-full",
+                  "bg-background/70 text-foreground/70",
+                  "hover:bg-background/90 hover:text-primary",
+                  "shadow-md",
+                  "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                  "transition-opacity duration-200 ease-in-out",
+                  "flex items-center justify-center",
+                  "border-none p-0",
+                  "transition-transform-none",
+                  "hover:translate-y-[-50%] active:translate-y-[-50%]"
+                )}
+              />
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
