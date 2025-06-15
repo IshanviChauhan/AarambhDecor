@@ -65,7 +65,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
 
   return (
     <Card className={cn(
-      "shadow-lg flex flex-col rounded-lg border-border/70 overflow-visible", // Changed overflow-hidden to overflow-visible
+      "shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden", // Reverted to overflow-hidden
       "flex-1 min-w-[200px] max-w-[300px]",
       "transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl",
       "animate-pop-in",
@@ -76,7 +76,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <div
-            className="relative w-full h-[13.5rem] rounded-t-lg" // Removed overflow-hidden
+            className="relative w-full h-[13.5rem] rounded-t-lg" // This container remains overflow-visible by default
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -94,7 +94,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
                     alt={`${product.name} image ${index + 1}`}
                     layout="fill"
                     objectFit="cover"
-                    className="w-full h-full rounded-lg object-top" // Added object-top
+                    className="w-full h-full rounded-lg object-top" // object-top remains
                     data-ai-hint={image.dataAiHint}
                   />
                 </div>
