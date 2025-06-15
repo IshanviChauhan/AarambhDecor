@@ -25,8 +25,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  // CarouselPrevious, // Removed
-  // CarouselNext, // Removed
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 
@@ -243,7 +243,7 @@ export default function ProductDetailPage() {
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           <Carousel 
-            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" 
+            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200 group" 
             opts={{ loop: safeImageUrls.length > 1 }}
           >
             <CarouselContent>
@@ -264,7 +264,34 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {/* CarouselPrevious and CarouselNext removed */}
+            <CarouselPrevious 
+              variant="ghost"
+              className={cn(
+                "absolute left-3 top-1/2 -translate-y-1/2 z-10",
+                "h-10 w-10 rounded-full",
+                "bg-background/60 hover:bg-background/90 text-foreground/70 hover:text-foreground",
+                "shadow-md",
+                "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                "transition-all duration-200 ease-in-out",
+                "flex items-center justify-center",
+                "border-none p-0",
+                "hover:scale-105 hover:translate-y-[-50%] active:scale-100"
+              )}
+            />
+            <CarouselNext 
+              variant="ghost"
+              className={cn(
+                "absolute right-3 top-1/2 -translate-y-1/2 z-10",
+                "h-10 w-10 rounded-full",
+                "bg-background/60 hover:bg-background/90 text-foreground/70 hover:text-foreground",
+                "shadow-md",
+                "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                "transition-all duration-200 ease-in-out",
+                "flex items-center justify-center",
+                "border-none p-0",
+                "hover:scale-105 hover:translate-y-[-50%] active:scale-100"
+              )}
+            />
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
@@ -446,3 +473,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+
