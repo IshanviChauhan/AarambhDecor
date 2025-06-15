@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ExternalLink, LayoutGrid, Home, ShoppingCart } from 'lucide-react';
+import { LayoutGrid, Home, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Header() {
@@ -27,17 +27,6 @@ export default function Header() {
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
             </Link>
-          </Button>
-          <Button asChild variant="outline" className="text-accent-foreground border-accent hover:bg-accent/10">
-            <a 
-              href="https://www.aarambhdecor.com" // Replace with actual URL
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Visit the main Aarambh Decor store (opens in a new tab)"
-            >
-              Visit Aarambh Decor
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
           </Button>
         </nav>
       </div>
