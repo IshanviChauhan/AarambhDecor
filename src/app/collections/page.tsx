@@ -10,6 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Loader2, LayoutGrid } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const NEW_IMAGE_URL = 'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
@@ -193,8 +200,8 @@ export default function CollectionsPage() {
     return cartItems.some(item => item.id === productId);
   };
 
-  const handleCategoryFilter = (category: string | null) => {
-    setSelectedCategory(category === 'All' ? null : category);
+  const handleCategoryFilter = (categoryValue: string) => {
+    setSelectedCategory(categoryValue === 'All' ? null : categoryValue);
   };
 
   return (
@@ -213,19 +220,22 @@ export default function CollectionsPage() {
           </p>
         </section>
 
-        <section id="category-filters" className="mb-8 md:mb-10">
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category || (category === 'All' && !selectedCategory) ? 'default' : 'outline'}
-                onClick={() => handleCategoryFilter(category)}
-                className="rounded-full px-4 py-2 text-sm md:text-base"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+        <section id="category-filters" className="mb-8 md:mb-10 flex justify-center">
+          <Select
+            onValueChange={handleCategoryFilter}
+            defaultValue={selectedCategory || 'All'}
+          >
+            <SelectTrigger className="w-full max-w-xs text-base">
+              <SelectValue placeholder="Filter by category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category} className="text-base">
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </section>
         
         <Separator className="my-8 md:my-10" />
@@ -260,3 +270,4 @@ export default function CollectionsPage() {
     </div>
   );
 }
+
