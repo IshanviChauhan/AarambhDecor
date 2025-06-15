@@ -35,25 +35,34 @@ function CollectionsPageContent() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [minProductPrice, setMinProductPrice] = useState(MIN_PRICE_DEFAULT);
   const [maxProductPrice, setMaxProductPrice] = useState(MAX_PRICE_DEFAULT);
   const [priceRange, setPriceRange] = useState<[number, number]>([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
   
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
 
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
+    return ['All', ...Array.from(uniqueCategories).sort()];
+  }, [allProducts]);
+  
   useEffect(() => {
     setIsClient(true);
-    const initialSearchTerm = searchParams.get('search') || '';
-    setSearchTerm(initialSearchTerm);
-
+    // Set searchTerm from URL on initial load or if URL changes directly
+    const currentSearch = searchParams.get('search') || '';
+    if (currentSearch !== searchTerm) {
+        setSearchTerm(currentSearch);
+    }
+    
     const timer = setTimeout(() => {
       setAllProducts(MOCK_PRODUCTS);
       
@@ -67,7 +76,38 @@ function CollectionsPageContent() {
       setIsLoadingProducts(false);
     }, 500); 
     return () => clearTimeout(timer);
-  }, [searchParams]);
+  }, [searchParams]); // Rerun if searchParams change
+
+  // Effect to synchronize selectedCategory with URL, and validate it
+  useEffect(() => {
+    if (isLoadingProducts || !isClient) return; // Wait for products to load, so `categories` list is accurate
+
+    const categoryFromUrl = searchParams.get('category');
+
+    if (categoryFromUrl) {
+      if (categories.includes(categoryFromUrl)) {
+        // Valid category from URL
+        if (categoryFromUrl !== selectedCategory) { 
+            setSelectedCategory(categoryFromUrl);
+        }
+      } else {
+        // Category in URL is invalid
+        if (selectedCategory !== null) { 
+            setSelectedCategory(null); 
+        }
+        // Clean up the URL
+        const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+        currentParams.delete('category');
+        router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
+      }
+    } else {
+      // No category in URL
+      if (selectedCategory !== null) { 
+          setSelectedCategory(null); 
+      }
+    }
+  }, [searchParams, categories, isLoadingProducts, selectedCategory, router, pathname, isClient]);
+
 
   useEffect(() => {
     if (!isClient) return;
@@ -104,11 +144,6 @@ function CollectionsPageContent() {
     localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
   }, [cartItems, isClient, user]);
-
-  const categories = useMemo(() => {
-    const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
-    return ['All', ...Array.from(uniqueCategories).sort()];
-  }, [allProducts]);
 
   useEffect(() => {
     let products = allProducts;
@@ -186,7 +221,16 @@ function CollectionsPageContent() {
   };
 
   const handleCategoryFilter = (categoryValue: string) => {
-    setSelectedCategory(categoryValue === 'All' ? null : categoryValue);
+    const newSelectedCategory = categoryValue === 'All' ? null : categoryValue;
+    setSelectedCategory(newSelectedCategory);
+  
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+    if (newSelectedCategory) {
+      currentParams.set('category', newSelectedCategory);
+    } else {
+      currentParams.delete('category');
+    }
+    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };
 
   const handlePriceChange = (newRange: [number, number]) => {
@@ -195,13 +239,13 @@ function CollectionsPageContent() {
 
   const handleCollectionSearch = (term: string) => {
     setSearchTerm(term);
-    const currentParams = new URLSearchParams(Array.from(searchParams.entries())); // Preserve existing params
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries())); 
     if (term.trim()) {
       currentParams.set('search', term.trim());
     } else {
       currentParams.delete('search');
     }
-    router.push(`${pathname}?${currentParams.toString()}`);
+    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };
 
 
@@ -235,7 +279,7 @@ function CollectionsPageContent() {
                   <h3 className="text-md font-semibold mb-2 text-foreground">Category</h3>
                   <Select
                     onValueChange={handleCategoryFilter}
-                    defaultValue={selectedCategory || 'All'}
+                    value={selectedCategory || 'All'} // Controlled component
                   >
                     <SelectTrigger className="w-full text-base">
                       <SelectValue placeholder="Select category" />
@@ -278,7 +322,7 @@ function CollectionsPageContent() {
                   initialValue={searchTerm}
                 />
             </div>
-            {isLoadingProducts ? (
+            {isLoadingProducts && !allProducts.length ? ( // Show loader only if products are truly not yet available
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
@@ -301,9 +345,12 @@ function CollectionsPageContent() {
                  <Search className="h-12 w-12 text-primary mx-auto mb-4 opacity-70" />
                 <p className="font-semibold text-xl mb-2">No Products Found</p>
                 <p>
-                Your search for "{searchTerm}" did not match any products. 
-                Try adjusting your search or filters.
+                {(searchTerm || selectedCategory) ? 
+                  `Your filters for "${searchTerm || ''}${searchTerm && selectedCategory ? ' in ' : ''}${selectedCategory || ''}" did not match any products.`
+                  : "There are no products in this collection yet."
+                }
                 </p>
+                <p>Try adjusting your search or filters, or check back later!</p>
               </div>
             )}
           </section>
@@ -317,7 +364,7 @@ function CollectionsPageContent() {
 
 export default function CollectionsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}> {/* Suspense for useSearchParams */}
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen"><Loader2 className="h-12 w-12 text-primary animate-spin" /><p className="ml-4 text-lg">Loading...</p></div>}> {/* Suspense for useSearchParams */}
       <CollectionsPageContent />
     </Suspense>
   )

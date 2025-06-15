@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -9,14 +9,14 @@ import { ProductCard } from '@/components/product-card';
 import { StyleSuggester } from '@/components/style-suggester';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react'; // Added SearchIcon
+import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
-import { SearchBar } from '@/components/search-bar'; // Import SearchBar
+import { SearchBar } from '@/components/search-bar';
 
 
 const LATEST_PRODUCTS_COUNT = 3;
@@ -38,7 +38,6 @@ export default function HomePage() {
       if (identifiedLatest.length > 0) {
         setLatestProducts(identifiedLatest.slice(0, LATEST_PRODUCTS_COUNT));
       } else {
-        // Fallback if no products are marked as latest
         setLatestProducts(MOCK_PRODUCTS.slice(0, LATEST_PRODUCTS_COUNT));
       }
       setIsLoadingProducts(false);
@@ -66,7 +65,6 @@ export default function HomePage() {
         }
       }
     } else {
-      // Clear local cart/wishlist if user logs out or is not logged in
       setWishlist(new Set());
       setCartItems([]);
     }
@@ -135,10 +133,24 @@ export default function HomePage() {
   };
 
   const handleHomepageSearch = (searchTerm: string) => {
-    if (searchTerm.trim()) {
-      router.push(`/collections?search=${encodeURIComponent(searchTerm.trim())}`);
-    } else {
+    const trimmedSearchTerm = searchTerm.trim();
+    if (!trimmedSearchTerm) {
       router.push('/collections');
+      return;
+    }
+  
+    const lowerSearchTerm = trimmedSearchTerm.toLowerCase();
+    // MOCK_PRODUCTS is directly available in the module scope.
+    const uniqueProductCategories = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category).filter(Boolean) as string[]));
+    
+    const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
+  
+    if (matchedCategory) {
+      // It's a category search
+      router.push(`/collections?category=${encodeURIComponent(matchedCategory)}&search=${encodeURIComponent(trimmedSearchTerm)}`);
+    } else {
+      // It's a general product/text search
+      router.push(`/collections?search=${encodeURIComponent(trimmedSearchTerm)}`);
     }
   };
 
