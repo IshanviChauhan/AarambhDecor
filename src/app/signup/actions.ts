@@ -43,7 +43,8 @@ export async function signUpWithEmail(prevState: SignUpFormState, formData: Form
     if (error.code === 'auth/email-already-in-use') {
       return { message: 'This email is already in use. Please try another one.', success: false, errors: { _form: ['This email is already in use.'], email: ['This email is already in use.'] } };
     }
-    console.error('Firebase SignUp Authentication Error:', error);
+    // Enhanced error logging
+    console.error('Firebase SignUp Authentication Error (Full):', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return { message: 'An unexpected error occurred during sign up (authentication phase). Please try again.', success: false, errors: { _form: ['An unexpected error occurred during authentication.'] } };
   }
   
@@ -51,23 +52,18 @@ export async function signUpWithEmail(prevState: SignUpFormState, formData: Form
     try {
       await createUserProfileDocument(user.uid, user.email || email, firstName, lastName);
     } catch (profileError: any) {
-        console.error('Error creating user profile document in Firestore:', profileError);
+        console.error('Error creating user profile document in Firestore (Full):', JSON.stringify(profileError, Object.getOwnPropertyNames(profileError)));
         // If profile creation fails, return an error. This is a critical step.
         return { 
             message: 'Your account was created, but we failed to save your profile information. Please contact support or try completing your profile later.', 
-            success: false, // Mark as overall failure for now as profile is essential
+            success: false, 
             errors: { _form: ['Failed to save profile information to database.'] } 
         };
     }
   } else {
-    // This case should ideally not be reached if createUserWithEmailAndPassword succeeded
-    // but user is somehow null.
     return { message: 'User authentication succeeded but user object is not available. Please try again.', success: false, errors: { _form: ['User data not available after authentication.'] } };
   }
 
-  // If both auth and profile creation succeed
   redirect('/');
-  // Unreachable due to redirect, but good practice for type consistency if redirect was conditional
-  // return { message: 'Sign up successful! Redirecting...', success: true };
 }
 
