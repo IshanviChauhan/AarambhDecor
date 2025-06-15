@@ -19,12 +19,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     console.log("AuthProvider: useEffect triggered. Setting up onAuthStateChanged listener.");
-    // It's often more insightful to see auth.currentUser *inside* the listener's first call,
-    // or just rely on what the listener itself provides.
-    // console.log("AuthProvider: Initial auth.currentUser before listener setup:", auth.currentUser ? auth.currentUser.uid : 'null');
+    // Log initial state of auth.currentUser before listener setup
+    const initialCurrentUser = auth.currentUser;
+    console.log(`AuthProvider: Initial auth.currentUser before listener setup: ${initialCurrentUser ? initialCurrentUser.uid : 'null'}`);
 
     const unsubscribe = onAuthStateChanged(auth, (currentUserFromListener) => {
       console.log("AuthProvider: --- onAuthStateChanged LISTENER FIRED ---");
+      // Log what the listener itself provides
       if (currentUserFromListener) {
         console.log(`AuthProvider: Listener reported - USER DETECTED. UID: ${currentUserFromListener.uid}, Email: ${currentUserFromListener.email}`);
         setUser(currentUserFromListener);
@@ -32,6 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log("AuthProvider: Listener reported - USER IS NULL.");
         setUser(null);
       }
+
+      // Also log auth.currentUser at the moment the listener fires, for comparison
+      const directCheckCurrentUser = auth.currentUser;
+      console.log(`AuthProvider: auth.currentUser at time of listener firing: ${directCheckCurrentUser ? directCheckCurrentUser.uid : 'null'}`);
+      
       setLoading(false);
       console.log(`AuthProvider: Listener finished. State updated: loading=${false}, user=${currentUserFromListener ? currentUserFromListener.uid : 'null'}`);
     }, (error) => {
@@ -48,7 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []); // Empty dependency array: runs once on mount, cleans up on unmount
 
   if (loading) {
-    // This log is fine for when the component is initially mounting and waiting for the first auth state.
     console.log("AuthProvider: Component rendering - IN LOADING STATE.");
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-background">
@@ -62,7 +67,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  // This log will show the state with which the children are being rendered.
   console.log(`AuthProvider: Component rendering - NOT loading. Current User state from AuthProvider: ${user ? user.uid : 'null'}`);
   return (
     <AuthContext.Provider value={{ user, loading }}>
@@ -78,3 +82,4 @@ export function useAuth() {
   }
   return context;
 }
+
