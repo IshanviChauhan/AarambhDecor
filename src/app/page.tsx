@@ -154,22 +154,7 @@ export default function HomePage() {
           </Button>
         </section>
 
-        <section className="py-12 md:py-16 bg-secondary/30 rounded-lg shadow-inner">
-          <div className="container mx-auto px-4 text-center">
-            <Image
-              src="/aarambh-decor-brand-image-new.png"
-              alt="Aarambh Decor - Inspiring Home Styles"
-              width={800}
-              height={800}
-              className="mx-auto rounded-lg shadow-xl mb-6 object-contain"
-              data-ai-hint="decor arrangement"
-              priority
-            />
-             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              At Aarambh, every piece is thoughtfully selected to bring beauty, warmth, and personality to your home.
-            </p>
-          </div>
-        </section>
+        {/* Brand Image Section Removed */}
 
         <Separator className="my-12 md:my-20 border-border/70" />
 
