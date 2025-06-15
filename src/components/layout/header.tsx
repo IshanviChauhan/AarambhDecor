@@ -134,7 +134,7 @@ export default function Header() {
           </Button>
           
           <Button asChild variant="ghost">
-            <Link href="/ai-advisor" aria-label="AI Advisor">
+            <Link href="/#ai-advisor" aria-label="AI Advisor">
               <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> 
               AI Advisor
             </Link>
