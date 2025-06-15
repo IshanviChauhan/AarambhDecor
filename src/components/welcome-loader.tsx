@@ -28,16 +28,20 @@ export default function WelcomeLoader() {
       }, 3000); // Show for 3 seconds
 
       return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false); // Already shown, ensure it's not visible
     }
   }, [isMounted]);
 
-  if (!isVisible) {
+  if (!isMounted || !isVisible) { // Do not render if not mounted or not supposed to be visible
     return null;
   }
 
   return (
-    <div className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-background animate-fade-in-down">
-      <div className="text-center p-4">
+    // This outer div is the fixed overlay. It is immediately opaque.
+    <div className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-background">
+      {/* This inner div contains the animated content */}
+      <div className="text-center p-4 animate-fade-in-down">
         <Image
           src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
           alt="Aarambh Decor Logo"

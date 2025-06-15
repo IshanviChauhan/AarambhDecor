@@ -32,7 +32,7 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    setIsClient(true); // This ensures WelcomeLoader (which uses localStorage) is only rendered client-side
+    setIsClient(true); 
     const timer = setTimeout(() => {
       const identifiedLatest = MOCK_PRODUCTS.filter(p => p.isLatest);
       if (identifiedLatest.length > 0) {
