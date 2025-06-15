@@ -29,6 +29,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Lens } from '@/components/magicui/lens';
+import { cn } from '@/lib/utils';
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
