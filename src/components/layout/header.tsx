@@ -68,6 +68,7 @@ export default function Header() {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
         } else if (!user && event.key && event.key.startsWith('aarambhCart_')) {
+            // This handles cases where user logs out on another tab
             calculateTotalItems();
         }
     };
@@ -89,7 +90,7 @@ export default function Header() {
         localStorage.removeItem(`aarambhWishlist_${user.uid}`);
       }
       await signOut(auth);
-      window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Update cart count in header
+      window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); 
       router.push('/');
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
     } catch (error) {
@@ -132,9 +133,9 @@ export default function Header() {
             </Link>
           </Button>
           
-          {/* AI Advisor link can be added here if needed, e.g.
+          {/* Placeholder for AI Advisor link if needed:
           <Button asChild variant="ghost">
-            <Link href="/ai-advisor-page" aria-label="AI Advisor">
+            <Link href="/ai-advisor" aria-label="AI Advisor">
               <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> 
               AI Advisor
             </Link>
@@ -181,8 +182,8 @@ export default function Header() {
                 </Link>
               </Button>
           ) : (
-             // Placeholder for loading state to maintain layout consistency if needed
-             <div className="w-10 h-10"></div> // Adjust size to match button/icon
+             // Placeholder for loading state to maintain layout consistency
+             <div className="w-10 h-10"></div> 
           )}
 
           <Button asChild variant="ghost" className="relative" size="icon">
