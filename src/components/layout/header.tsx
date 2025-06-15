@@ -131,11 +131,6 @@ export default function Header() {
                   {user.email}
                 </span>
               )}
-              <Button asChild variant="ghost" size="icon">
-                <Link href="/profile" aria-label="User Profile">
-                  <UserCircle className="h-5 w-5" />
-                </Link>
-              </Button>
               <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
                 <LogOut className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
                 Sign Out
@@ -143,16 +138,10 @@ export default function Header() {
             </>
           ) : !authLoading && !user ? (
             <>
-              <Button asChild variant="ghost">
+              <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
                 <Link href="/signin" aria-label="Log In">
                   <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
                   Log In
-                </Link>
-              </Button>
-              <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
-                <Link href="/signup" aria-label="Sign Up">
-                   <UserCircle className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-                  Sign Up
                 </Link>
               </Button>
             </>
@@ -168,8 +157,14 @@ export default function Header() {
               )}
             </Link>
           </Button>
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/profile" aria-label="User Profile">
+              <UserCircle className="h-5 w-5" />
+            </Link>
+          </Button>
         </nav>
       </div>
     </header>
   );
 }
+
