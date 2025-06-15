@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Filter } from 'lucide-react';
+import { Loader2, Filter, Search } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -22,31 +22,38 @@ import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { parsePrice } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { SearchBar } from '@/components/search-bar';
 
 const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = 10000;
 
-
-export default function CollectionsPage() {
+function CollectionsPageContent() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [minProductPrice, setMinProductPrice] = useState(MIN_PRICE_DEFAULT);
   const [maxProductPrice, setMaxProductPrice] = useState(MAX_PRICE_DEFAULT);
   const [priceRange, setPriceRange] = useState<[number, number]>([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
+  
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
+    const initialSearchTerm = searchParams.get('search') || '';
+    setSearchTerm(initialSearchTerm);
+
     const timer = setTimeout(() => {
       setAllProducts(MOCK_PRODUCTS);
       
@@ -60,7 +67,7 @@ export default function CollectionsPage() {
       setIsLoadingProducts(false);
     }, 500); 
     return () => clearTimeout(timer);
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!isClient) return;
@@ -115,8 +122,17 @@ export default function CollectionsPage() {
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
+    if (searchTerm.trim()) {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      products = products.filter(p => 
+        p.name.toLowerCase().includes(lowerSearchTerm) ||
+        p.description.toLowerCase().includes(lowerSearchTerm) ||
+        (p.category && p.category.toLowerCase().includes(lowerSearchTerm))
+      );
+    }
+
     setFilteredProducts(products);
-  }, [selectedCategory, allProducts, priceRange]);
+  }, [selectedCategory, allProducts, priceRange, searchTerm]);
 
   const handleToggleWishlist = (productId: string) => {
     if (!user) {
@@ -176,6 +192,18 @@ export default function CollectionsPage() {
   const handlePriceChange = (newRange: [number, number]) => {
     setPriceRange(newRange);
   };
+
+  const handleCollectionSearch = (term: string) => {
+    setSearchTerm(term);
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries())); // Preserve existing params
+    if (term.trim()) {
+      currentParams.set('search', term.trim());
+    } else {
+      currentParams.delete('search');
+    }
+    router.push(`${pathname}?${currentParams.toString()}`);
+  };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -243,6 +271,13 @@ export default function CollectionsPage() {
           </aside>
 
           <section id="product-listing" aria-labelledby="product-listing-title" className="md:col-span-3 xl:col-span-4">
+            <div className="mb-8">
+                <SearchBar 
+                  onSearch={handleCollectionSearch} 
+                  placeholder="Search products in this collection..."
+                  initialValue={searchTerm}
+                />
+            </div>
             {isLoadingProducts ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
@@ -262,9 +297,14 @@ export default function CollectionsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground text-lg py-10">
-                No products found matching your filters. Try adjusting your selection!
-              </p>
+              <div className="text-center text-muted-foreground text-lg py-10">
+                 <Search className="h-12 w-12 text-primary mx-auto mb-4 opacity-70" />
+                <p className="font-semibold text-xl mb-2">No Products Found</p>
+                <p>
+                Your search for "{searchTerm}" did not match any products. 
+                Try adjusting your search or filters.
+                </p>
+              </div>
             )}
           </section>
         </div>
@@ -272,4 +312,13 @@ export default function CollectionsPage() {
       <Footer />
     </div>
   );
+}
+
+
+export default function CollectionsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}> {/* Suspense for useSearchParams */}
+      <CollectionsPageContent />
+    </Suspense>
+  )
 }

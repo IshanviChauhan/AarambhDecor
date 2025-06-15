@@ -9,13 +9,14 @@ import { ProductCard } from '@/components/product-card';
 import { StyleSuggester } from '@/components/style-suggester';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingBag } from 'lucide-react';
+import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react'; // Added SearchIcon
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
+import { SearchBar } from '@/components/search-bar'; // Import SearchBar
 
 
 const LATEST_PRODUCTS_COUNT = 3;
@@ -133,6 +134,14 @@ export default function HomePage() {
     return cartItems.some(item => item.id === productId);
   };
 
+  const handleHomepageSearch = (searchTerm: string) => {
+    if (searchTerm.trim()) {
+      router.push(`/collections?search=${encodeURIComponent(searchTerm.trim())}`);
+    } else {
+      router.push('/collections');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -154,7 +163,27 @@ export default function HomePage() {
           </Button>
         </section>
 
-        <Separator className="my-12 md:my-20 border-border/70" />
+        <Separator className="my-12 md:my-16 border-border/70" />
+
+        <section id="homepage-search" aria-labelledby="homepage-search-title" className="py-8 md:py-12">
+          <div className="flex flex-col items-center justify-center space-y-4 mb-10 md:mb-12">
+            <SearchIcon className="h-10 w-10 text-primary" />
+            <h2 id="homepage-search-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
+              Find Your Perfect Piece
+            </h2>
+             <p className="text-lg text-muted-foreground max-w-xl mx-auto text-center">
+              Search our collections by product name or category to quickly find what you're looking for.
+            </p>
+            <SearchBar 
+              onSearch={handleHomepageSearch} 
+              placeholder="Search products or categories..."
+              className="mt-4"
+            />
+          </div>
+        </section>
+
+
+        <Separator className="my-12 md:my-16 border-border/70" />
 
         <section id="latest-product-showcase" aria-labelledby="latest-product-showcase-title" className="py-8">
           <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12">
