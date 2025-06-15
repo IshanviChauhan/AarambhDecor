@@ -7,6 +7,26 @@ body {
   font-family: 'PT Sans', sans-serif; /* Default body font */
 }
 
+/* Keyframes for the glittery background effect */
+@keyframes glitter-drift {
+  0% {
+    background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+  }
+  100% {
+    /* Animate to multiples of background-size for smoother looping if possible, otherwise just large distinct movements */
+    background-position: 400px 400px, -300px -300px, 200px -200px, -400px 200px, 300px -400px;
+  }
+}
+
+@keyframes glitter-flicker {
+  0%, 100% { opacity: 0.7; } /* Base opacity of the glitter layer */
+  20% { opacity: 0.4; }
+  40% { opacity: 0.9; }
+  60% { opacity: 0.3; }
+  80% { opacity: 0.8; }
+}
+
+
 @layer base {
   :root {
     --background: 60 56% 91%; /* Light beige #F5F5DC */
@@ -108,8 +128,45 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    position: relative; /* For pseudo-element positioning */
+  }
+
+  body::before {
+    content: '';
+    position: fixed; /* Cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none; /* Don't interfere with content */
+    z-index: -1; /* Behind all page content */
+
+    background-image: 
+      /* Layer 1: Primary color glitter */
+      radial-gradient(circle at 10% 30%, hsla(var(--primary), 0.05) 0%, transparent 8%),
+      radial-gradient(circle at 50% 70%, hsla(var(--primary), 0.07) 0%, transparent 10%),
+      /* Layer 2: Accent color glitter */
+      radial-gradient(circle at 80% 20%, hsla(var(--accent), 0.04) 0%, transparent 7%),
+      radial-gradient(circle at 30% 90%, hsla(var(--accent), 0.06) 0%, transparent 9%),
+      /* Layer 3: Secondary color glitter (very subtle) */
+      radial-gradient(circle at 65% 50%, hsla(var(--secondary), 0.03) 0%, transparent 6%);
+    
+    background-repeat: repeat; /* Ensure gradients tile */
+    
+    /* Different sizes for each layer of gradients to create a more complex, less uniform pattern */
+    background-size: 
+      250px 250px, /* Layer 1 particles */
+      300px 300px, /* Layer 1 particles */
+      200px 200px, /* Layer 2 particles */
+      350px 350px, /* Layer 2 particles */
+      180px 180px;  /* Layer 3 particles */
+    
+    animation: 
+      glitter-drift 50s linear infinite, 
+      glitter-flicker 7s ease-in-out infinite;
   }
 }
+
 
 /* Custom animation keyframes */
 @keyframes fadeInDown {
@@ -173,4 +230,3 @@ input[type="search"]::-ms-reveal {
   width: 0;
   height: 0;
 }
-
