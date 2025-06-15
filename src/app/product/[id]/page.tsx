@@ -242,7 +242,10 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          <Carousel className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" opts={{ loop: safeImageUrls.length > 1 }}>
+          <Carousel 
+            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200 group" 
+            opts={{ loop: safeImageUrls.length > 1 }}
+          >
             <CarouselContent>
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
@@ -262,8 +265,14 @@ export default function ProductDetailPage() {
             </CarouselContent>
             {safeImageUrls.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 transition-none hover:translate-y-[-50%]" />
-                <CarouselNext className="right-2 transition-none hover:translate-y-[-50%]" />
+                <CarouselPrevious 
+                  variant="ghost"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
+                />
+                <CarouselNext 
+                  variant="ghost"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
+                />
               </>
             )}
           </Carousel>
