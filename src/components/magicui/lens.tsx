@@ -1,7 +1,7 @@
 
 "use client";
 
-import { AnimatePresence, motion, useMotionTemplate } from "motion/react";
+import { AnimatePresence, motion, useMotionTemplate } from "motion";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 
 interface Position {
@@ -30,7 +30,7 @@ interface LensProps {
   lensColor?: string;
   /** The aria label of the lens */
   ariaLabel?: string;
-  className?: string; // Added className to allow styling the container
+  className?: string; 
 }
 
 export function Lens({
@@ -43,7 +43,7 @@ export function Lens({
   duration = 0.1,
   lensColor = "black",
   ariaLabel = "Zoom Area",
-  className, // Destructure className
+  className, 
 }: LensProps) {
   if (zoomFactor < 1) {
     throw new Error("zoomFactor must be greater than 1");
@@ -113,7 +113,7 @@ export function Lens({
   return (
     <div
       ref={containerRef}
-      className={`relative z-20 overflow-hidden rounded-xl ${className || ''}`} // Apply className here
+      className={cn("relative z-20 overflow-hidden rounded-xl", className || '')} 
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onMouseMove={handleMouseMove}
