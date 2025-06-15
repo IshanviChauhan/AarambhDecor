@@ -1,3 +1,4 @@
+
 export interface Product {
   id: string;
   name: string;
@@ -7,4 +8,5 @@ export interface Product {
   dataAiHint: string;
   price?: string; // Optional for now
   category?: string; // Optional
+  isLatest?: boolean; // To identify latest products for home page
 }

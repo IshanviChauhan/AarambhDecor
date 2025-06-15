@@ -1,16 +1,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Product } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
-import { StyleSuggester } from '@/components/style-suggester';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2, LayoutGrid } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 // Mock product data - in a real app, this would come from an API/database
 const MOCK_PRODUCTS: Product[] = [
@@ -23,7 +21,6 @@ const MOCK_PRODUCTS: Product[] = [
     dataAiHint: 'mandala art',
     price: '₹2,499',
     category: 'Wall Art',
-    isLatest: true,
   },
   {
     id: '2',
@@ -34,7 +31,6 @@ const MOCK_PRODUCTS: Product[] = [
     dataAiHint: 'ceramic vase',
     price: '₹1,899',
     category: 'Tabletops',
-    isLatest: true,
   },
   {
     id: '3',
@@ -45,7 +41,6 @@ const MOCK_PRODUCTS: Product[] = [
     dataAiHint: 'boho mirror',
     price: '₹3,200',
     category: 'Mirrors',
-    isLatest: true,
   },
   {
     id: '4',
@@ -77,28 +72,42 @@ const MOCK_PRODUCTS: Product[] = [
     price: '₹4,500',
     category: 'Wall Art',
   },
+   {
+    id: '7',
+    name: 'Macrame Plant Hanger',
+    description: 'Stylish macrame plant hanger, perfect for bringing greenery indoors. Fits various pot sizes.',
+    careInstructions: 'Spot clean with a damp cloth. Keep away from direct flame.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    dataAiHint: 'macrame plant',
+    price: '₹899',
+    category: 'Planters',
+  },
+  {
+    id: '8',
+    name: 'Ethnic Print Cushion Covers',
+    description: 'Set of two vibrant cushion covers with traditional ethnic prints. Adds color and comfort to your sofa or bed.',
+    careInstructions: 'Machine wash cold, gentle cycle. Tumble dry low.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    dataAiHint: 'cushion covers',
+    price: '₹1,299',
+    category: 'Textiles',
+  },
 ];
 
-const LATEST_PRODUCTS_COUNT = 3;
 
-export default function HomePage() {
+export default function CollectionsPage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
-  const [latestProducts, setLatestProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Simulate fetching products and select latest
+  // Simulate fetching products
   useEffect(() => {
     const timer = setTimeout(() => {
-      // In a real app, "latest" would be determined by a timestamp or admin flag
-      // For mock data, we'll take the first N or those marked `isLatest`
-      const identifiedLatest = MOCK_PRODUCTS.filter(p => p.isLatest);
-      if (identifiedLatest.length > 0) {
-        setLatestProducts(identifiedLatest.slice(0, LATEST_PRODUCTS_COUNT));
-      } else {
-        setLatestProducts(MOCK_PRODUCTS.slice(0, LATEST_PRODUCTS_COUNT));
-      }
+      setAllProducts(MOCK_PRODUCTS);
       setIsLoadingProducts(false);
-    }, 1000); // Simulate network delay
+    }, 500); // Simulate network delay
     return () => clearTimeout(timer);
   }, []);
 
@@ -115,6 +124,19 @@ export default function HomePage() {
     localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
   }, [wishlist]);
 
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
+    return ['All', ...Array.from(uniqueCategories)];
+  }, [allProducts]);
+
+  useEffect(() => {
+    if (selectedCategory && selectedCategory !== 'All') {
+      setFilteredProducts(allProducts.filter(p => p.category === selectedCategory));
+    } else {
+      setFilteredProducts(allProducts);
+    }
+  }, [selectedCategory, allProducts]);
+
   const handleToggleWishlist = (productId: string) => {
     setWishlist((prevWishlist) => {
       const newWishlist = new Set(prevWishlist);
@@ -127,36 +149,52 @@ export default function HomePage() {
     });
   };
 
+  const handleCategoryFilter = (category: string | null) => {
+    setSelectedCategory(category === 'All' ? null : category);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
-        
-        <section className="text-center mb-12 md:mb-16">
-          <h1 className="text-4xl md:text-5xl font-headline text-primary mb-4">
-            Discover Your Signature Style
-          </h1>
+        <section className="text-center mb-10 md:mb-12">
+           <div className="flex items-center justify-center space-x-3 mb-4">
+            <LayoutGrid className="h-10 w-10 text-primary" />
+            <h1 className="text-4xl md:text-5xl font-headline text-primary">
+              Our Collections
+            </h1>
+          </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Explore Aarambh Decor's curated collection of home decor that tells a story. 
-            Find pieces that resonate with your soul and transform your space.
+            Browse through our diverse range of handcrafted decor items. Filter by category to find exactly what you're looking for.
           </p>
         </section>
 
-        <section id="latest-product-showcase" aria-labelledby="latest-product-showcase-title">
-          <div className="flex items-center justify-center space-x-3 mb-8 md:mb-10">
-            <Sparkles className="h-8 w-8 text-accent" />
-            <h2 id="latest-product-showcase-title" className="text-3xl font-headline text-center text-foreground">
-              New Arrivals
-            </h2>
+        <section id="category-filters" className="mb-8 md:mb-10">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category || (category === 'All' && !selectedCategory) ? 'default' : 'outline'}
+                onClick={() => handleCategoryFilter(category)}
+                className="rounded-full px-4 py-2 text-sm md:text-base"
+              >
+                {category}
+              </Button>
+            ))}
           </div>
+        </section>
+        
+        <Separator className="my-8 md:my-10" />
+
+        <section id="product-listing" aria-labelledby="product-listing-title">
           {isLoadingProducts ? (
             <div className="flex justify-center items-center h-64">
               <Loader2 className="h-12 w-12 text-primary animate-spin" />
-              <p className="ml-4 text-lg text-muted-foreground">Loading newest treasures...</p>
+              <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
             </div>
-          ) : latestProducts.length > 0 ? (
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {latestProducts.map((product) => (
+              {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -166,28 +204,14 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground text-lg">No new products to display at the moment. Please check back soon!</p>
+            <p className="text-center text-muted-foreground text-lg py-10">
+              No products found for the selected category. Try a different filter!
+            </p>
           )}
-          <div className="text-center mt-10">
-            <Button asChild variant="secondary" size="lg">
-              <Link href="/collections">View All Collections</Link>
-            </Button>
-          </div>
-        </section>
-
-        <Separator className="my-12 md:my-16" />
-
-        <section id="style-suggestions" aria-labelledby="style-suggestions-title" className="py-8">
-           <div className="flex items-center justify-center space-x-3 mb-8 md:mb-10">
-             {/* Icon for Style Suggester can be added here if desired */}
-            <h2 id="style-suggestions-title" className="text-3xl font-headline text-center text-foreground">
-              Need Inspiration?
-            </h2>
-          </div>
-          <StyleSuggester />
         </section>
       </main>
       <Footer />
     </div>
   );
 }
+

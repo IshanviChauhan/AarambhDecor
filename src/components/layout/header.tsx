@@ -1,15 +1,34 @@
+
 import Link from 'next/link';
-import { ExternalLink, ShoppingBag } from 'lucide-react';
+import { ExternalLink, LayoutGrid, Users, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Header() {
   return (
     <header className="py-6 px-4 md:px-8 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-3xl font-headline text-primary hover:opacity-80 transition-opacity">
+      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+        <Link href="/" className="text-3xl font-headline text-primary hover:opacity-80 transition-opacity mb-4 sm:mb-0">
           Aarambh Lookbook
         </Link>
-        <nav>
+        <nav className="flex flex-wrap items-center gap-2 sm:gap-4">
+          <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+            <Link href="/" aria-label="Home">
+              <Home className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+              Home
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+            <Link href="/collections" aria-label="Collections">
+              <LayoutGrid className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+              Collections
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+            <Link href="/users" aria-label="Users">
+              <Users className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+              Users
+            </Link>
+          </Button>
           <Button asChild variant="outline" className="text-accent-foreground border-accent hover:bg-accent/10">
             <a 
               href="https://www.aarambhdecor.com" // Replace with actual URL
