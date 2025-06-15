@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Product } from '@/lib/types';
@@ -5,7 +6,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from './wishlist-icon';
-import { ExternalLink } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -38,17 +39,15 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist }: Product
         <CardDescription className="text-sm text-muted-foreground mb-2 line-clamp-3">{product.description}</CardDescription>
         {product.price && <p className="font-semibold text-primary text-lg">{product.price}</p>}
       </CardContent>
-      <CardFooter className="p-4 pt-0">
-         {/* In a real app, this button would link to the product detail page */}
-        <Button variant="outline" className="w-full" disabled> 
+      <CardFooter className="p-4 pt-0 flex flex-col sm:flex-row gap-2">
+        {/* In a real app, this button would link to the product detail page */}
+        <Button variant="outline" className="w-full sm:flex-1" disabled> 
           View Details
         </Button>
-        {/* Example of a direct shop link, if needed per product */}
-        {/* <Button asChild variant="default" className="w-full mt-2">
-          <a href={`https://www.aarambhdecor.com/products/${product.id}`} target="_blank" rel="noopener noreferrer">
-            Shop Now <ExternalLink className="ml-2 h-4 w-4" />
-          </a>
-        </Button> */}
+        <Button variant="default" className="w-full sm:flex-1" disabled>
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          Add to Cart
+        </Button>
       </CardFooter>
     </Card>
   );
