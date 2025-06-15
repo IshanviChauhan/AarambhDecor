@@ -12,75 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { MOCK_PRODUCTS } from '@/lib/mock-data';
 
-const NEW_IMAGE_URL = 'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
-// Mock product data
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Intricate Mandala Wall Art',
-    description: 'Hand-painted wooden mandala, perfect for adding a spiritual and artistic touch to your living space. Each piece is unique.',
-    careInstructions: 'Wipe clean with a soft, dry cloth. Avoid direct sunlight and moisture.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'mandala art',
-    price: '₹2,499',
-    category: 'Wall Art',
-    isLatest: true,
-  },
-  {
-    id: '2',
-    name: 'Elegant Ceramic Vase Set',
-    description: 'Set of three minimalist ceramic vases in earthy tones, ideal for modern and traditional decor. Perfect for dried flowers or as standalone pieces.',
-    careInstructions: 'Hand wash only with mild soap. Handle with care to avoid chipping.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'ceramic vase',
-    price: '₹1,899',
-    category: 'Tabletops',
-    isLatest: true,
-  },
-  {
-    id: '3',
-    name: 'Bohemian Tasseled Mirror',
-    description: 'A stunning statement piece mirror framed with natural fibers and cotton tassels, adding a touch of boho chic to any room.',
-    careInstructions: 'Clean mirror surface with glass cleaner. Dust tassels gently or use a low-suction vacuum attachment.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'boho mirror',
-    price: '₹3,200',
-    category: 'Mirrors',
-    isLatest: true,
-  },
-  {
-    id: '4',
-    name: 'Artisan-Crafted Table Runner',
-    description: 'Hand-woven cotton table runner featuring traditional motifs and rich textures. Brings heritage and warmth to your dining experience.',
-    careInstructions: 'Gentle hand wash or dry clean recommended. Iron on low heat on the reverse side.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'table runner',
-    price: '₹1,550',
-    category: 'Textiles',
-  },
-  {
-    id: '5',
-    name: 'Handcrafted Wooden Bowl',
-    description: 'A versatile and beautiful wooden bowl, hand-carved by skilled artisans. Ideal for serving or as a decorative centerpiece.',
-    careInstructions: 'Wipe with a damp cloth. Occasionally treat with food-safe mineral oil.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'wooden bowl',
-    price: '₹1,250',
-    category: 'Tabletops',
-  },
-  {
-    id: '6',
-    name: 'Expressive Abstract Canvas Art',
-    description: 'Vibrant and expressive abstract art on canvas, ready to hang. Adds a contemporary flair and a pop of color to your walls.',
-    careInstructions: 'Dust gently with a feather duster. Avoid placing in humid areas.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'abstract art',
-    price: '₹4,500',
-    category: 'Wall Art',
-  },
-];
 
 const LATEST_PRODUCTS_COUNT = 3;
 
@@ -99,6 +32,7 @@ export default function HomePage() {
       if (identifiedLatest.length > 0) {
         setLatestProducts(identifiedLatest.slice(0, LATEST_PRODUCTS_COUNT));
       } else {
+        // Fallback if no products are marked as latest
         setLatestProducts(MOCK_PRODUCTS.slice(0, LATEST_PRODUCTS_COUNT));
       }
       setIsLoadingProducts(false);

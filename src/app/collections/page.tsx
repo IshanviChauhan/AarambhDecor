@@ -17,91 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const NEW_IMAGE_URL = 'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Intricate Mandala Wall Art',
-    description: 'Hand-painted wooden mandala, perfect for adding a spiritual and artistic touch to your living space. Each piece is unique.',
-    careInstructions: 'Wipe clean with a soft, dry cloth. Avoid direct sunlight and moisture.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'mandala art',
-    price: '₹2,499',
-    category: 'Wall Art',
-  },
-  {
-    id: '2',
-    name: 'Elegant Ceramic Vase Set',
-    description: 'Set of three minimalist ceramic vases in earthy tones, ideal for modern and traditional decor. Perfect for dried flowers or as standalone pieces.',
-    careInstructions: 'Hand wash only with mild soap. Handle with care to avoid chipping.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'ceramic vase',
-    price: '₹1,899',
-    category: 'Tabletops',
-  },
-  {
-    id: '3',
-    name: 'Bohemian Tasseled Mirror',
-    description: 'A stunning statement piece mirror framed with natural fibers and cotton tassels, adding a touch of boho chic to any room.',
-    careInstructions: 'Clean mirror surface with glass cleaner. Dust tassels gently or use a low-suction vacuum attachment.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'boho mirror',
-    price: '₹3,200',
-    category: 'Mirrors',
-  },
-  {
-    id: '4',
-    name: 'Artisan-Crafted Table Runner',
-    description: 'Hand-woven cotton table runner featuring traditional motifs and rich textures. Brings heritage and warmth to your dining experience.',
-    careInstructions: 'Gentle hand wash or dry clean recommended. Iron on low heat on the reverse side.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'table runner',
-    price: '₹1,550',
-    category: 'Textiles',
-  },
-  {
-    id: '5',
-    name: 'Handcrafted Wooden Bowl',
-    description: 'A versatile and beautiful wooden bowl, hand-carved by skilled artisans. Ideal for serving or as a decorative centerpiece.',
-    careInstructions: 'Wipe with a damp cloth. Occasionally treat with food-safe mineral oil.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'wooden bowl',
-    price: '₹1,250',
-    category: 'Tabletops',
-  },
-  {
-    id: '6',
-    name: 'Expressive Abstract Canvas Art',
-    description: 'Vibrant and expressive abstract art on canvas, ready to hang. Adds a contemporary flair and a pop of color to your walls.',
-    careInstructions: 'Dust gently with a feather duster. Avoid placing in humid areas.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'abstract art',
-    price: '₹4,500',
-    category: 'Wall Art',
-  },
-   {
-    id: '7',
-    name: 'Macrame Plant Hanger',
-    description: 'Stylish macrame plant hanger, perfect for bringing greenery indoors. Fits various pot sizes.',
-    careInstructions: 'Spot clean with a damp cloth. Keep away from direct flame.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'macrame plant',
-    price: '₹899',
-    category: 'Planters',
-  },
-  {
-    id: '8',
-    name: 'Ethnic Print Cushion Covers',
-    description: 'Set of two vibrant cushion covers with traditional ethnic prints. Adds color and comfort to your sofa or bed.',
-    careInstructions: 'Machine wash cold, gentle cycle. Tumble dry low.',
-    imageUrl: NEW_IMAGE_URL,
-    dataAiHint: 'cushion covers',
-    price: '₹1,299',
-    category: 'Textiles',
-  },
-];
+import { MOCK_PRODUCTS } from '@/lib/mock-data';
 
 
 export default function CollectionsPage() {
@@ -156,7 +72,7 @@ export default function CollectionsPage() {
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
-    return ['All', ...Array.from(uniqueCategories)];
+    return ['All', ...Array.from(uniqueCategories).sort()];
   }, [allProducts]);
 
   useEffect(() => {
@@ -270,4 +186,3 @@ export default function CollectionsPage() {
     </div>
   );
 }
-

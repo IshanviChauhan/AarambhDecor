@@ -1,4 +1,11 @@
 
+export interface Review {
+  reviewer: string;
+  rating: number; // e.g., 1-5
+  comment: string;
+  date: string; // e.g., "YYYY-MM-DD"
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -6,9 +13,12 @@ export interface Product {
   careInstructions: string;
   imageUrl: string;
   dataAiHint: string;
-  price?: string; // Optional for now
-  category?: string; // Optional
-  isLatest?: boolean; // To identify latest products for home page
+  price?: string;
+  category?: string;
+  isLatest?: boolean;
+  sizeAndDimensions?: string;
+  material?: string;
+  reviews?: Review[];
 }
 
 export interface CartItem extends Product {
