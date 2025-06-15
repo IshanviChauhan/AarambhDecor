@@ -117,13 +117,13 @@ export default function Header() {
           </span>
         </Link>
         <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
-          <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+          <Button asChild variant="ghost" className="text-foreground">
             <Link href="/" aria-label="Home">
               <Home className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
               Home
             </Link>
           </Button>
-          <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+          <Button asChild variant="ghost" className="text-foreground">
             <Link href="/collections" aria-label="Collections">
               <LayoutGrid className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
               Collections
@@ -144,7 +144,7 @@ export default function Header() {
             </>
           ) : !authLoading && !user ? (
             <>
-              <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+              <Button asChild variant="ghost" className="text-foreground">
                 <Link href="/signin" aria-label="Log In">
                   <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
                   Log In
