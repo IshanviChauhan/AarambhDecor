@@ -61,4 +61,3 @@ export async function signUpWithEmail(prevState: SignUpFormState, formData: Form
   // However, redirect itself throws an error, so this return is effectively unreachable.
   // return { message: 'Sign up successful! Redirecting...', success: true };
 }
-
