@@ -193,8 +193,8 @@ export default function CollectionsPage() {
           </p>
         </section>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 md:gap-8">
-          <aside className="md:col-span-1 mb-8 md:mb-0">
+        <div className="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-5 md:gap-8">
+          <aside className="md:col-span-1 xl:col-span-1 mb-8 md:mb-0">
             <Card className="p-4 shadow-md rounded-lg border-border/70 sticky top-24">
               <CardHeader className="p-0 mb-4">
                 <div className="flex items-center space-x-2">
@@ -242,7 +242,7 @@ export default function CollectionsPage() {
             </Card>
           </aside>
 
-          <section id="product-listing" aria-labelledby="product-listing-title" className="md:col-span-3">
+          <section id="product-listing" aria-labelledby="product-listing-title" className="md:col-span-3 xl:col-span-4">
             {isLoadingProducts ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
@@ -258,6 +258,7 @@ export default function CollectionsPage() {
                     onToggleWishlist={handleToggleWishlist}
                     onAddToCart={handleAddToCart}
                     isProductInCart={isProductInCart(product.id)}
+                    className="w-[300px]"
                   />
                 ))}
               </div>
