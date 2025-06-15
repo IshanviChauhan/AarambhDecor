@@ -7,7 +7,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Filter, Search } from 'lucide-react';
+import { Loader2, Filter, Search, Layers } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -44,7 +44,6 @@ function CollectionsPageContent() {
   const [maxProductPrice, setMaxProductPrice] = useState(MAX_PRICE_DEFAULT);
   const [priceRange, setPriceRange] = useState<[number, number]>([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
   
-  // Initialize searchTerm from URL, but allow SearchBar to control its input value directly
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
 
   const { toast } = useToast();
@@ -60,8 +59,6 @@ function CollectionsPageContent() {
     setIsClient(true);
     const currentSearchFromUrl = searchParams.get('search') || '';
     if (currentSearchFromUrl !== searchTerm) {
-      // This keeps searchTerm in sync if URL changes externally (e.g. browser back/forward)
-      // SearchBar's initialValue will also pick this up.
       setSearchTerm(currentSearchFromUrl);
     }
     
@@ -73,7 +70,7 @@ function CollectionsPageContent() {
       const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
       setMinProductPrice(minP);
       setMaxProductPrice(maxP);
-      // Set initial price range from URL if present, otherwise default
+
       const urlMinPrice = searchParams.get('minPrice');
       const urlMaxPrice = searchParams.get('maxPrice');
       setPriceRange([
@@ -84,7 +81,7 @@ function CollectionsPageContent() {
       setIsLoadingProducts(false);
     }, 500); 
     return () => clearTimeout(timer);
-  }, [searchParams]); // Only re-run if searchParams object itself changes
+  }, [searchParams]); 
 
   useEffect(() => {
     if (isLoadingProducts || !isClient) return;
@@ -100,7 +97,6 @@ function CollectionsPageContent() {
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
-        // If invalid category in URL, remove it
         const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
         currentParams.delete('category');
         router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
@@ -149,7 +145,6 @@ function CollectionsPageContent() {
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
   }, [cartItems, isClient, user]);
 
-  // This useEffect is responsible for filtering products based on state (searchTerm, selectedCategory, priceRange)
   useEffect(() => {
     let products = allProducts;
 
@@ -226,10 +221,6 @@ function CollectionsPageContent() {
 
   const handleCategoryFilter = (categoryValue: string) => {
     const newSelectedCategory = categoryValue === 'All' ? null : categoryValue;
-    // setSelectedCategory is not strictly needed here if URL drives the state,
-    // but can be useful for immediate optimistic UI updates if desired.
-    // For now, let's rely on the URL change to trigger the filter update via useEffect.
-
     const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
     if (newSelectedCategory) {
       currentParams.set('category', newSelectedCategory);
@@ -240,26 +231,23 @@ function CollectionsPageContent() {
   };
 
   const handlePriceChange = (newRange: [number, number]) => {
-    // setPriceRange(newRange); // Optimistic update
+    setPriceRange(newRange); // Optimistic update for slider UI responsiveness
     const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
     currentParams.set('minPrice', newRange[0].toString());
     currentParams.set('maxPrice', newRange[1].toString());
     router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };
-
-  // This function is called by SearchBar as user types (debounced)
-  const handleCollectionSearch = (newSearchTerm: string) => {
-    setSearchTerm(newSearchTerm); // Update local state for filtering
-    
+  
+  const handleCollectionSearch = useCallback((newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm); 
     const currentParams = new URLSearchParams(Array.from(searchParams.entries())); 
     if (newSearchTerm.trim()) {
       currentParams.set('search', newSearchTerm.trim());
     } else {
       currentParams.delete('search');
     }
-    // Update URL without full page reload, useEffect for filtering will pick this up
     router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
-  };
+  }, [router, pathname, searchParams]);
 
 
   return (
@@ -268,7 +256,7 @@ function CollectionsPageContent() {
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <section className="text-center mb-10 md:mb-12 animate-fade-in-down">
            <div className="flex items-center justify-center space-x-3 mb-4">
-            <Filter className="h-10 w-10 text-primary" />
+            <Layers className="h-10 w-10 text-primary" />
             <h1 className="text-4xl md:text-5xl font-headline text-primary">
               Our Collections
             </h1>
@@ -309,8 +297,8 @@ function CollectionsPageContent() {
                 <div>
                   <h3 className="text-md font-semibold mb-2 text-foreground">Price Range</h3>
                   <Slider
-                    value={priceRange} // Controlled by state which is synced with URL
-                    onValueChange={handlePriceChange} // This will update URL
+                    value={priceRange} 
+                    onValueChange={handlePriceChange} 
                     min={minProductPrice}
                     max={maxProductPrice}
                     step={50}
@@ -332,8 +320,8 @@ function CollectionsPageContent() {
                 <SearchBar 
                   onSearch={handleCollectionSearch} 
                   placeholder="Search products in this collection..."
-                  initialValue={searchTerm} // Sync SearchBar's input with page's searchTerm state
-                  debounceDelay={300} // Debounce for live filtering
+                  initialValue={searchTerm} 
+                  debounceDelay={300} 
                 />
             </div>
             {isLoadingProducts && !allProducts.length ? (
