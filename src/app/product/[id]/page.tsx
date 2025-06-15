@@ -249,7 +249,7 @@ export default function ProductDetailPage() {
             <CarouselContent>
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden border border-border/50 shadow-lg bg-card">
+                  <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden shadow-lg bg-card">
                     <Image
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
@@ -269,15 +269,14 @@ export default function ProductDetailPage() {
               className={cn(
                 "absolute left-3 top-1/2 -translate-y-1/2 z-10",
                 "h-10 w-10 rounded-full",
-                "bg-background/60 text-foreground/70", // Base appearance
-                "hover:bg-background/90 hover:text-foreground", // Custom hover appearance (overrides ghost variant hover)
+                "bg-background/60 text-foreground/70", 
+                "hover:bg-background/90 hover:text-foreground", 
                 "shadow-md",
                 "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                "transition-opacity duration-200 ease-in-out", // Opacity transition for group-hover
-                "transition-transform-none", // Disable transform transitions from base button
+                "transition-opacity duration-200 ease-in-out", 
+                "transition-transform-none", 
                 "flex items-center justify-center",
-                "border-none p-0", // Override default ghost padding if any
-                // Ensure vertical position is maintained, overriding ghost variant's hover/active transforms
+                "border-none p-0", 
                 "hover:translate-y-[-50%]",
                 "active:translate-y-[-50%]"
               )}
@@ -287,15 +286,14 @@ export default function ProductDetailPage() {
               className={cn(
                 "absolute right-3 top-1/2 -translate-y-1/2 z-10",
                 "h-10 w-10 rounded-full",
-                "bg-background/60 text-foreground/70", // Base appearance
-                "hover:bg-background/90 hover:text-foreground", // Custom hover appearance (overrides ghost variant hover)
+                "bg-background/60 text-foreground/70", 
+                "hover:bg-background/90 hover:text-foreground", 
                 "shadow-md",
                 "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                "transition-opacity duration-200 ease-in-out", // Opacity transition for group-hover
-                "transition-transform-none", // Disable transform transitions from base button
+                "transition-opacity duration-200 ease-in-out", 
+                "transition-transform-none", 
                 "flex items-center justify-center",
-                "border-none p-0", // Override default ghost padding if any
-                // Ensure vertical position is maintained, overriding ghost variant's hover/active transforms
+                "border-none p-0", 
                 "hover:translate-y-[-50%]",
                 "active:translate-y-[-50%]"
               )}
