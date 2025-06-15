@@ -1,6 +1,6 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth'; // Import persistence
+import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -13,14 +13,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Log the config being used by the client-side SDK
-if (typeof window !== 'undefined') { // Ensure this only runs on the client
+if (typeof window !== 'undefined') {
   console.log("Firebase config being used by client-side SDK:", firebaseConfig);
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
     console.error("CRITICAL: Firebase API Key or Project ID is missing. Check your .env file and ensure it's loaded correctly for the client (NEXT_PUBLIC_ prefix).");
   }
-  // Check if storageBucket ends with .appspot.com, which is typical.
-  // Warn if it doesn't, as it's a common misconfiguration point.
   if (firebaseConfig.storageBucket && !firebaseConfig.storageBucket.endsWith('.appspot.com')) {
     console.warn(`POTENTIAL CONFIG ISSUE: Your NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET value is "${firebaseConfig.storageBucket}". It typically should end with ".appspot.com" (e.g., "${firebaseConfig.projectId || 'your-project-id'}.appspot.com"). Please verify this in your .env file and Firebase project settings.`);
   }
@@ -33,22 +30,26 @@ if (!getApps().length) {
     app = initializeApp(firebaseConfig);
     if (typeof window !== 'undefined') {
       console.log("Firebase app initialized successfully.");
+      console.log(`Initialized Firebase app name: ${app.name}`); // Default is "[DEFAULT]"
+      console.log(`Initialized Firebase app Project ID from options: ${app.options.projectId}`);
     }
   } catch (e) {
     console.error("Error initializing Firebase app:", e);
-    throw e;
+    // It's often better not to throw here in client-side code if you want the app to attempt to run partially
+    // throw e; 
   }
 } else {
   app = getApps()[0]!;
   if (typeof window !== 'undefined') {
     console.log("Firebase app already initialized.");
+    console.log(`Reusing Firebase app name: ${app.name}`);
+    console.log(`Reusing Firebase app Project ID from options: ${app.options.projectId}`);
   }
 }
 
-const auth = getAuth(app);
+const auth = getAuth(app!); // Add non-null assertion if app could be undefined due to caught error
 
-// Set persistence explicitly - this should run on the client side
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && app!) { // ensure app is initialized
   setPersistence(auth, browserLocalPersistence)
     .then(() => {
       console.log("Firebase auth persistence explicitly set to 'local'.");
@@ -58,6 +59,6 @@ if (typeof window !== 'undefined') {
     });
 }
 
-const db = getFirestore(app);
+const db = getFirestore(app!); // Add non-null assertion
 
 export { app, auth, db };

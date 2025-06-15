@@ -18,25 +18,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AuthProvider: Mounting. Setting up onAuthStateChanged listener.");
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        console.log(`AuthProvider: onAuthStateChanged - User detected. UID: ${currentUser.uid}, Email: ${currentUser.email}`);
-      } else {
-        console.log("AuthProvider: onAuthStateChanged - No user detected (currentUser is null).");
-      }
-      setUser(currentUser);
+    console.log("AuthProvider: Mounting. Initial auth.currentUser:", auth.currentUser ? auth.currentUser.uid : 'null');
+    const unsubscribe = onAuthStateChanged(auth, (currentUserFromListener) => {
+      console.log("AuthProvider: onAuthStateChanged listener fired.");
+      console.log("AuthProvider: currentUserFromListener:", currentUserFromListener ? currentUserFromListener.uid : 'null');
+      // Check auth.currentUser directly as well, it should match currentUserFromListener
+      console.log("AuthProvider: auth.currentUser at time of listener firing:", auth.currentUser ? auth.currentUser.uid : 'null');
+
+      setUser(currentUserFromListener);
       setLoading(false);
-      console.log(`AuthProvider: State updated. Loading: false, User: ${currentUser ? currentUser.uid : 'null'}`);
+      console.log(`AuthProvider: State updated. Loading: false, User set to: ${currentUserFromListener ? currentUserFromListener.uid : 'null'}`);
     }, (error) => {
       console.error("AuthProvider: Error in onAuthStateChanged listener:", error);
-      setLoading(false); // Ensure loading is set to false on error too
+      setUser(null); // Ensure user is null on error
+      setLoading(false); // Ensure loading is false on error
+      console.log(`AuthProvider: State updated due to error. Loading: false, User set to: null`);
     });
     
+    // This initial check is good for seeing the very first state.
     if (auth.currentUser) {
-        console.log(`AuthProvider: Initial check on mount - auth.currentUser found. UID: ${auth.currentUser.uid}`);
+        console.log(`AuthProvider: Initial check on mount (after listener setup) - auth.currentUser found. UID: ${auth.currentUser.uid}`);
     } else {
-        console.log("AuthProvider: Initial check on mount - auth.currentUser is null.");
+        console.log("AuthProvider: Initial check on mount (after listener setup) - auth.currentUser is null.");
     }
 
     return () => {
@@ -58,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  console.log(`AuthProvider: Rendering children. Final loading state: ${loading}, User state: ${user ? user.uid : 'null'}`);
+  console.log(`AuthProvider: Rendering children. Current loading state: ${loading}, User state: ${user ? user.uid : 'null'}`);
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
