@@ -131,7 +131,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
           onClick={() => onAddToCart(product)}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
-          {/* {isProductInCart ? 'Added to Cart' : 'Add to Cart'} */}
+          {isProductInCart ? 'Added to Cart' : 'Add to Cart'}
         </Button>
       </CardFooter>
     </Card>
