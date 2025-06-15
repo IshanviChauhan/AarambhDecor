@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useActionState, useFormStatus } from 'react'; // useFormStatus imported from react
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom'; // Changed useFormStatus import back to react-dom
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignUpSchema, type SignUpInput } from '@/lib/schemas';
