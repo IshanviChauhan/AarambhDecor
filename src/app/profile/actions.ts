@@ -26,7 +26,11 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     return { uid: user.uid, email: user.email || '', ...profileSnap.data() } as UserProfile;
   } else {
     // Create a basic profile if it doesn't exist
-    const newProfile: UserProfile = { uid: user.uid, email: user.email || '', name: user.displayName || '' };
+    let profileName = user.displayName || '';
+    if (user.email === 'ishanvi.chauhan@gmail.com') {
+      profileName = 'Ishanvi Chauhan';
+    }
+    const newProfile: UserProfile = { uid: user.uid, email: user.email || '', name: profileName };
     await setDoc(profileDocRef, { email: newProfile.email, name: newProfile.name });
     return newProfile;
   }
@@ -60,7 +64,12 @@ export async function updateUserProfile(prevState: FormState, formData: FormData
     if (Object.keys(dataToUpdate).length > 0) {
       await updateDoc(profileDocRef, dataToUpdate);
     } else if (! (await getDoc(profileDocRef)).exists()) { // if profile doesn't exist, create it
-        await setDoc(profileDocRef, { email: user.email, name: validation.data.name || user.displayName || '' });
+        // If profile doesn't exist, check if it's the mock user email for specific name setting
+        let profileName = validation.data.name || user.displayName || '';
+        if (user.email === 'ishanvi.chauhan@gmail.com' && !validation.data.name) {
+            profileName = 'Ishanvi Chauhan';
+        }
+        await setDoc(profileDocRef, { email: user.email, name: profileName });
     }
 
 
@@ -167,3 +176,4 @@ export async function deleteShippingAddress(addressId: string): Promise<FormStat
     return { message: 'Failed to delete shipping address.', success: false };
   }
 }
+
