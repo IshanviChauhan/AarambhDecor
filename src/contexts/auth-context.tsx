@@ -5,7 +5,7 @@ import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { auth } from '@/lib/firebase';
-import { Loader2 } from 'lucide-react';
+// import { Loader2 } from 'lucide-react'; // Loader2 is no longer used
 
 interface AuthContextType {
   user: User | null;
@@ -28,9 +28,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
-        <Loader2 className="h-12 w-12 text-primary animate-spin" />
-        <p className="ml-4 text-lg text-muted-foreground">Initializing app...</p>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-background">
+        <div className="flex flex-row gap-2">
+          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.7s]"></div>
+          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.3s]"></div>
+          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.7s]"></div>
+        </div>
+        <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
       </div>
     );
   }
