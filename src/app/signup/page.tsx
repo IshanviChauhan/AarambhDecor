@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 import { Loader2, LogIn } from 'lucide-react';
 
 function SubmitButton() {
@@ -29,7 +28,6 @@ function SubmitButton() {
 
 export default function SignUpPage() {
   const { toast } = useToast();
-  const router = useRouter();
 
   const initialFormState: SignUpFormState = { message: null, success: false };
   const [formState, formAction] = useActionState(signUpWithEmail, initialFormState);
@@ -44,33 +42,24 @@ export default function SignUpPage() {
   });
 
   useEffect(() => {
-    let inlineErrorMessage: string | null = null;
-
     if (formState.errors) {
       if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });
       if (formState.errors.password) form.setError('password', { type: 'server', message: formState.errors.password.join(', ') });
       if (formState.errors.confirmPassword) {
           form.setError('confirmPassword', { type: 'server', message: formState.errors.confirmPassword.join(', ') });
       }
-      if (formState.errors._form) {
-        inlineErrorMessage = formState.errors._form.join(', ');
-        form.setError('root.serverError', { type: 'custom', message: inlineErrorMessage });
-      }
+      // Do not set root.serverError for _form errors here, they will be handled by toast
     }
 
     if (formState.message) {
-      // If there's an inline error message and it's the same as the toast message, don't show the toast for the error.
-      // Always show success toasts.
-      if (formState.success || (!formState.success && formState.message !== inlineErrorMessage)) {
-        toast({
-          title: formState.success ? 'Success' : 'Error',
-          description: formState.message,
-          variant: formState.success ? 'default' : 'destructive',
-        });
-      }
+      toast({
+        title: formState.success ? 'Success' : 'Error',
+        description: formState.message,
+        variant: formState.success ? 'default' : 'destructive',
+      });
     }
     // The redirect in server action handles this, so no client-side redirect needed here on formState.success
-  }, [formState, toast, form, router]);
+  }, [formState, toast, form]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-2">
@@ -121,16 +110,7 @@ export default function SignUpPage() {
                   </FormItem>
                 )}
               />
-              {form.formState.errors.root?.serverError && (
-                <p className="text-sm font-medium text-destructive">{form.formState.errors.root.serverError.message}</p>
-              )}
-              {/* This explicit check for formState.errors._form is redundant if form.setError('root.serverError') is used correctly above.
-                  However, keeping it doesn't hurt and ensures the message is shown if form.setError somehow wasn't effective.
-                  But it's one of the sources of duplication if not handled. The logic above should handle it.
-              */}
-              {/* {formState.errors?._form && !form.formState.errors.root?.serverError && (
-                <p className="text-sm font-medium text-destructive">{formState.errors._form.join(', ')}</p>
-              )} */}
+              {/* Removed inline display of formState.errors._form or root.serverError */}
               <SubmitButton />
             </form>
           </Form>
