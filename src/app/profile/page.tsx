@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link'; // Added missing import
+import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/header';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle } from 'lucide-react';
+import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, Database } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile, Address } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
@@ -38,6 +38,7 @@ import {
   deleteShippingAddress,
   type FormState
 } from './actions';
+import { seedProductsToFirestore } from '@/app/products/actions'; // Import the seed function
 import { useActionState } from 'react';
 
 
@@ -68,6 +69,7 @@ export default function ProfilePage() {
   const initialAddressFormState: FormState = { message: null, success: false, errors: undefined };
   const [currentAddressServerAction, setCurrentAddressServerAction] = useState<'add' | 'update'>('add');
 
+  // This ensures the correct action is used based on currentAddressServerAction
   const addressActionToUse = currentAddressServerAction === 'add' ? addShippingAddress : updateShippingAddress;
   const [addressFormState, actualAddressFormAction, isAddressFormSubmitting] = useActionState(
     addressActionToUse, 
@@ -166,6 +168,18 @@ export default function ProfilePage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressFormState]);
+
+  // Handler for the seed data button
+  const handleSeedData = async () => {
+    toast({ title: "Seeding Data...", description: "Please wait, this may take a moment." });
+    const result = await seedProductsToFirestore();
+    toast({
+      title: result.success ? 'Seeding Successful' : 'Seeding Failed',
+      description: result.message + (result.success ? ` Added ${result.count} products.` : ''),
+      variant: result.success ? 'default' : 'destructive',
+      duration: result.success ? 5000 : 10000, // Show success for shorter, error for longer
+    });
+  };
 
 
   const handleOpenAddAddressModal = () => {
@@ -416,8 +430,36 @@ export default function ProfilePage() {
             )}
           </CardContent>
         </Card>
+        
+        {/* Temporary Seeding Button Section - REMOVE AFTER USE */}
+        <Separator className="my-10" />
+        <Card className="mb-8 shadow-lg rounded-lg border-border/70">
+          <CardHeader>
+            <CardTitle className="font-headline text-2xl text-destructive">Admin: Database Tools</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              This button will populate the Firestore database with the mock product data. 
+              <strong> Only click this once.</strong> After successful seeding, remove this button from the code.
+            </p>
+            <Button onClick={handleSeedData} variant="destructive" className="w-full sm:w-auto">
+              <Database className="mr-2 h-4 w-4" />
+              Seed Product Data to Firestore
+            </Button>
+          </CardContent>
+          <CardFooter>
+            <CardDescription>
+                Ensure your Firestore security rules for the 'products' collection are set up correctly before seeding.
+                (Allow public read, and temporarily allow write or ensure server action has privileges).
+            </CardDescription>
+          </CardFooter>
+        </Card>
+        {/* End Temporary Seeding Button Section */}
+
       </main>
       <Footer />
     </div>
   );
 }
+
+    
