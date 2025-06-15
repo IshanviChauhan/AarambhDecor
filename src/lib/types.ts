@@ -10,3 +10,7 @@ export interface Product {
   category?: string; // Optional
   isLatest?: boolean; // To identify latest products for home page
 }
+
+export interface CartItem extends Product {
+  quantity: number;
+}

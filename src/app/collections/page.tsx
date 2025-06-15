@@ -2,15 +2,15 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import type { Product } from '@/lib/types';
+import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { Loader2, LayoutGrid } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock product data - in a real app, this would come from an API/database
 const MOCK_PRODUCTS: Product[] = [
   {
     id: '1',
@@ -97,32 +97,39 @@ const MOCK_PRODUCTS: Product[] = [
 
 export default function CollectionsPage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Simulate fetching products
   useEffect(() => {
     const timer = setTimeout(() => {
       setAllProducts(MOCK_PRODUCTS);
       setIsLoadingProducts(false);
-    }, 500); // Simulate network delay
+    }, 500); 
     return () => clearTimeout(timer);
   }, []);
 
-  // Load wishlist from localStorage on initial mount
   useEffect(() => {
     const storedWishlist = localStorage.getItem('aarambhWishlist');
     if (storedWishlist) {
       setWishlist(new Set(JSON.parse(storedWishlist)));
     }
+    const storedCart = localStorage.getItem('aarambhCart');
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
   }, []);
 
-  // Update localStorage when wishlist changes
   useEffect(() => {
     localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
   }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
@@ -147,6 +154,26 @@ export default function CollectionsPage() {
       }
       return newWishlist;
     });
+  };
+
+  const handleAddToCart = (product: Product) => {
+    setCartItems((prevCartItems) => {
+      const existingItem = prevCartItems.find(item => item.id === product.id);
+      if (existingItem) {
+        return prevCartItems.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevCartItems, { ...product, quantity: 1 }];
+    });
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const isProductInCart = (productId: string) => {
+    return cartItems.some(item => item.id === productId);
   };
 
   const handleCategoryFilter = (category: string | null) => {
@@ -200,6 +227,8 @@ export default function CollectionsPage() {
                   product={product}
                   isWishlisted={wishlist.has(product.id)}
                   onToggleWishlist={handleToggleWishlist}
+                  onAddToCart={handleAddToCart}
+                  isProductInCart={isProductInCart(product.id)}
                 />
               ))}
             </div>
@@ -214,4 +243,3 @@ export default function CollectionsPage() {
     </div>
   );
 }
-

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Product } from '@/lib/types';
+import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
@@ -11,8 +11,9 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock product data - in a real app, this would come from an API/database
+// Mock product data
 const MOCK_PRODUCTS: Product[] = [
   {
     id: '1',
@@ -83,14 +84,13 @@ const LATEST_PRODUCTS_COUNT = 3;
 
 export default function HomePage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const { toast } = useToast();
 
-  // Simulate fetching products and select latest
   useEffect(() => {
     const timer = setTimeout(() => {
-      // In a real app, "latest" would be determined by a timestamp or admin flag
-      // For mock data, we'll take the first N or those marked `isLatest`
       const identifiedLatest = MOCK_PRODUCTS.filter(p => p.isLatest);
       if (identifiedLatest.length > 0) {
         setLatestProducts(identifiedLatest.slice(0, LATEST_PRODUCTS_COUNT));
@@ -98,22 +98,28 @@ export default function HomePage() {
         setLatestProducts(MOCK_PRODUCTS.slice(0, LATEST_PRODUCTS_COUNT));
       }
       setIsLoadingProducts(false);
-    }, 1000); // Simulate network delay
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Load wishlist from localStorage on initial mount
   useEffect(() => {
     const storedWishlist = localStorage.getItem('aarambhWishlist');
     if (storedWishlist) {
       setWishlist(new Set(JSON.parse(storedWishlist)));
     }
+    const storedCart = localStorage.getItem('aarambhCart');
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
   }, []);
 
-  // Update localStorage when wishlist changes
   useEffect(() => {
     localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
   }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const handleToggleWishlist = (productId: string) => {
     setWishlist((prevWishlist) => {
@@ -125,6 +131,26 @@ export default function HomePage() {
       }
       return newWishlist;
     });
+  };
+
+  const handleAddToCart = (product: Product) => {
+    setCartItems((prevCartItems) => {
+      const existingItem = prevCartItems.find(item => item.id === product.id);
+      if (existingItem) {
+        return prevCartItems.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevCartItems, { ...product, quantity: 1 }];
+    });
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+  
+  const isProductInCart = (productId: string) => {
+    return cartItems.some(item => item.id === productId);
   };
 
   return (
@@ -162,6 +188,8 @@ export default function HomePage() {
                   product={product}
                   isWishlisted={wishlist.has(product.id)}
                   onToggleWishlist={handleToggleWishlist}
+                  onAddToCart={handleAddToCart}
+                  isProductInCart={isProductInCart(product.id)}
                 />
               ))}
             </div>
@@ -179,7 +207,6 @@ export default function HomePage() {
 
         <section id="style-suggestions" aria-labelledby="style-suggestions-title" className="py-8">
            <div className="flex items-center justify-center space-x-3 mb-8 md:mb-10">
-             {/* Icon for Style Suggester can be added here if desired */}
             <h2 id="style-suggestions-title" className="text-3xl font-headline text-center text-foreground">
               Need Inspiration?
             </h2>

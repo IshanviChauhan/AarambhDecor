@@ -12,9 +12,11 @@ interface ProductCardProps {
   product: Product;
   isWishlisted: boolean;
   onToggleWishlist: (productId: string) => void;
+  onAddToCart: (product: Product) => void;
+  isProductInCart?: boolean; // Optional: to change button state if product is already in cart
 }
 
-export function ProductCard({ product, isWishlisted, onToggleWishlist }: ProductCardProps) {
+export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart }: ProductCardProps) {
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full rounded-lg border-border/70">
       <CardHeader className="p-0 relative">
@@ -44,9 +46,14 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist }: Product
         <Button variant="outline" className="w-full sm:flex-1" disabled> 
           View Details
         </Button>
-        <Button variant="default" className="w-full sm:flex-1" disabled>
+        <Button 
+          variant="default" 
+          className="w-full sm:flex-1" 
+          onClick={() => onAddToCart(product)}
+          disabled={isProductInCart} // Example: disable if in cart, or change text
+        >
           <ShoppingCart className="mr-2 h-4 w-4" />
-          Add to Cart
+          {isProductInCart ? 'Added to Cart' : 'Add to Cart'}
         </Button>
       </CardFooter>
     </Card>
