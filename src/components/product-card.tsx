@@ -88,12 +88,12 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
               }}
             >
               {imagesToDisplay.map((image, index) => (
-                <div key={index} className="w-full h-full flex-shrink-0 relative" style={{ width: `${100 / imagesToDisplay.length}%`}}> 
+                <div key={index} className="top-1 w-full h-full flex-shrink-0 relative" style={{ width: `${100 / imagesToDisplay.length}%`}}> 
                   <Image
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     layout="fill"
-                    objectFit="contain" 
+                    objectFit="cover" 
                     className="w-full h-full rounded-t-lg" 
                     data-ai-hint={image.dataAiHint}
                   />
