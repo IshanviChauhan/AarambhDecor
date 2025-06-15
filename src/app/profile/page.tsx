@@ -13,8 +13,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from '@/components/ui/separator';
 import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { UserProfile, Address, AddressInput } from '@/lib/types';
-import { UserProfileSchema, AddressSchema, type UserProfileInput } from '@/lib/schemas';
+import type { UserProfile, Address } from '@/lib/types';
+import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -62,9 +62,13 @@ export default function ProfilePage() {
   const initialProfileFormState: FormState = { message: null, success: false };
   const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialProfileFormState);
 
+  // We need a way to dynamically set the action for the address form
+  const [currentAddressAction, setCurrentAddressAction] = useState<'add' | 'update'>('add');
+  
+  const addressFormActionToUse = currentAddressAction === 'add' ? addShippingAddress : updateShippingAddress;
   const initialAddressFormState: FormState = { message: null, success: false };
   const [addressFormState, addressFormAction, isAddressSubmitting] = useActionState(
-    editingAddress ? updateShippingAddress : addShippingAddress, 
+    addressFormActionToUse, 
     initialAddressFormState
   );
   
@@ -82,7 +86,7 @@ export default function ProfilePage() {
       city: '',
       state: '',
       postalCode: '',
-      country: 'India', // Default country
+      country: 'India', 
       phoneNumber: '',
     },
   });
@@ -93,6 +97,7 @@ export default function ProfilePage() {
     } else if (user) {
       fetchProfileAndAddresses();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
   const fetchProfileAndAddresses = async () => {
@@ -103,7 +108,10 @@ export default function ProfilePage() {
       setUserProfile(profileData);
       if (profileData?.name) {
         profileForm.reset({ name: profileData.name });
+      } else if (profileData?.email) { // if name is empty, fallback to display name or empty string
+        profileForm.reset({ name: user.displayName || '' });
       }
+
       const addressesData = await getShippingAddresses();
       setAddresses(addressesData);
     } catch (error) {
@@ -122,6 +130,7 @@ export default function ProfilePage() {
       });
       if (profileFormState.success) fetchProfileAndAddresses(); 
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState, toast]);
 
   useEffect(() => {
@@ -135,13 +144,18 @@ export default function ProfilePage() {
         fetchProfileAndAddresses(); 
         setIsAddressModalOpen(false);
         setEditingAddress(null);
-        addressForm.reset();
+        addressForm.reset({
+            fullName: '', addressLine1: '', addressLine2: '', city: '',
+            state: '', postalCode: '', country: 'India', phoneNumber: ''
+        });
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressFormState, toast]);
 
   const handleOpenAddAddressModal = () => {
     setEditingAddress(null);
+    setCurrentAddressAction('add');
     addressForm.reset({ 
         fullName: '', addressLine1: '', addressLine2: '', city: '',
         state: '', postalCode: '', country: 'India', phoneNumber: ''
@@ -151,13 +165,16 @@ export default function ProfilePage() {
 
   const handleOpenEditAddressModal = (address: Address) => {
     setEditingAddress(address);
+    setCurrentAddressAction('update');
     addressForm.reset({ ...address }); 
     setIsAddressModalOpen(true);
   };
 
   const handleDeleteAddress = async (addressId?: string) => {
     if (!addressId) return;
-    if (!confirm('Are you sure you want to delete this address?')) return;
+    // Using window.confirm for simplicity, consider a custom dialog for better UX
+    const confirmed = window.confirm('Are you sure you want to delete this address?');
+    if (!confirmed) return;
 
     const result = await deleteShippingAddress(addressId);
     toast({
@@ -170,7 +187,7 @@ export default function ProfilePage() {
     }
   };
   
-  if (authLoading || isLoadingData) {
+  if (authLoading || (isLoadingData && !userProfile)) { // Adjusted loading condition
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -183,7 +200,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
+  if (!user) { // This check handles the case after loading and no user is found
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -228,7 +245,7 @@ export default function ProfilePage() {
                 />
                 <div>
                   <Label>Email</Label>
-                  <Input type="email" value={userProfile?.email || ''} disabled className="mt-1 bg-muted/50"/>
+                  <Input type="email" value={userProfile?.email || user.email || ''} disabled className="mt-1 bg-muted/50"/>
                   <p className="text-sm text-muted-foreground mt-1">Email cannot be changed.</p>
                 </div>
                  {profileFormState.errors?._form && (
@@ -247,7 +264,7 @@ export default function ProfilePage() {
             <CardTitle className="font-headline text-2xl text-primary">Shipping Addresses</CardTitle>
             <Dialog open={isAddressModalOpen} onOpenChange={(isOpen) => {
               setIsAddressModalOpen(isOpen);
-              if (!isOpen) { // Reset form if modal is closed
+              if (!isOpen) { 
                 setEditingAddress(null);
                 addressForm.reset({
                     fullName: '', addressLine1: '', addressLine2: '', city: '',
@@ -263,7 +280,7 @@ export default function ProfilePage() {
               <DialogContent className="sm:max-w-lg">
                  <Form {...addressForm}>
                     <form 
-                        action={addressFormAction}
+                        onSubmit={addressForm.handleSubmit(() => addressFormAction(new FormData(addressForm.control._formValues)))}
                         className="space-y-4"
                     >
                       <DialogHeader>

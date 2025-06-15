@@ -4,11 +4,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle, LogIn, UserCircle2 } from 'lucide-react';
+import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/lib/firebase'; 
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -50,12 +50,12 @@ export default function Header() {
       }
     };
 
-    calculateTotalItems();
+    calculateTotalItems(); 
 
     const handleCartUpdateEvent = () => {
       calculateTotalItems();
     };
-
+    
     const handleStorageChange = (event: StorageEvent) => {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
@@ -72,7 +72,7 @@ export default function Header() {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('aarambhCartUpdated', handleCartUpdateEvent as EventListener);
     };
-  }, [isClient, user]);
+  }, [isClient, user]); 
 
   const handleSignOut = async () => {
     try {
@@ -82,7 +82,7 @@ export default function Header() {
       }
       await signOut(auth);
       window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-      router.push('/');
+      router.push('/'); 
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
     } catch (error) {
       console.error("Error signing out: ", error);
@@ -97,9 +97,9 @@ export default function Header() {
           <Image
             src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
             alt="Aarambh Decor Logo"
-            width={50}
-            height={50}
-            priority
+            width={50} 
+            height={50} 
+            priority 
             className="object-contain rounded-sm transition-opacity group-hover:opacity-80"
           />
            <span
@@ -123,7 +123,7 @@ export default function Header() {
               Collections
             </Link>
           </Button>
-
+          
           {!authLoading && user ? (
             <>
               {user.email && (
@@ -133,10 +133,10 @@ export default function Header() {
               )}
                <Button asChild variant="ghost" size="icon">
                 <Link href="/profile" aria-label="User Profile">
-                  <UserCircle2 className="h-5 w-5 text-black" />
+                  <UserCircle className="h-5 w-5 text-black" />
                 </Link>
               </Button>
-              <Button variant="ghost" onClick={handleSignOut} className="text-foreground">
+              <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
                 <LogOut className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
                 Sign Out
               </Button>
@@ -166,6 +166,11 @@ export default function Header() {
                   {cartItemCount}
                 </span>
               )}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/profile" aria-label="User Profile">
+              <UserCircle className="h-4 w-4 sm:hidden md:inline-block" />
             </Link>
           </Button>
         </nav>

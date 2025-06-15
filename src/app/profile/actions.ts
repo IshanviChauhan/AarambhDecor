@@ -51,7 +51,19 @@ export async function updateUserProfile(prevState: FormState, formData: FormData
 
   try {
     const profileDocRef = doc(db, 'userProfiles', user.uid);
-    await updateDoc(profileDocRef, { name: validation.data.name });
+    // Ensure only 'name' is updated if it's provided and valid
+    const dataToUpdate: { name?: string } = {};
+    if (validation.data.name) {
+      dataToUpdate.name = validation.data.name;
+    }
+    
+    if (Object.keys(dataToUpdate).length > 0) {
+      await updateDoc(profileDocRef, dataToUpdate);
+    } else if (! (await getDoc(profileDocRef)).exists()) { // if profile doesn't exist, create it
+        await setDoc(profileDocRef, { email: user.email, name: validation.data.name || user.displayName || '' });
+    }
+
+
     revalidatePath('/profile');
     return { message: 'Profile updated successfully!', success: true };
   } catch (error) {
@@ -91,6 +103,7 @@ export async function addShippingAddress(prevState: FormState, formData: FormDat
 
   try {
     const addressesColRef = collection(db, 'userProfiles', user.uid, 'shippingAddresses');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...addressData } = validation.data; // Exclude 'id' if present from Zod
     await addDoc(addressesColRef, addressData);
     revalidatePath('/profile');
