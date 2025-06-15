@@ -67,7 +67,7 @@ export default function SignUpPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-headline text-primary">Create an Account</CardTitle>
-          <CardDescription>Enter your details to get started with Aarambh Lookbook.</CardDescription>
+          <CardDescription>Enter your details to get started with Aarambh Decor.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

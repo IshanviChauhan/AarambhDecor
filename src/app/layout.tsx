@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/contexts/auth-context';
 
 export const metadata: Metadata = {
-  title: 'Aarambh Lookbook',
+  title: 'Aarambh Decor',
   description: 'Discover inspiration with Aarambh Decor. Curated home decor items and AI-powered style suggestions.',
 };
 

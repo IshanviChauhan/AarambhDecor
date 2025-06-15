@@ -65,7 +65,7 @@ export default function SignInPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-headline text-primary">Welcome Back</CardTitle>
-          <CardDescription>Log in to continue to your Aarambh Lookbook.</CardDescription>
+          <CardDescription>Log in to continue to your Aarambh Decor.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
