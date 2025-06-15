@@ -243,7 +243,7 @@ export default function ProductDetailPage() {
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           <Carousel 
-            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200 group" 
+            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" 
             opts={{ loop: safeImageUrls.length > 1 }}
           >
             <CarouselContent>
@@ -253,8 +253,9 @@ export default function ProductDetailPage() {
                     <Image
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
-                      layout="fill"
-                      objectFit="contain"
+                      fill // Changed from layout="fill"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Added sizes prop
+                      style={{ objectFit: 'contain' }} // Changed from objectFit="contain"
                       className="w-full h-full"
                       data-ai-hint={image.dataAiHint}
                       priority={index === 0} 
@@ -266,12 +267,14 @@ export default function ProductDetailPage() {
             {safeImageUrls.length > 1 && (
               <>
                 <CarouselPrevious 
-                  variant="ghost"
-                  className="absolute left-3 top-[40%] -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
+                  variant="outline" 
+                  size="icon" 
+                  className="transition-none hover:bg-background hover:text-muted-foreground hover:border-input hover:transform-none"
                 />
                 <CarouselNext 
-                  variant="ghost"
-                  className="absolute right-3 top-[40%] -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
+                  variant="outline" 
+                  size="icon" 
+                  className="transition-none hover:bg-background hover:text-muted-foreground hover:border-input hover:transform-none"
                 />
               </>
             )}
