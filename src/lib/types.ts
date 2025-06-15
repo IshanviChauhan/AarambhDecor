@@ -47,3 +47,22 @@ export interface UserProfile {
   firstName?: string | null;
   lastName?: string | null;
 }
+
+// --- Order Related Types (for future implementation) ---
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: string; // Price at the time of order
+  imageUrl?: string; // Optional image URL for display in order history
+}
+
+export interface Order {
+  id: string; // Firestore document ID
+  userId: string;
+  orderDate: string; // ISO string or Firestore Timestamp
+  items: OrderItem[];
+  totalAmount: number;
+  shippingAddress: Address;
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+}

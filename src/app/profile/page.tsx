@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useActionState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
@@ -12,9 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, Database } from 'lucide-react';
+import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { UserProfile, Address } from '@/lib/types';
+import type { UserProfile, Address, Order } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -36,11 +36,10 @@ import {
   addShippingAddress,
   updateShippingAddress,
   deleteShippingAddress,
+  getOrderHistory, // Placeholder for order history
   type FormState
 } from './actions';
-import { seedProductsToFirestore } from '@/app/products/actions'; // Import the seed function
-import { useActionState } from 'react';
-
+// Removed seedProductsToFirestore import, assuming it's handled or not needed on this page permanently
 
 function ProfileSubmitButton({ pending, text = "Save Changes" }: { pending: boolean, text?: string }) {
   return (
@@ -58,6 +57,7 @@ export default function ProfilePage() {
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]); // For order history
   const [isLoadingData, setIsLoadingData] = useState(true);
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -69,14 +69,12 @@ export default function ProfilePage() {
   const initialAddressFormState: FormState = { message: null, success: false, errors: undefined };
   const [currentAddressServerAction, setCurrentAddressServerAction] = useState<'add' | 'update'>('add');
 
-  // This ensures the correct action is used based on currentAddressServerAction
   const addressActionToUse = currentAddressServerAction === 'add' ? addShippingAddress : updateShippingAddress;
   const [addressFormState, actualAddressFormAction, isAddressFormSubmitting] = useActionState(
     addressActionToUse, 
     initialAddressFormState
   );
   
-
   const profileForm = useForm<UserProfileInput>({
     resolver: zodResolver(UserProfileSchema),
     defaultValues: { firstName: '', lastName: '' },
@@ -90,19 +88,25 @@ export default function ProfilePage() {
     },
   });
 
-  const fetchProfileAndAddresses = async () => {
+  const fetchProfileData = async () => {
     if (!user) return;
     setIsLoadingData(true);
     try {
-      const profileData = await getUserProfile();
+      const [profileData, addressesData, ordersData] = await Promise.all([
+        getUserProfile(),
+        getShippingAddresses(),
+        getOrderHistory() // Fetch orders
+      ]);
+      
       setUserProfile(profileData);
       profileForm.reset({ 
         firstName: profileData?.firstName || '', 
         lastName: profileData?.lastName || '' 
       });
 
-      const addressesData = await getShippingAddresses();
       setAddresses(addressesData);
+      setOrders(ordersData);
+
     } catch (error) {
       console.error("Failed to load profile data:", error)
       toast({ title: "Error", description: "Failed to load profile data.", variant: "destructive" });
@@ -115,7 +119,7 @@ export default function ProfilePage() {
     if (!authLoading && !user) {
       router.push('/signin');
     } else if (user) {
-      fetchProfileAndAddresses();
+      fetchProfileData();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
@@ -136,7 +140,7 @@ export default function ProfilePage() {
         });
       }
       if (profileFormState.success) {
-        fetchProfileAndAddresses(); 
+        fetchProfileData(); 
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,7 +162,7 @@ export default function ProfilePage() {
         });
       }
       if (addressFormState.success) {
-        fetchProfileAndAddresses();
+        fetchProfileData();
         setIsAddressModalOpen(false);
         addressForm.reset({
             fullName: '', addressLine1: '', addressLine2: '', city: '',
@@ -168,19 +172,6 @@ export default function ProfilePage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressFormState]);
-
-  // Handler for the seed data button
-  const handleSeedData = async () => {
-    toast({ title: "Seeding Data...", description: "Please wait, this may take a moment." });
-    const result = await seedProductsToFirestore();
-    toast({
-      title: result.success ? 'Seeding Successful' : 'Seeding Failed',
-      description: result.message + (result.success ? ` Added ${result.count} products.` : ''),
-      variant: result.success ? 'default' : 'destructive',
-      duration: result.success ? 5000 : 10000, // Show success for shorter, error for longer
-    });
-  };
-
 
   const handleOpenAddAddressModal = () => {
     setEditingAddress(null);
@@ -211,7 +202,7 @@ export default function ProfilePage() {
       variant: result.success ? 'default' : 'destructive',
     });
     if (result.success) {
-      fetchProfileAndAddresses();
+      fetchProfileData();
     }
   };
 
@@ -281,7 +272,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your first name" {...field} />
+                            <Input placeholder="Your first name" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -294,7 +285,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your last name" {...field} />
+                            <Input placeholder="Your last name" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -317,7 +308,7 @@ export default function ProfilePage() {
 
         <Separator className="my-10" />
 
-        <Card className="shadow-lg rounded-lg border-border/70">
+        <Card className="mb-8 shadow-lg rounded-lg border-border/70">
           <CardHeader className="flex flex-row justify-between items-center">
             <CardTitle className="font-headline text-2xl text-primary">Shipping Addresses</CardTitle>
             <Dialog open={isAddressModalOpen} onOpenChange={(isOpen) => {
@@ -393,7 +384,12 @@ export default function ProfilePage() {
             </Dialog>
           </CardHeader>
           <CardContent>
-            {addresses.length === 0 ? (
+            {isLoadingData ? (
+                 <div className="flex justify-center items-center py-6">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                    <p className="ml-3 text-muted-foreground">Loading addresses...</p>
+                 </div>
+            ) : addresses.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
                 <Home className="mx-auto h-10 w-10 mb-3 opacity-50" />
                 <p>You haven't added any shipping addresses yet.</p>
@@ -430,36 +426,55 @@ export default function ProfilePage() {
             )}
           </CardContent>
         </Card>
-        
-        {/* Temporary Seeding Button Section - REMOVE AFTER USE */}
-        <Separator className="my-10" />
-        <Card className="mb-8 shadow-lg rounded-lg border-border/70">
-          <CardHeader>
-            <CardTitle className="font-headline text-2xl text-destructive">Admin: Database Tools</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              This button will populate the Firestore database with the mock product data. 
-              <strong> Only click this once.</strong> After successful seeding, remove this button from the code.
-            </p>
-            <Button onClick={handleSeedData} variant="destructive" className="w-full sm:w-auto">
-              <Database className="mr-2 h-4 w-4" />
-              Seed Product Data to Firestore
-            </Button>
-          </CardContent>
-          <CardFooter>
-            <CardDescription>
-                Ensure your Firestore security rules for the 'products' collection are set up correctly before seeding.
-                (Allow public read, and temporarily allow write or ensure server action has privileges).
-            </CardDescription>
-          </CardFooter>
-        </Card>
-        {/* End Temporary Seeding Button Section */}
 
+        <Separator className="my-10" />
+
+        <Card className="shadow-lg rounded-lg border-border/70">
+           <CardHeader>
+            <CardTitle className="font-headline text-2xl text-primary">Order History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingData ? (
+                <div className="flex justify-center items-center py-6">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                    <p className="ml-3 text-muted-foreground">Loading order history...</p>
+                </div>
+            ) : orders.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                <ShoppingBag className="mx-auto h-10 w-10 mb-3 opacity-50" />
+                <p>You haven't placed any orders yet.</p>
+                <Button asChild variant="link" className="mt-2">
+                    <Link href="/collections">Start Shopping</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Placeholder for displaying orders - This will be expanded later */}
+                {orders.map((order) => (
+                  <Card key={order.id} className="p-4 border-border/50 shadow-sm">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold text-foreground">Order ID: {order.id.substring(0,8)}...</p>
+                        <p className="text-sm text-muted-foreground">Date: {new Date(order.orderDate).toLocaleDateString()}</p>
+                        <p className="text-sm text-muted-foreground">Total: Rs. {order.totalAmount.toFixed(2)}</p>
+                        <p className="text-sm text-muted-foreground">Status: <span className="font-medium">{order.status}</span></p>
+                      </div>
+                       <Button variant="outline" size="sm" asChild>
+                          <Link href={`/profile/orders/${order.id}`}>View Details</Link>
+                       </Button>
+                    </div>
+                  </Card>
+                ))}
+                 <div className="text-center py-6 text-muted-foreground border-t mt-6 pt-6">
+                     <Info className="mx-auto h-8 w-8 mb-3 opacity-50" />
+                    <p>Full order history display is coming soon!</p>
+                 </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>
   );
 }
-
-    

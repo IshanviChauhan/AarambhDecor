@@ -127,13 +127,13 @@ export default function Header() {
           {!authLoading && user ? (
             <>
               {user.email && (
-                <span className="text-sm text-muted-foreground hidden md:inline-block mr-2">
+                <span className="text-sm text-muted-foreground hidden lg:inline-block mr-2">
                   {user.email}
                 </span>
               )}
-               <Button asChild variant="ghost" size="icon">
+              <Button asChild variant="ghost" size="icon">
                 <Link href="/profile" aria-label="User Profile">
-                  <UserCircle className="h-5 w-5 text-black" />
+                  <UserCircle className="h-5 w-5" />
                 </Link>
               </Button>
               <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
@@ -166,11 +166,6 @@ export default function Header() {
                   {cartItemCount}
                 </span>
               )}
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="icon">
-            <Link href="/profile" aria-label="User Profile">
-              <UserCircle className="h-4 w-4 sm:hidden md:inline-block" />
             </Link>
           </Button>
         </nav>
