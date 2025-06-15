@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -126,6 +127,11 @@ body {
   100% { opacity: 1; transform: scale(1); }
 }
 
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 
 /* Custom animation classes */
 .animate-fade-in-down {
@@ -138,6 +144,10 @@ body {
 
 .animate-pop-in {
   animation: popIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
 }
 
 
@@ -163,3 +173,4 @@ input[type="search"]::-ms-reveal {
   width: 0;
   height: 0;
 }
+
