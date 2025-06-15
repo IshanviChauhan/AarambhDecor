@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -11,7 +11,6 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/auth-context';
@@ -140,19 +139,34 @@ export default function HomePage() {
     }
   
     const lowerSearchTerm = trimmedSearchTerm.toLowerCase();
-    // MOCK_PRODUCTS is directly available in the module scope.
     const uniqueProductCategories = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category).filter(Boolean) as string[]));
     
     const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
   
     if (matchedCategory) {
-      // It's a category search
       router.push(`/collections?category=${encodeURIComponent(matchedCategory)}&search=${encodeURIComponent(trimmedSearchTerm)}`);
     } else {
-      // It's a general product/text search
       router.push(`/collections?search=${encodeURIComponent(trimmedSearchTerm)}`);
     }
   };
+
+  const fetchHomepageSuggestions = useCallback(async (query: string): Promise<string[]> => {
+    if (!query.trim()) return [];
+    const lowerQuery = query.toLowerCase();
+    
+    const productSuggestions = MOCK_PRODUCTS
+      .filter(product => product.name.toLowerCase().includes(lowerQuery))
+      .map(product => product.name);
+
+    const categorySuggestions = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category).filter(Boolean) as string[]))
+      .filter(category => category.toLowerCase().includes(lowerQuery))
+      .map(category => `${category} (Category)`);
+      
+    // Combine and limit suggestions
+    const combined = Array.from(new Set([...productSuggestions, ...categorySuggestions]));
+    return combined.slice(0, 7); // Limit to 7 suggestions
+  }, []);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -188,6 +202,7 @@ export default function HomePage() {
             </p>
             <SearchBar 
               onSearch={handleHomepageSearch} 
+              fetchSuggestionsCallback={fetchHomepageSuggestions}
               placeholder="Search products or categories..."
               className="mt-4"
             />

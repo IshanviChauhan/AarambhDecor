@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense, useCallback } from 'react';
 import type { Product, CartItem } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -57,7 +57,6 @@ function CollectionsPageContent() {
   
   useEffect(() => {
     setIsClient(true);
-    // Set searchTerm from URL on initial load or if URL changes directly
     const currentSearch = searchParams.get('search') || '';
     if (currentSearch !== searchTerm) {
         setSearchTerm(currentSearch);
@@ -76,32 +75,27 @@ function CollectionsPageContent() {
       setIsLoadingProducts(false);
     }, 500); 
     return () => clearTimeout(timer);
-  }, [searchParams]); // Rerun if searchParams change
+  }, [searchParams]);
 
-  // Effect to synchronize selectedCategory with URL, and validate it
   useEffect(() => {
-    if (isLoadingProducts || !isClient) return; // Wait for products to load, so `categories` list is accurate
+    if (isLoadingProducts || !isClient) return;
 
     const categoryFromUrl = searchParams.get('category');
 
     if (categoryFromUrl) {
       if (categories.includes(categoryFromUrl)) {
-        // Valid category from URL
         if (categoryFromUrl !== selectedCategory) { 
             setSelectedCategory(categoryFromUrl);
         }
       } else {
-        // Category in URL is invalid
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
-        // Clean up the URL
         const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
         currentParams.delete('category');
         router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
       }
     } else {
-      // No category in URL
       if (selectedCategory !== null) { 
           setSelectedCategory(null); 
       }
@@ -248,6 +242,23 @@ function CollectionsPageContent() {
     router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };
 
+  const fetchCollectionSuggestions = useCallback(async (query: string): Promise<string[]> => {
+    if (!query.trim() || allProducts.length === 0) return [];
+    const lowerQuery = query.toLowerCase();
+    
+    const nameSuggestions = allProducts
+      .filter(product => product.name.toLowerCase().includes(lowerQuery))
+      .map(product => product.name);
+
+    // Could also add description suggestions if desired, but might be too noisy
+    // const descriptionSuggestions = allProducts
+    //   .filter(product => product.description.toLowerCase().includes(lowerQuery))
+    //   .map(product => `${product.name} (match in description)`); 
+      
+    const combined = Array.from(new Set([...nameSuggestions]));
+    return combined.slice(0, 7); // Limit suggestions
+  }, [allProducts]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -279,7 +290,7 @@ function CollectionsPageContent() {
                   <h3 className="text-md font-semibold mb-2 text-foreground">Category</h3>
                   <Select
                     onValueChange={handleCategoryFilter}
-                    value={selectedCategory || 'All'} // Controlled component
+                    value={selectedCategory || 'All'}
                   >
                     <SelectTrigger className="w-full text-base">
                       <SelectValue placeholder="Select category" />
@@ -318,11 +329,12 @@ function CollectionsPageContent() {
             <div className="mb-8">
                 <SearchBar 
                   onSearch={handleCollectionSearch} 
+                  fetchSuggestionsCallback={fetchCollectionSuggestions}
                   placeholder="Search products in this collection..."
                   initialValue={searchTerm}
                 />
             </div>
-            {isLoadingProducts && !allProducts.length ? ( // Show loader only if products are truly not yet available
+            {isLoadingProducts && !allProducts.length ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
@@ -364,8 +376,9 @@ function CollectionsPageContent() {
 
 export default function CollectionsPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-screen"><Loader2 className="h-12 w-12 text-primary animate-spin" /><p className="ml-4 text-lg">Loading...</p></div>}> {/* Suspense for useSearchParams */}
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen"><Loader2 className="h-12 w-12 text-primary animate-spin" /><p className="ml-4 text-lg">Loading...</p></div>}>
       <CollectionsPageContent />
     </Suspense>
   )
 }
+
