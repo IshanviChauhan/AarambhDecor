@@ -25,8 +25,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  // CarouselPrevious, // Removed
+  // CarouselNext, // Removed
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 
@@ -253,9 +253,9 @@ export default function ProductDetailPage() {
                     <Image
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
-                      fill // Changed from layout="fill"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Added sizes prop
-                      style={{ objectFit: 'contain' }} // Changed from objectFit="contain"
+                      fill 
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+                      style={{ objectFit: 'contain' }} 
                       className="w-full h-full"
                       data-ai-hint={image.dataAiHint}
                       priority={index === 0} 
@@ -264,20 +264,7 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {safeImageUrls.length > 1 && (
-              <>
-                <CarouselPrevious 
-                  variant="outline" 
-                  size="icon" 
-                  className="transition-none hover:bg-background hover:text-muted-foreground hover:border-input hover:transform-none"
-                />
-                <CarouselNext 
-                  variant="outline" 
-                  size="icon" 
-                  className="transition-none hover:bg-background hover:text-muted-foreground hover:border-input hover:transform-none"
-                />
-              </>
-            )}
+            {/* CarouselPrevious and CarouselNext removed */}
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
@@ -459,4 +446,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
