@@ -1,8 +1,9 @@
 
 "use client";
 
-import { AnimatePresence, motion, useMotionTemplate } from "motion";
+import { AnimatePresence, motion, useMotionTemplate } from "framer-motion";
 import React, { useCallback, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface Position {
   /** The x coordinate of the lens */
@@ -30,7 +31,7 @@ interface LensProps {
   lensColor?: string;
   /** The aria label of the lens */
   ariaLabel?: string;
-  className?: string; 
+  className?: string;
 }
 
 export function Lens({
@@ -43,7 +44,7 @@ export function Lens({
   duration = 0.1,
   lensColor = "black",
   ariaLabel = "Zoom Area",
-  className, 
+  className,
 }: LensProps) {
   if (zoomFactor < 1) {
     throw new Error("zoomFactor must be greater than 1");
@@ -113,7 +114,7 @@ export function Lens({
   return (
     <div
       ref={containerRef}
-      className={cn("relative z-20 overflow-hidden rounded-xl", className || '')} 
+      className={cn("relative z-20 overflow-hidden rounded-xl", className || '')}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onMouseMove={handleMouseMove}
