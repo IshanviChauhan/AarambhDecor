@@ -18,38 +18,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AuthProvider: Mounting. Initial auth.currentUser:", auth.currentUser ? auth.currentUser.uid : 'null');
-    const unsubscribe = onAuthStateChanged(auth, (currentUserFromListener) => {
-      console.log("AuthProvider: onAuthStateChanged listener fired.");
-      console.log("AuthProvider: currentUserFromListener:", currentUserFromListener ? currentUserFromListener.uid : 'null');
-      // Check auth.currentUser directly as well, it should match currentUserFromListener
-      console.log("AuthProvider: auth.currentUser at time of listener firing:", auth.currentUser ? auth.currentUser.uid : 'null');
+    console.log("AuthProvider: useEffect triggered. Setting up onAuthStateChanged listener.");
+    // It's often more insightful to see auth.currentUser *inside* the listener's first call,
+    // or just rely on what the listener itself provides.
+    // console.log("AuthProvider: Initial auth.currentUser before listener setup:", auth.currentUser ? auth.currentUser.uid : 'null');
 
-      setUser(currentUserFromListener);
+    const unsubscribe = onAuthStateChanged(auth, (currentUserFromListener) => {
+      console.log("AuthProvider: --- onAuthStateChanged LISTENER FIRED ---");
+      if (currentUserFromListener) {
+        console.log(`AuthProvider: Listener reported - USER DETECTED. UID: ${currentUserFromListener.uid}, Email: ${currentUserFromListener.email}`);
+        setUser(currentUserFromListener);
+      } else {
+        console.log("AuthProvider: Listener reported - USER IS NULL.");
+        setUser(null);
+      }
       setLoading(false);
-      console.log(`AuthProvider: State updated. Loading: false, User set to: ${currentUserFromListener ? currentUserFromListener.uid : 'null'}`);
+      console.log(`AuthProvider: Listener finished. State updated: loading=${false}, user=${currentUserFromListener ? currentUserFromListener.uid : 'null'}`);
     }, (error) => {
-      console.error("AuthProvider: Error in onAuthStateChanged listener:", error);
-      setUser(null); // Ensure user is null on error
-      setLoading(false); // Ensure loading is false on error
-      console.log(`AuthProvider: State updated due to error. Loading: false, User set to: null`);
+      console.error("AuthProvider: ERROR in onAuthStateChanged listener:", error);
+      setUser(null);
+      setLoading(false);
+      console.log(`AuthProvider: Listener finished due to ERROR. State updated: loading=${false}, user=null`);
     });
-    
-    // This initial check is good for seeing the very first state.
-    if (auth.currentUser) {
-        console.log(`AuthProvider: Initial check on mount (after listener setup) - auth.currentUser found. UID: ${auth.currentUser.uid}`);
-    } else {
-        console.log("AuthProvider: Initial check on mount (after listener setup) - auth.currentUser is null.");
-    }
 
     return () => {
-      console.log("AuthProvider: Unmounting. Unsubscribing from onAuthStateChanged.");
+      console.log("AuthProvider: useEffect cleanup. Unsubscribing from onAuthStateChanged.");
       unsubscribe();
     };
-  }, []);
+  }, []); // Empty dependency array: runs once on mount, cleans up on unmount
 
   if (loading) {
-    console.log("AuthProvider: In loading state, rendering loader.");
+    // This log is fine for when the component is initially mounting and waiting for the first auth state.
+    console.log("AuthProvider: Component rendering - IN LOADING STATE.");
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-background">
         <div className="flex flex-row gap-2">
@@ -61,7 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  console.log(`AuthProvider: Rendering children. Current loading state: ${loading}, User state: ${user ? user.uid : 'null'}`);
+
+  // This log will show the state with which the children are being rendered.
+  console.log(`AuthProvider: Component rendering - NOT loading. Current User state from AuthProvider: ${user ? user.uid : 'null'}`);
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
