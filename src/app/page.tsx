@@ -136,7 +136,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+      <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         
         <section className="text-center pt-8 pb-12 md:pt-12 md:pb-16">
           <h1 className="text-5xl md:text-6xl font-headline text-primary mb-6 animate-fade-in-down">
@@ -153,8 +153,6 @@ export default function HomePage() {
             </Link>
           </Button>
         </section>
-
-        {/* Brand Image Section Removed */}
 
         <Separator className="my-12 md:my-20 border-border/70" />
 

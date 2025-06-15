@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
-        <main className="flex-grow container mx-auto px-4 py-8 flex justify-center items-center">
+        <main className="flex-grow container mx-auto px-2 py-8 flex justify-center items-center">
           <Loader2 className="h-16 w-16 text-primary animate-spin" />
            <p className="ml-4 text-xl text-muted-foreground">Loading product details...</p>
         </main>
@@ -200,7 +200,7 @@ export default function ProductDetailPage() {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
-        <main className="flex-grow container mx-auto px-4 py-8 text-center">
+        <main className="flex-grow container mx-auto px-2 py-8 text-center">
           <AlertTriangle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-3xl font-headline text-destructive mb-2">Product Not Found</h1>
           <p className="text-muted-foreground mb-6">Sorry, we couldn't find the product you're looking for.</p>
@@ -219,7 +219,7 @@ export default function ProductDetailPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+      <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <div className="mb-6">
           <Button variant="outline" asChild size="sm">
             <Link href="/collections">

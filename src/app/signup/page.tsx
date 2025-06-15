@@ -63,7 +63,7 @@ export default function SignUpPage() {
   }, [formState, toast, form, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+    <div className="flex items-center justify-center min-h-screen bg-background p-2">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-headline text-primary">Create an Account</CardTitle>

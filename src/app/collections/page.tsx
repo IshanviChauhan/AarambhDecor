@@ -180,7 +180,7 @@ export default function CollectionsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+      <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <section className="text-center mb-10 md:mb-12">
            <div className="flex items-center justify-center space-x-3 mb-4">
             <LayoutGrid className="h-10 w-10 text-primary" />

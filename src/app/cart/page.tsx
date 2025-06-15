@@ -94,7 +94,7 @@ export default function CartPage() {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
-        <main className="flex-grow container mx-auto px-4 py-8 md:py-12 flex justify-center items-center">
+        <main className="flex-grow container mx-auto px-2 py-8 md:py-12 flex justify-center items-center">
           <ShoppingBag className="h-12 w-12 text-primary animate-pulse" />
            <p className="ml-4 text-lg text-muted-foreground">Loading your cart...</p>
         </main>
@@ -107,7 +107,7 @@ export default function CartPage() {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
-        <main className="flex-grow container mx-auto px-4 py-8 md:py-12 text-center">
+        <main className="flex-grow container mx-auto px-2 py-8 md:py-12 text-center">
             <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
             <h1 className="text-3xl font-headline text-primary mb-2">Authentication Required</h1>
             <p className="text-muted-foreground mb-6">Please log in to view your cart.</p>
@@ -123,7 +123,7 @@ export default function CartPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+      <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <section className="text-center mb-10 md:mb-12">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <ShoppingBag className="h-10 w-10 text-primary" />

@@ -97,7 +97,7 @@ export default function Header() {
   };
 
   return (
-    <header className="py-4 px-4 md:px-8 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
+    <header className="py-4 px-2 md:px-4 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
         <Link href="/" className="hover:opacity-80 transition-opacity mb-4 sm:mb-0" aria-label="Aarambh Decor Lookbook Home">
           <Image
@@ -106,7 +106,7 @@ export default function Header() {
             width={50} 
             height={50} 
             priority 
-            className="object-contain rounded-full"
+            className="object-contain rounded-sm"
           />
         </Link>
         <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
