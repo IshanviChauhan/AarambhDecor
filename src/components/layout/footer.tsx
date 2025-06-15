@@ -1,6 +1,9 @@
 
 import Link from 'next/link';
 import { Instagram, Heart } from 'lucide-react';
+import { useMemo } from 'react';
+import { MOCK_PRODUCTS } from '@/lib/mock-data';
+import type { Product } from '@/lib/types';
 
 // Simple inline SVG for WhatsApp icon
 const WhatsAppIcon = () => (
@@ -22,6 +25,17 @@ const WhatsAppIcon = () => (
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  const productCategories = useMemo(() => {
+    if (!MOCK_PRODUCTS || MOCK_PRODUCTS.length === 0) {
+      return [];
+    }
+    const uniqueCategories = new Set(
+      MOCK_PRODUCTS.map(p => p.category).filter(Boolean) as string[]
+    );
+    return Array.from(uniqueCategories).sort();
+  }, []);
+
   return (
     <footer className="py-12 md:py-16 px-4 md:px-8 border-t border-border/50 mt-auto bg-secondary/30 text-foreground">
       <div className="container mx-auto">
@@ -51,10 +65,23 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-lg mb-4 text-foreground">Collections</h3>
             <ul className="space-y-2.5">
-              <li><Link href="/collections?category=Wall%20Art" className="text-sm text-muted-foreground hover:text-primary transition-colors">Wall Art</Link></li>
-              <li><Link href="/collections?category=Tabletops" className="text-sm text-muted-foreground hover:text-primary transition-colors">Tabletops</Link></li>
-              <li><Link href="/collections?category=Mirrors" className="text-sm text-muted-foreground hover:text-primary transition-colors">Mirrors</Link></li>
-              <li><Link href="/collections?category=Handicrafts" className="text-sm text-muted-foreground hover:text-primary transition-colors">Handicrafts</Link></li>
+              {productCategories.length > 0 ? (
+                productCategories.map(category => (
+                  <li key={category}>
+                    <Link
+                      href={`/collections?category=${encodeURIComponent(category)}`}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {category}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li>
+                  <p className="text-sm text-muted-foreground">No specific categories found.</p>
+                </li>
+              )}
+              <li><Link href="/collections" className="text-sm text-muted-foreground hover:text-primary transition-colors">View All</Link></li>
             </ul>
           </div>
 
