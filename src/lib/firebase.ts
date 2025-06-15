@@ -1,6 +1,7 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,6 +21,7 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 // To use the Firebase Auth Emulator, uncomment the lines below and ensure the emulator is running.
 // Note: connectAuthEmulator should ideally be called only once.
@@ -35,4 +37,4 @@ const auth = getAuth(app);
 //   }
 // }
 
-export { app, auth };
+export { app, auth, db };

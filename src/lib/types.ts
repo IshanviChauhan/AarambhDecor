@@ -16,7 +16,7 @@ export interface Product {
   name: string;
   description: string;
   careInstructions: string;
-  imageUrls: ProductImage[]; // Changed from imageUrl and dataAiHint
+  imageUrls: ProductImage[];
   price?: string;
   category?: string;
   isLatest?: boolean;
@@ -27,4 +27,23 @@ export interface Product {
 
 export interface CartItem extends Product {
   quantity: number;
+}
+
+export interface Address {
+  id?: string; // Firestore document ID
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string; // Or province/region
+  postalCode: string;
+  country: string;
+  phoneNumber?: string;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string; // From Firebase Auth
+  name?: string;
+  // addresses?: Address[]; // Addresses will be a subcollection
 }

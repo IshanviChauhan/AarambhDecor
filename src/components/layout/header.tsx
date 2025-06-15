@@ -4,11 +4,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle, LogIn } from 'lucide-react';
+import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle, LogIn, UserCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
-import { auth } from '@/lib/firebase'; // Import auth for direct use if needed
+import { auth } from '@/lib/firebase'; 
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -32,7 +32,6 @@ export default function Header() {
       if (user) {
         storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
       } else {
-        // If no user, cart count is 0
         setCartItemCount(0);
         return;
       }
@@ -53,17 +52,14 @@ export default function Header() {
 
     calculateTotalItems(); 
 
-    // Listen for custom event when cart is updated elsewhere in the app
     const handleCartUpdateEvent = () => {
       calculateTotalItems();
     };
     
-    // Listen for direct storage changes (e.g. other tabs, though less reliable for our specific keys)
     const handleStorageChange = (event: StorageEvent) => {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
         } else if (!user && event.key && event.key.startsWith('aarambhCart_')) {
-            // If user logs out, we want to ensure count is 0
             calculateTotalItems();
         }
     };
@@ -76,19 +72,17 @@ export default function Header() {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('aarambhCartUpdated', handleCartUpdateEvent as EventListener);
     };
-  }, [isClient, user]); // Re-run if user state changes
+  }, [isClient, user]); 
 
   const handleSignOut = async () => {
     try {
-      // Clear user-specific cart from localStorage before signing out
       if (user) {
         localStorage.removeItem(`aarambhCart_${user.uid}`);
         localStorage.removeItem(`aarambhWishlist_${user.uid}`);
       }
       await signOut(auth);
-      // Dispatch event so header immediately updates count to 0
       window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-      router.push('/'); // Redirect to home after sign out
+      router.push('/'); 
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
     } catch (error) {
       console.error("Error signing out: ", error);
@@ -137,6 +131,11 @@ export default function Header() {
                   {user.email}
                 </span>
               )}
+               <Button asChild variant="ghost" className="text-foreground" size="icon">
+                <Link href="/profile" aria-label="User Profile">
+                  <UserCircle2 className="h-5 w-5" />
+                </Link>
+              </Button>
               <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
                 <LogOut className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
                 Sign Out
