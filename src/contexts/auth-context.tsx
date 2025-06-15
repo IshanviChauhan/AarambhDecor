@@ -18,27 +18,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AuthProvider mounted. Setting up onAuthStateChanged listener.");
+    console.log("AuthProvider: Mounting. Setting up onAuthStateChanged listener.");
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("onAuthStateChanged triggered. Current user:", currentUser ? currentUser.uid : null, currentUser);
+      if (currentUser) {
+        console.log(`AuthProvider: onAuthStateChanged - User detected. UID: ${currentUser.uid}, Email: ${currentUser.email}`);
+      } else {
+        console.log("AuthProvider: onAuthStateChanged - No user detected (currentUser is null).");
+      }
       setUser(currentUser);
       setLoading(false);
-      console.log("AuthProvider: loading set to false, user set to:", currentUser ? currentUser.uid : null);
+      console.log(`AuthProvider: State updated. Loading: false, User: ${currentUser ? currentUser.uid : 'null'}`);
     }, (error) => {
       console.error("AuthProvider: Error in onAuthStateChanged listener:", error);
-      setLoading(false);
+      setLoading(false); // Ensure loading is set to false on error too
     });
     
-    // Check initial auth state more directly if needed, though onAuthStateChanged usually handles it
     if (auth.currentUser) {
-        console.log("AuthProvider: Initial auth.currentUser check on mount:", auth.currentUser.uid);
-        // setUser(auth.currentUser); // This might cause a race condition with onAuthStateChanged
+        console.log(`AuthProvider: Initial check on mount - auth.currentUser found. UID: ${auth.currentUser.uid}`);
     } else {
-        console.log("AuthProvider: Initial auth.currentUser check on mount: no user.");
+        console.log("AuthProvider: Initial check on mount - auth.currentUser is null.");
     }
 
     return () => {
-      console.log("AuthProvider unmounted. Unsubscribing from onAuthStateChanged.");
+      console.log("AuthProvider: Unmounting. Unsubscribing from onAuthStateChanged.");
       unsubscribe();
     };
   }, []);
@@ -52,11 +54,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:0.15s]"></div>
           <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:0.3s]"></div>
         </div>
-        <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
+        <p className="mt-4 text-lg text-muted-foreground">Initializing Authentication...</p>
       </div>
     );
   }
-  console.log("AuthProvider: Not loading, rendering children. User state:", user ? user.uid : null);
+  console.log(`AuthProvider: Rendering children. Final loading state: ${loading}, User state: ${user ? user.uid : 'null'}`);
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}

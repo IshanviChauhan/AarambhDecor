@@ -1,6 +1,6 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth'; // Import persistence
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -19,6 +19,8 @@ if (typeof window !== 'undefined') { // Ensure this only runs on the client
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
     console.error("CRITICAL: Firebase API Key or Project ID is missing. Check your .env file and ensure it's loaded correctly for the client (NEXT_PUBLIC_ prefix).");
   }
+  // Check if storageBucket ends with .appspot.com, which is typical.
+  // Warn if it doesn't, as it's a common misconfiguration point.
   if (firebaseConfig.storageBucket && !firebaseConfig.storageBucket.endsWith('.appspot.com')) {
     console.warn(`POTENTIAL CONFIG ISSUE: Your NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET value is "${firebaseConfig.storageBucket}". It typically should end with ".appspot.com" (e.g., "${firebaseConfig.projectId || 'your-project-id'}.appspot.com"). Please verify this in your .env file and Firebase project settings.`);
   }
@@ -34,7 +36,6 @@ if (!getApps().length) {
     }
   } catch (e) {
     console.error("Error initializing Firebase app:", e);
-    // Fallback or rethrow, depending on desired error handling
     throw e;
   }
 } else {
@@ -45,6 +46,18 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(app);
+
+// Set persistence explicitly - this should run on the client side
+if (typeof window !== 'undefined') {
+  setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+      console.log("Firebase auth persistence explicitly set to 'local'.");
+    })
+    .catch((error) => {
+      console.error("Error setting Firebase auth persistence:", error);
+    });
+}
+
 const db = getFirestore(app);
 
 export { app, auth, db };
