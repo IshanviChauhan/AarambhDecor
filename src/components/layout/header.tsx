@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, ShoppingCart, LogIn, UserCircle, LogOut, Sparkles } from 'lucide-react'; // Added Sparkles
+import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -133,14 +133,13 @@ export default function Header() {
             </Link>
           </Button>
           
-          {/* Placeholder for AI Advisor link if needed:
           <Button asChild variant="ghost">
             <Link href="/ai-advisor" aria-label="AI Advisor">
               <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> 
               AI Advisor
             </Link>
           </Button> 
-          */}
+         
 
           {!authLoading && user ? (
             <DropdownMenu>
@@ -201,4 +200,3 @@ export default function Header() {
     </header>
   );
 }
-

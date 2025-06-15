@@ -10,32 +10,38 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID, // Added Measurement ID
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
+
+// Log the config being used by the client-side SDK
+if (typeof window !== 'undefined') { // Ensure this only runs on the client
+  console.log("Firebase config being used by client-side SDK:", firebaseConfig);
+  if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+    console.error("Firebase API Key or Project ID is missing. Check your .env file and ensure it's loaded correctly for the client (NEXT_PUBLIC_ prefix).");
+  }
+}
 
 let app: FirebaseApp;
 
 if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
+  try {
+    app = initializeApp(firebaseConfig);
+    if (typeof window !== 'undefined') {
+      console.log("Firebase app initialized successfully.");
+    }
+  } catch (e) {
+    console.error("Error initializing Firebase app:", e);
+    // Fallback or rethrow, depending on desired error handling
+    throw e;
+  }
 } else {
   app = getApps()[0]!;
+  if (typeof window !== 'undefined') {
+    console.log("Firebase app already initialized.");
+  }
 }
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-// To use the Firebase Auth Emulator, uncomment the lines below and ensure the emulator is running.
-// Note: connectAuthEmulator should ideally be called only once.
-// if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-//   // Check if emulator is already connected to prevent re-connecting on HMR
-//   if (!auth.emulatorConfig) { 
-//     try {
-//       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-//       console.log("Firebase Auth Emulator connected.");
-//     } catch (error) {
-//       console.error("Error connecting to Firebase Auth Emulator:", error);
-//     }
-//   }
-// }
 
 export { app, auth, db };

@@ -5,7 +5,6 @@ import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { auth } from '@/lib/firebase';
-// import { Loader2 } from 'lucide-react'; // Loader2 is no longer used
 
 interface AuthContextType {
   user: User | null;
@@ -19,14 +18,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthProvider mounted. Setting up onAuthStateChanged listener.");
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log("onAuthStateChanged triggered. Current user:", currentUser ? currentUser.uid : null, currentUser);
       setUser(currentUser);
       setLoading(false);
+      console.log("AuthProvider: loading set to false, user set to:", currentUser ? currentUser.uid : null);
+    }, (error) => {
+      console.error("AuthProvider: Error in onAuthStateChanged listener:", error);
+      setLoading(false);
     });
-    return () => unsubscribe();
+    
+    // Check initial auth state more directly if needed, though onAuthStateChanged usually handles it
+    if (auth.currentUser) {
+        console.log("AuthProvider: Initial auth.currentUser check on mount:", auth.currentUser.uid);
+        // setUser(auth.currentUser); // This might cause a race condition with onAuthStateChanged
+    } else {
+        console.log("AuthProvider: Initial auth.currentUser check on mount: no user.");
+    }
+
+    return () => {
+      console.log("AuthProvider unmounted. Unsubscribing from onAuthStateChanged.");
+      unsubscribe();
+    };
   }, []);
 
   if (loading) {
+    console.log("AuthProvider: In loading state, rendering loader.");
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-background">
         <div className="flex flex-row gap-2">
@@ -38,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
+  console.log("AuthProvider: Not loading, rendering children. User state:", user ? user.uid : null);
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
@@ -53,4 +71,3 @@ export function useAuth() {
   }
   return context;
 }
-
