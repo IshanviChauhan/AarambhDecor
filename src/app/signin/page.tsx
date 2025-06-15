@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SignInSchema, type SignInInput } from '@/lib/schemas';
 import { signInWithEmail, type SignInFormState } from './actions';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -44,7 +45,6 @@ export default function SignInPage() {
     if (formState.errors) {
       if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });
       if (formState.errors.password) form.setError('password', { type: 'server', message: formState.errors.password.join(', ') });
-      // Do not set root.serverError for _form errors here, they will be handled by toast
     }
 
     if (formState.message) {
@@ -54,11 +54,29 @@ export default function SignInPage() {
         variant: formState.success ? 'default' : 'destructive',
       });
     }
-    // Redirect is handled by server action, so no client-side redirect needed here on formState.success
   }, [formState, toast, form]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-2">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-2">
+      <div className="mb-8">
+        <Link href="/" className="flex items-center group" aria-label="Aarambh Decor Home">
+          <Image
+            src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
+            alt="Aarambh Decor Logo"
+            width={60} 
+            height={60} 
+            priority 
+            className="object-contain rounded-sm transition-opacity group-hover:opacity-80"
+          />
+           <span
+            className="ml-3 text-2xl font-headline text-primary opacity-0 w-0 transform -translate-x-4
+                       group-hover:opacity-100 group-hover:w-auto group-hover:translate-x-0
+                       transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap"
+          >
+            Aarambh Decor
+          </span>
+        </Link>
+      </div>
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-headline text-primary">Welcome Back</CardTitle>
@@ -93,7 +111,6 @@ export default function SignInPage() {
                   </FormItem>
                 )}
               />
-              {/* Removed inline display of formState.errors._form or root.serverError */}
               <SubmitButton />
             </form>
           </Form>
