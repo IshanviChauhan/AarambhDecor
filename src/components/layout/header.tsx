@@ -111,13 +111,13 @@ export default function Header() {
           </span>
         </Link>
         <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
-          <Button asChild variant="ghost" className="text-foreground">
+          <Button asChild variant="ghost">
             <Link href="/" aria-label="Home">
               <Home className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
               Home
             </Link>
           </Button>
-          <Button asChild variant="ghost" className="text-foreground">
+          <Button asChild variant="ghost">
             <Link href="/collections" aria-label="Collections">
               <LayoutGrid className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
               Collections
@@ -131,9 +131,9 @@ export default function Header() {
                   {user.email}
                 </span>
               )}
-               <Button asChild variant="ghost" className="text-foreground" size="icon">
+               <Button asChild variant="ghost" size="icon">
                 <Link href="/profile" aria-label="User Profile">
-                  <UserCircle2 className="h-5 w-5" />
+                  <UserCircle2 className="h-5 w-5 text-black" />
                 </Link>
               </Button>
               <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
@@ -143,7 +143,7 @@ export default function Header() {
             </>
           ) : !authLoading && !user ? (
             <>
-              <Button asChild variant="ghost" className="text-foreground">
+              <Button asChild variant="ghost">
                 <Link href="/signin" aria-label="Log In">
                   <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
                   Log In
@@ -158,7 +158,7 @@ export default function Header() {
             </>
           ) : null}
 
-          <Button asChild variant="ghost" className="text-foreground relative" size="icon">
+          <Button asChild variant="ghost" className="relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
               {isClient && user && cartItemCount > 0 && (
