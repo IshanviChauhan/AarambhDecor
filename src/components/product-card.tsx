@@ -76,7 +76,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <div 
-            className="relative w-full h-56 overflow-hidden rounded-t-lg" // Container for sliding images, added rounded-t-lg
+            className="relative w-full h-52 overflow-hidden rounded-t-lg" // Container for sliding images, added rounded-t-lg
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -94,7 +94,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
                     alt={`${product.name} image ${index + 1}`}
                     layout="fill"
                     objectFit="cover"
-                    className="w-full h-full" // Ensure image fills its container
+                    className="w-full h-full rounded-lg" // Ensure image fills its container
                     data-ai-hint={image.dataAiHint}
                   />
                 </div>
@@ -137,4 +137,3 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
     </Card>
   );
 }
-
