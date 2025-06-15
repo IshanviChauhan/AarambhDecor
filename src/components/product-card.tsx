@@ -93,7 +93,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     layout="fill"
-                    objectFit="contain"
+                    objectFit="cover"
                     className="w-full h-full rounded-lg" // Ensure image fills its container
                     data-ai-hint={image.dataAiHint}
                   />
