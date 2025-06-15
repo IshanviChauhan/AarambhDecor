@@ -33,7 +33,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
     if (isHovering && imagesToDisplay.length > 1) {
       intervalRef.current = setInterval(() => {
         setCurrentImageIndex(prevIndex => (prevIndex + 1) % imagesToDisplay.length);
-      }, 1500); // Change image every 1.5 seconds
+      }, 1000); // Change image every 1 second
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
