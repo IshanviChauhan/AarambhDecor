@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, ShoppingCart, LogIn, UserCircle, LogOut } from 'lucide-react';
+import { LayoutGrid, Home, ShoppingCart, LogIn, UserCircle, LogOut, Sparkles } from 'lucide-react'; // Added Sparkles
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -201,3 +201,4 @@ export default function Header() {
     </header>
   );
 }
+
