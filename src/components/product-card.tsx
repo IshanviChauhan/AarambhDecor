@@ -56,9 +56,9 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   const handleMouseLeave = () => {
     if (imagesToDisplay.length > 1) {
       setIsHovering(false);
-      setCurrentImageIndex(0); 
+      setCurrentImageIndex(0);
       if (intervalRef.current) {
-        clearInterval(intervalRef.current); 
+        clearInterval(intervalRef.current);
       }
     }
   };
@@ -68,23 +68,23 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
       "overflow-hidden shadow-lg flex flex-col rounded-lg border-border/70",
       "flex-1 min-w-[200px] max-w-[300px]", // Adjusted for potentially better flex behavior
       "transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl",
-      "animate-pop-in", 
+      "animate-pop-in",
       propClassName
     )}>
       <CardHeader
         className="p-0 relative" // Keep relative for WishlistIcon positioning
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
-          <div 
+          <div
             className="relative w-full h-52 overflow-hidden rounded-t-lg" // Container for sliding images, added rounded-t-lg
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
             <div
               className="flex h-full transition-transform duration-500 ease-in-out"
-              style={{ 
+              style={{
                 width: `${imagesToDisplay.length * 100}%`, // Ensure filmstrip is wide enough
-                transform: `translateX(-${(currentImageIndex / imagesToDisplay.length) * 100}%)` 
+                transform: `translateX(-${(currentImageIndex / imagesToDisplay.length) * 100}%)`
               }}
             >
               {imagesToDisplay.map((image, index) => (
@@ -93,7 +93,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     layout="fill"
-                    objectFit="cover"
+                    objectFit="contain"
                     className="w-full h-full rounded-lg" // Ensure image fills its container
                     data-ai-hint={image.dataAiHint}
                   />
@@ -111,7 +111,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         </div>
       </CardHeader>
       <CardContent className="p-4 flex flex-col flex-grow min-w-0">
-        <div> 
+        <div>
           <CardTitle className="font-headline text-xl mb-2 leading-tight break-words">
             <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
               {product.name}
