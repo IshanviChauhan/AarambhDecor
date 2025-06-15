@@ -3,13 +3,21 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { LayoutGrid, Home, ShoppingCart } from 'lucide-react';
+import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
+import { useAuth } from '@/contexts/auth-context';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Header() {
   const [cartItemCount, setCartItemCount] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
@@ -34,7 +42,7 @@ export default function Header() {
       }
     };
 
-    calculateTotalItems(); // Initial calculation
+    calculateTotalItems(); 
 
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'aarambhCart') {
@@ -55,6 +63,17 @@ export default function Header() {
     };
   }, [isClient]);
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+      toast({ title: "Signed Out", description: "You have been successfully signed out." });
+    } catch (error) {
+      console.error("Error signing out: ", error);
+      toast({ title: "Sign Out Error", description: "Failed to sign out. Please try again.", variant: "destructive" });
+    }
+  };
+
   return (
     <header className="py-6 px-4 md:px-8 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
@@ -74,6 +93,36 @@ export default function Header() {
               Collections
             </Link>
           </Button>
+          
+          {!authLoading && user ? (
+            <>
+              {user.email && (
+                <span className="text-sm text-muted-foreground hidden md:inline-block mr-2">
+                  {user.email}
+                </span>
+              )}
+              <Button variant="ghost" onClick={handleSignOut} className="text-foreground hover:text-primary">
+                <LogOut className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                Sign Out
+              </Button>
+            </>
+          ) : !authLoading && !user ? (
+            <>
+              <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+                <Link href="/signin" aria-label="Sign In">
+                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                  Sign In
+                </Link>
+              </Button>
+              <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
+                <Link href="/signup" aria-label="Sign Up">
+                   <UserCircle className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                  Sign Up
+                </Link>
+              </Button>
+            </>
+          ) : null}
+
           <Button asChild variant="ghost" className="text-foreground hover:text-primary relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
