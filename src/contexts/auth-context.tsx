@@ -30,9 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-background">
         <div className="flex flex-row gap-2">
-          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.7s]"></div>
-          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.3s]"></div>
-          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:.7s]"></div>
+          <div className="w-4 h-4 rounded-full bg-primary animate-bounce"></div>
+          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:0.15s]"></div>
+          <div className="w-4 h-4 rounded-full bg-primary animate-bounce [animation-delay:0.3s]"></div>
         </div>
         <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
       </div>
@@ -53,3 +53,4 @@ export function useAuth() {
   }
   return context;
 }
+
