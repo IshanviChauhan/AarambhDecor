@@ -1,0 +1,11 @@
+export default function Footer() {
+  const currentYear = new Date().getFullYear();
+  return (
+    <footer className="py-8 px-4 md:px-8 border-t border-border/50 mt-auto bg-secondary/30">
+      <div className="container mx-auto text-center text-muted-foreground">
+        <p>&copy; {currentYear} Aarambh Lookbook. All rights reserved.</p>
+        <p className="text-sm mt-1">Inspired by Aarambh Decor - Where stories unfold in every space.</p>
+      </div>
+    </footer>
+  );
+}
