@@ -7,7 +7,7 @@ import type { Product, CartItem, Review, ProductImage } from '@/lib/types';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-// import Image from 'next/image'; // Replaced by Lens with img
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from '@/components/wishlist-icon';
 import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send } from 'lucide-react';
@@ -28,7 +28,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Lens } from '@/components/magicui/lens';
 import { cn } from '@/lib/utils';
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
@@ -248,28 +247,23 @@ export default function ProductDetailPage() {
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
                   <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden border border-border/50 shadow-lg bg-card">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <Lens 
-                        zoomFactor={2} 
-                        lensSize={120} 
-                        className="w-full h-full"
-                        ariaLabel={`Zoom area for ${product.name} - Image ${index + 1}`}
-                    >
-                      <img
-                        src={image.url}
-                        alt={`${product.name} - Image ${index + 1}`}
-                        data-ai-hint={image.dataAiHint}
-                        className="w-full h-full object-contain"
-                      />
-                    </Lens>
+                    <Image
+                      src={image.url}
+                      alt={`${product.name} - Image ${index + 1}`}
+                      layout="fill"
+                      objectFit="contain"
+                      className="w-full h-full"
+                      data-ai-hint={image.dataAiHint}
+                      priority={index === 0} 
+                    />
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
             {safeImageUrls.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 sm:-left-4 md:-left-10 hover:translate-y-0" />
-                <CarouselNext className="right-2 sm:-right-4 md:-right-10 hover:translate-y-0" />
+                <CarouselPrevious className="left-2 hover:translate-y-0" />
+                <CarouselNext className="right-2 hover:translate-y-0" />
               </>
             )}
           </Carousel>
