@@ -4,12 +4,12 @@
 import { useFormState, useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SignInSchema, signInWithEmail, type SignInInput, type SignInFormState } from './actions';
+import { SignInSchema, type SignInInput } from '@/lib/schemas';
+import { signInWithEmail, type SignInFormState } from './actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -51,7 +51,6 @@ export default function SignInPage() {
     }
     if (formState.success) {
       // Redirect is handled by server action
-      // router.push('/'); 
     }
      if (formState.errors) {
       if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });

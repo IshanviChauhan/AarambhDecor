@@ -3,15 +3,10 @@
 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { z } from 'zod';
 import { redirect } from 'next/navigation';
+import { SignInSchema } from '@/lib/schemas';
+import type { SignInInput } from '@/lib/schemas';
 
-export const SignInSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
-});
-
-export type SignInInput = z.infer<typeof SignInSchema>;
 
 export interface SignInFormState {
   message: string | null;
@@ -48,7 +43,5 @@ export async function signInWithEmail(prevState: SignInFormState, formData: Form
   }
   
   redirect('/');
-  // This return is effectively unreachable due to redirect.
   // return { message: 'Sign in successful! Redirecting...', success: true };
 }
-

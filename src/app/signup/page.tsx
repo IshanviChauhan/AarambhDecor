@@ -4,16 +4,16 @@
 import { useFormState, useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SignUpSchema, signUpWithEmail, type SignUpInput, type SignUpFormState } from './actions';
+import { SignUpSchema, type SignUpInput } from '@/lib/schemas';
+import { signUpWithEmail, type SignUpFormState } from './actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation'; // For programmatic navigation
+import { useRouter } from 'next/navigation';
 import { Loader2, LogIn } from 'lucide-react';
 
 function SubmitButton() {
@@ -51,11 +51,9 @@ export default function SignUpPage() {
       });
     }
     if (formState.success) {
-      // The redirect in server action handles this, but as a fallback or for client-side indication:
-      // router.push('/'); // This might conflict with server action redirect
+      // The redirect in server action handles this
     }
     if (formState.errors) {
-      // Manually set form errors for react-hook-form if needed, though server action errors are primary
       if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });
       if (formState.errors.password) form.setError('password', { type: 'server', message: formState.errors.password.join(', ') });
       if (formState.errors.confirmPassword) form.setError('confirmPassword', { type: 'server', message: formState.errors.confirmPassword.join(', ') });
