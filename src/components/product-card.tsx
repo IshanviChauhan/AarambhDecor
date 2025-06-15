@@ -64,7 +64,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   const currentImage = imagesToDisplay[currentImageIndex];
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70 max-w-sm mx-auto w-full">
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70 w-[300px]">
       <CardHeader
         className="p-0 relative"
         onMouseEnter={handleMouseEnter}
@@ -98,17 +98,17 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         <CardDescription className="text-sm text-muted-foreground mb-2 line-clamp-3">{product.description}</CardDescription>
         {product.price && <p className="font-semibold text-primary text-lg">{product.price}</p>}
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex flex-col sm:flex-row gap-2">
+      <CardFooter className="p-4 pt-0 flex flex-col gap-2">
         <Button variant="outline" className="w-full sm:flex-1" asChild>
           <Link href={`/product/${product.id}`}>View Details</Link>
         </Button>
         <Button
           variant="default"
-          className="w-full sm:flex-1"
+          className="w-full"
           onClick={() => onAddToCart(product)}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
-          {isProductInCart ? 'Added to Cart' : 'Add to Cart'}
+          {/* {isProductInCart ? 'Added to Cart' : 'Add to Cart'} */}
         </Button>
       </CardFooter>
     </Card>

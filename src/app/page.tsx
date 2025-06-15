@@ -169,7 +169,7 @@ export default function HomePage() {
               <p className="ml-4 text-lg text-muted-foreground">Loading newest treasures...</p>
             </div>
           ) : latestProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
               {latestProducts.map((product) => (
                 <ProductCard
                   key={product.id}

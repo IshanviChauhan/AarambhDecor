@@ -7,7 +7,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, LayoutGrid, Filter } from 'lucide-react';
+import { Loader2, Filter } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -183,7 +183,7 @@ export default function CollectionsPage() {
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <section className="text-center mb-10 md:mb-12">
            <div className="flex items-center justify-center space-x-3 mb-4">
-            <LayoutGrid className="h-10 w-10 text-primary" />
+            <Filter className="h-10 w-10 text-primary" />
             <h1 className="text-4xl md:text-5xl font-headline text-primary">
               Our Collections
             </h1>
@@ -249,7 +249,7 @@ export default function CollectionsPage() {
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+              <div className="flex flex-wrap justify-center gap-6 md:gap-8">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
