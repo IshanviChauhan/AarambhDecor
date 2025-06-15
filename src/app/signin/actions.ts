@@ -1,11 +1,11 @@
 
 'use server';
 
+import type { UserCredential } from 'firebase/auth';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { redirect } from 'next/navigation';
 import { SignInSchema } from '@/lib/schemas';
-import type { SignInInput } from '@/lib/schemas';
 import { getUserProfile } from '@/app/profile/actions';
 
 
@@ -32,9 +32,10 @@ export async function signInWithEmail(prevState: SignInFormState, formData: Form
   }
 
   const { email, password } = validation.data;
+  let userCredential: UserCredential | null = null;
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    userCredential = await signInWithEmailAndPassword(auth, email, password);
   } catch (error: any) {
     if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-email') {
       return { message: 'Invalid email or password. Please try again.', success: false, errors: { _form: ['Invalid email or password.'] } };
@@ -44,16 +45,23 @@ export async function signInWithEmail(prevState: SignInFormState, formData: Form
   }
   
   let welcomeMessage = "Welcome!";
-  try {
-    const profile = await getUserProfile();
-    if (profile && profile.firstName) {
-      welcomeMessage = `Welcome ${profile.firstName}!`;
+  if (userCredential && userCredential.user) {
+    try {
+      // Pass the user object directly from the credential for more immediate profile fetching
+      const profile = await getUserProfile(userCredential.user); 
+      if (profile && profile.firstName) {
+        welcomeMessage = `Welcome ${profile.firstName}!`;
+      }
+    } catch (profileError) {
+      console.error("Error fetching user profile after login:", profileError);
+      // Fallback to generic welcome message if profile fetch fails
     }
-  } catch (profileError) {
-    console.error("Error fetching user profile after login:", profileError);
-    // Fallback to generic welcome message if profile fetch fails
+  } else {
+    // This case indicates signInWithEmailAndPassword succeeded but didn't return a user credential,
+    // or an error was caught but the flow unexpectedly continued.
+    // The catch block above should typically return, preventing this.
+    console.warn("Login appeared to succeed, but no user credential was available for profile fetch.");
   }
 
   redirect(`/?welcome_message=${encodeURIComponent(welcomeMessage)}`);
 }
-

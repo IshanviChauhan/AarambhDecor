@@ -1,6 +1,7 @@
 
 'use server';
 
+import type { User } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { UserProfileSchema, AddressSchema } from '@/lib/schemas';
 import type { UserProfile, Address, Order } from '@/lib/types';
@@ -18,54 +19,52 @@ export interface FormState {
 
 export async function createUserProfileDocument(uid: string, email: string, firstName: string, lastName: string): Promise<void> {
   const profileDocRef = doc(db, 'userProfiles', uid);
-  const newProfileData: UserProfile = { // Explicitly type for clarity
+  const newProfileData: UserProfile = { 
     uid: uid,
     email: email,
     firstName: firstName,
     lastName: lastName,
   };
-  await setDoc(profileDocRef, newProfileData, { merge: true }); // merge true in case some other process creates it
+  await setDoc(profileDocRef, newProfileData, { merge: true }); 
 }
 
 
-export async function getUserProfile(): Promise<UserProfile | null> {
-  const user = auth.currentUser;
-  if (!user) return null;
+export async function getUserProfile(authenticatedUser?: User | null): Promise<UserProfile | null> {
+  const userToQuery = authenticatedUser || auth.currentUser; 
+  if (!userToQuery) return null;
 
-  const profileDocRef = doc(db, 'userProfiles', user.uid);
+  const profileDocRef = doc(db, 'userProfiles', userToQuery.uid);
   const profileSnap = await getDoc(profileDocRef);
 
   if (profileSnap.exists()) {
-    const data = profileSnap.data() as Partial<UserProfile>; // Cast for easier access
+    const data = profileSnap.data() as Partial<UserProfile>; 
     let firstName = data.firstName;
     let lastName = data.lastName;
 
-    if (user.email === 'ishanvi.chauhan@gmail.com') {
-      firstName = firstName || 'Ishanvi'; // Default if undefined or empty
-      lastName = lastName || 'Chauhan';   // Default if undefined or empty
+    if (userToQuery.email === 'ishanvi.chauhan@gmail.com') {
+      firstName = firstName || 'Ishanvi'; 
+      lastName = lastName || 'Chauhan';   
     }
     
     return { 
-        uid: user.uid, 
-        email: user.email || '', 
-        firstName: firstName || null, // Ensure null if empty
-        lastName: lastName || null  // Ensure null if empty
+        uid: userToQuery.uid, 
+        email: userToQuery.email || '', 
+        firstName: firstName || null, 
+        lastName: lastName || null  
     } as UserProfile;
   } else {
-    // This case should be less common now with createUserProfileDocument on signup
-    // However, let's ensure it still creates a basic profile if somehow missed.
     let newFirstName = '';
     let newLastName = '';
-    if (user.email === 'ishanvi.chauhan@gmail.com') {
+    if (userToQuery.email === 'ishanvi.chauhan@gmail.com') {
       newFirstName = 'Ishanvi';
       newLastName = 'Chauhan';
-    } else if (user.displayName) {
-        const nameParts = user.displayName.split(' ');
+    } else if (userToQuery.displayName) {
+        const nameParts = userToQuery.displayName.split(' ');
         newFirstName = nameParts[0] || '';
         newLastName = nameParts.slice(1).join(' ') || '';
     }
     
-    const newProfileData: UserProfile = { uid: user.uid, email: user.email || '', firstName: newFirstName || null, lastName: newLastName || null };
+    const newProfileData: UserProfile = { uid: userToQuery.uid, email: userToQuery.email || '', firstName: newFirstName || null, lastName: newLastName || null };
     await setDoc(profileDocRef, newProfileData);
     return newProfileData;
   }
@@ -97,11 +96,10 @@ export async function updateUserProfile(prevState: FormState, formData: FormData
     let lastNameToSet = validation.data.lastName;
 
     if (user.email === 'ishanvi.chauhan@gmail.com') {
-      firstNameToSet = firstNameToSet || 'Ishanvi'; // Default if empty
-      lastNameToSet = lastNameToSet || 'Chauhan';   // Default if empty
+      firstNameToSet = firstNameToSet || 'Ishanvi'; 
+      lastNameToSet = lastNameToSet || 'Chauhan';   
     }
     
-    // Only include fields if they are provided (or defaulted for the mock user)
     if (firstNameToSet) dataToUpdate.firstName = firstNameToSet;
     if (lastNameToSet) dataToUpdate.lastName = lastNameToSet;
 
@@ -110,8 +108,6 @@ export async function updateUserProfile(prevState: FormState, formData: FormData
     if (profileSnap.exists()) {
         await updateDoc(profileDocRef, dataToUpdate);
     } else {
-        // Should not happen if createUserProfileDocument runs correctly on signup
-        // but as a fallback, create it with email as well
         await setDoc(profileDocRef, { 
             email: user.email || '', 
             ...dataToUpdate 
@@ -249,15 +245,7 @@ export async function deleteShippingAddress(addressId: string): Promise<FormStat
 export async function getOrderHistory(): Promise<Order[]> {
   const user = auth.currentUser;
   if (!user) return [];
-
-  // This is a placeholder. In a real application, you'd query a 'orders' collection
-  // likely filtered by userId and ordered by date.
-  // For example:
-  // const ordersColRef = collection(db, 'userProfiles', user.uid, 'orders');
-  // const q = query(ordersColRef, orderBy('orderDate', 'desc'));
-  // const ordersSnap = await getDocs(q);
-  // return ordersSnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as Order));
   
   console.warn("getOrderHistory is a placeholder and does not fetch real order data yet.");
-  return Promise.resolve([]); // Return empty array for now
+  return Promise.resolve([]); 
 }
