@@ -105,8 +105,10 @@ export default function CollectionsPage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const timer = setTimeout(() => {
       setAllProducts(MOCK_PRODUCTS);
       setIsLoadingProducts(false);
@@ -115,23 +117,35 @@ export default function CollectionsPage() {
   }, []);
 
   useEffect(() => {
+    if (!isClient) return;
     const storedWishlist = localStorage.getItem('aarambhWishlist');
     if (storedWishlist) {
-      setWishlist(new Set(JSON.parse(storedWishlist)));
+       try {
+        setWishlist(new Set(JSON.parse(storedWishlist)));
+      } catch (e) {
+        console.error("Failed to parse wishlist from localStorage", e);
+      }
     }
     const storedCart = localStorage.getItem('aarambhCart');
     if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+       try {
+        setCartItems(JSON.parse(storedCart));
+      } catch (e) {
+        console.error("Failed to parse cart from localStorage", e);
+      }
     }
-  }, []);
+  }, [isClient]);
 
   useEffect(() => {
+    if (!isClient) return;
     localStorage.setItem('aarambhWishlist', JSON.stringify(Array.from(wishlist)));
-  }, [wishlist]);
+  }, [wishlist, isClient]);
 
   useEffect(() => {
+    if (!isClient) return;
     localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
+  }, [cartItems, isClient]);
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
@@ -175,6 +189,7 @@ export default function CollectionsPage() {
   };
 
   const isProductInCart = (productId: string) => {
+    if (!isClient) return false;
     return cartItems.some(item => item.id === productId);
   };
 
@@ -227,7 +242,7 @@ export default function CollectionsPage() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  isWishlisted={wishlist.has(product.id)}
+                  isWishlisted={isClient && wishlist.has(product.id)}
                   onToggleWishlist={handleToggleWishlist}
                   onAddToCart={handleAddToCart}
                   isProductInCart={isProductInCart(product.id)}

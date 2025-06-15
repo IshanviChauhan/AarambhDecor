@@ -27,13 +27,19 @@ export default function CartPage() {
     setIsClient(true);
     const storedCart = localStorage.getItem('aarambhCart');
     if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+      try {
+        setCartItems(JSON.parse(storedCart));
+      } catch (e) {
+        console.error("Failed to parse cart from localStorage", e);
+        setCartItems([]);
+      }
     }
   }, []);
 
   useEffect(() => {
     if(isClient) {
       localStorage.setItem('aarambhCart', JSON.stringify(cartItems));
+      window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
     }
   }, [cartItems, isClient]);
 

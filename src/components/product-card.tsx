@@ -13,7 +13,7 @@ interface ProductCardProps {
   isWishlisted: boolean;
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product) => void;
-  isProductInCart?: boolean; // Optional: to change button state if product is already in cart
+  isProductInCart?: boolean;
 }
 
 export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart }: ProductCardProps) {
@@ -50,7 +50,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
           variant="default" 
           className="w-full sm:flex-1" 
           onClick={() => onAddToCart(product)}
-          disabled={isProductInCart} // Example: disable if in cart, or change text
+          // Removed disabled={isProductInCart} to allow multiple adds (increment quantity)
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           {isProductInCart ? 'Added to Cart' : 'Add to Cart'}
