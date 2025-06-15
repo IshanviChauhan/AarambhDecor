@@ -1,142 +1,134 @@
 
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useRef, type MouseEvent, type ReactNode, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { AnimatePresence, motion, useMotionTemplate } from "motion/react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+
+interface Position {
+  /** The x coordinate of the lens */
+  x: number;
+  /** The y coordinate of the lens */
+  y: number;
+}
 
 interface LensProps {
+  /** The children of the lens */
+  children: React.ReactNode;
+  /** The zoom factor of the lens */
   zoomFactor?: number;
+  /** The size of the lens */
   lensSize?: number;
+  /** The position of the lens */
+  position?: Position;
+  /** The default position of the lens */
+  defaultPosition?: Position;
+  /** Whether the lens is static */
   isStatic?: boolean;
+  /** The duration of the animation */
+  duration?: number;
+  /** The color of the lens */
+  lensColor?: string;
+  /** The aria label of the lens */
   ariaLabel?: string;
-  children: ReactNode; // Expecting an <img> element
-  className?: string;
-  imgClassName?: string; // Class for the internal image
+  className?: string; // Added className to allow styling the container
 }
 
 export function Lens({
-  zoomFactor = 2,
-  lensSize = 150,
-  isStatic = false,
-  ariaLabel = 'Zoomed image area',
   children,
-  className,
-  imgClassName,
+  zoomFactor = 1.3,
+  lensSize = 170,
+  isStatic = false,
+  position = { x: 0, y: 0 },
+  defaultPosition,
+  duration = 0.1,
+  lensColor = "black",
+  ariaLabel = "Zoom Area",
+  className, // Destructure className
 }: LensProps) {
-  const [lensVisible, setLensVisible] = useState(false);
-  const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
-  const [backgroundPosition, setBackgroundPosition] = useState('0% 0%');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
-
-  // Extract src and alt from the child img element
-  let imgSrc = '';
-  let imgAlt = 'Zoomed image';
-  if (React.isValidElement(children) && children.type === 'img') {
-    imgSrc = children.props.src;
-    imgAlt = children.props.alt || imgAlt;
+  if (zoomFactor < 1) {
+    throw new Error("zoomFactor must be greater than 1");
+  }
+  if (lensSize < 0) {
+    throw new Error("lensSize must be greater than 0");
   }
 
-  useEffect(() => {
-    if (imgRef.current) {
-      // Ensure image is loaded to get correct dimensions
-      const image = imgRef.current;
-      const updateDimensions = () => {
-        setImgDimensions({ width: image.offsetWidth, height: image.offsetHeight });
-      };
+  const [isHovering, setIsHovering] = useState(false);
+  const [mousePosition, setMousePosition] = useState<Position>(position);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-      if (image.complete) {
-        updateDimensions();
-      } else {
-        image.onload = updateDimensions;
-      }
-      // Update dimensions if window resizes
-      window.addEventListener('resize', updateDimensions);
-      return () => window.removeEventListener('resize', updateDimensions);
-    }
-  }, [imgSrc, children]); // Re-run if imgSrc changes (e.g. carousel slide)
+  const currentPosition = useMemo(() => {
+    if (isStatic) return position;
+    if (defaultPosition && !isHovering) return defaultPosition;
+    return mousePosition;
+  }, [isStatic, position, defaultPosition, isHovering, mousePosition]);
 
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (isStatic || !containerRef.current || !imgRef.current || imgDimensions.width === 0 || imgDimensions.height === 0) return;
-
-    const containerRect = containerRef.current.getBoundingClientRect();
-    
-    // Calculate mouse position relative to the container (which is the image bounds)
-    let x = e.clientX - containerRect.left;
-    let y = e.clientY - containerRect.top;
-
-    // Ensure mouse position is within image bounds (using actual rendered dimensions)
-    x = Math.max(0, Math.min(x, imgDimensions.width));
-    y = Math.max(0, Math.min(y, imgDimensions.height));
-    
-    // Calculate lens position so it's centered on the mouse cursor
-    // and constrained within the container.
-    const lensX = x - lensSize / 2;
-    const lensY = y - lensSize / 2;
-
-    setLensPosition({
-      x: Math.max(0, Math.min(lensX, imgDimensions.width - lensSize)),
-      y: Math.max(0, Math.min(lensY, imgDimensions.height - lensSize)),
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     });
+  }, []);
 
-    // Calculate background position for the zoomed image
-    const bgX = (x / imgDimensions.width) * 100;
-    const bgY = (y / imgDimensions.height) * 100;
-    setBackgroundPosition(`${bgX}% ${bgY}%`);
-  };
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Escape") setIsHovering(false);
+  }, []);
 
-  const handleMouseEnter = () => {
-    if (!isStatic && imgDimensions.width > 0 && imgDimensions.height > 0) { // Only show if image has dimensions
-        setLensVisible(true);
-    }
-  };
+  const maskImage = useMotionTemplate`radial-gradient(circle ${
+    lensSize / 2
+  }px at ${currentPosition.x}px ${
+    currentPosition.y
+  }px, ${lensColor} 100%, transparent 100%)`;
 
-  const handleMouseLeave = () => {
-    if (!isStatic) setLensVisible(false);
-  };
+  const LensContent = useMemo(() => {
+    const { x, y } = currentPosition;
 
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.58 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration }}
+        className="absolute inset-0 overflow-hidden"
+        style={{
+          maskImage,
+          WebkitMaskImage: maskImage,
+          transformOrigin: `${x}px ${y}px`,
+          zIndex: 50,
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `scale(${zoomFactor})`,
+            transformOrigin: `${x}px ${y}px`,
+          }}
+        >
+          {children}
+        </div>
+      </motion.div>
+    );
+  }, [currentPosition, lensSize, lensColor, zoomFactor, children, duration]);
 
   return (
     <div
       ref={containerRef}
-      className={cn("relative overflow-hidden w-full h-full", !isStatic && "cursor-crosshair", className)}
+      className={`relative z-20 overflow-hidden rounded-xl ${className || ''}`} // Apply className here
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
+      role="region"
       aria-label={ariaLabel}
-      role="img"
+      tabIndex={0}
     >
-      {React.isValidElement(children) ? React.cloneElement(children as React.ReactElement, { 
-        ref: imgRef, 
-        className: cn('w-full h-full object-contain block select-none', imgClassName),
-        // Prevent browser's default image drag behavior
-        onDragStart: (e: MouseEvent) => e.preventDefault(),
-      }) : children}
-
-      {!isStatic && lensVisible && (
-        <div
-          style={{
-            width: `${lensSize}px`,
-            height: `${lensSize}px`,
-            top: `${lensPosition.y}px`,
-            left: `${lensPosition.x}px`,
-            backgroundImage: `url(${imgSrc})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: `${imgDimensions.width * zoomFactor}px ${imgDimensions.height * zoomFactor}px`,
-            backgroundPosition: backgroundPosition,
-            border: '2px solid hsl(var(--primary))',
-            borderRadius: '50%', 
-            boxShadow: '0 0 15px rgba(0,0,0,0.3)',
-            pointerEvents: 'none', 
-            position: 'absolute',
-            zIndex: 10,
-            // Improve performance with will-change
-            willChange: 'transform, top, left',
-          }}
-          aria-hidden="true"
-        />
+      {children}
+      {isStatic || defaultPosition ? (
+        LensContent
+      ) : (
+        <AnimatePresence mode="popLayout">
+          {isHovering && LensContent}
+        </AnimatePresence>
       )}
     </div>
   );
