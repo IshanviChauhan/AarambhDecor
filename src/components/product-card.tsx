@@ -68,7 +68,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   return (
     <Card className={cn(
       "overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70",
-      "flex-1 min-w-[200px] max-w-[300px]", // Responsive width classes
+      "w-full min-w-[200px] max-w-[300px]", // Ensures card respects grid cell width and its own constraints
       propClassName
     )}>
       <CardHeader
