@@ -79,7 +79,7 @@ function CollectionsPageContent() {
       ]);
 
       setIsLoadingProducts(false);
-    }, 500); 
+    }, 1000); 
     return () => clearTimeout(timer);
   }, [searchParams]); 
 
