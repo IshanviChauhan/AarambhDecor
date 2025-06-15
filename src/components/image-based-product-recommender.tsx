@@ -141,7 +141,7 @@ export function ImageBasedProductRecommender() {
           <Button
             variant="outline"
             onClick={triggerFileInput}
-            className="w-full border-dashed border-primary/50 hover:border-primary text-primary/80 hover:text-primary"
+            className="w-full border-dashed border-primary/50 hover:border-primary text-primary/80 hover:text-primary-foreground"
             aria-label="Upload an image of your space"
           >
             <FileImage className="mr-2 h-5 w-5" />
