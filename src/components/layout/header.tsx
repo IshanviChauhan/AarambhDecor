@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle, LogIn, UserCircle2 } from 'lucide-react';
+import { LayoutGrid, Home, ShoppingCart, LogOut, UserCircle2, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -151,7 +151,9 @@ export default function Header() {
               </Button>
               <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
                 <Link href="/signup" aria-label="Sign Up">
-                   <UserCircle className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                   {/* Intentionally using UserCircle here for a different visual than profile, if desired */}
+                   {/* If same icon as profile is wanted, change to UserCircle2 */}
+                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> 
                   Sign Up
                 </Link>
               </Button>
