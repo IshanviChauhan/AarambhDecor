@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ExternalLink, LayoutGrid, Users, Home } from 'lucide-react';
+import { ExternalLink, LayoutGrid, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Header() {
@@ -21,12 +21,6 @@ export default function Header() {
             <Link href="/collections" aria-label="Collections">
               <LayoutGrid className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
               Collections
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" className="text-foreground hover:text-primary">
-            <Link href="/users" aria-label="Users">
-              <Users className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-              Users
             </Link>
           </Button>
           <Button asChild variant="outline" className="text-accent-foreground border-accent hover:bg-accent/10">
