@@ -60,10 +60,10 @@ export default function ProfilePage() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
   const initialProfileFormState: FormState = { message: null, success: false };
-  const [profileFormState, profileFormAction] = useActionState(updateUserProfile, initialProfileFormState);
+  const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialProfileFormState);
 
   const initialAddressFormState: FormState = { message: null, success: false };
-  const [addressFormState, addressFormAction] = useActionState(
+  const [addressFormState, addressFormAction, isAddressSubmitting] = useActionState(
     editingAddress ? updateShippingAddress : addShippingAddress, 
     initialAddressFormState
   );
@@ -120,7 +120,7 @@ export default function ProfilePage() {
         description: profileFormState.message,
         variant: profileFormState.success ? 'default' : 'destructive',
       });
-      if (profileFormState.success) fetchProfileAndAddresses(); // Re-fetch to show updated name
+      if (profileFormState.success) fetchProfileAndAddresses(); 
     }
   }, [profileFormState, toast]);
 
@@ -132,7 +132,7 @@ export default function ProfilePage() {
         variant: addressFormState.success ? 'default' : 'destructive',
       });
       if (addressFormState.success) {
-        fetchProfileAndAddresses(); // Re-fetch addresses
+        fetchProfileAndAddresses(); 
         setIsAddressModalOpen(false);
         setEditingAddress(null);
         addressForm.reset();
@@ -142,7 +142,7 @@ export default function ProfilePage() {
 
   const handleOpenAddAddressModal = () => {
     setEditingAddress(null);
-    addressForm.reset({ // Reset to default or empty for new address
+    addressForm.reset({ 
         fullName: '', addressLine1: '', addressLine2: '', city: '',
         state: '', postalCode: '', country: 'India', phoneNumber: ''
     });
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
   const handleOpenEditAddressModal = (address: Address) => {
     setEditingAddress(address);
-    addressForm.reset({ ...address }); // Populate form with address data
+    addressForm.reset({ ...address }); 
     setIsAddressModalOpen(true);
   };
 
@@ -184,7 +184,6 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    // This case should be handled by the useEffect redirect, but as a fallback:
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -198,10 +197,6 @@ export default function ProfilePage() {
     );
   }
   
-  const {formState: {isSubmitting: isProfileSubmitting}} = profileForm;
-  const {formState: {isSubmitting: isAddressSubmitting}} = addressForm;
-
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -211,7 +206,6 @@ export default function ProfilePage() {
           <h1 className="text-4xl font-headline text-primary">My Profile</h1>
         </div>
 
-        {/* Personal Details Section */}
         <Card className="mb-8 shadow-lg rounded-lg border-border/70">
           <CardHeader>
             <CardTitle className="font-headline text-2xl text-primary">Personal Details</CardTitle>
@@ -248,11 +242,19 @@ export default function ProfilePage() {
 
         <Separator className="my-10" />
 
-        {/* Shipping Addresses Section */}
         <Card className="shadow-lg rounded-lg border-border/70">
           <CardHeader className="flex flex-row justify-between items-center">
             <CardTitle className="font-headline text-2xl text-primary">Shipping Addresses</CardTitle>
-            <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
+            <Dialog open={isAddressModalOpen} onOpenChange={(isOpen) => {
+              setIsAddressModalOpen(isOpen);
+              if (!isOpen) { // Reset form if modal is closed
+                setEditingAddress(null);
+                addressForm.reset({
+                    fullName: '', addressLine1: '', addressLine2: '', city: '',
+                    state: '', postalCode: '', country: 'India', phoneNumber: ''
+                });
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button onClick={handleOpenAddAddressModal}>
                   <PlusCircle className="mr-2 h-4 w-4" /> Add New Address
@@ -261,31 +263,7 @@ export default function ProfilePage() {
               <DialogContent className="sm:max-w-lg">
                  <Form {...addressForm}>
                     <form 
-                        action={async (formData) => {
-                            const actionToCall = editingAddress ? updateShippingAddress : addShippingAddress;
-                            const state = await actionToCall(initialAddressFormState, formData);
-                            // Manually update addressFormState for immediate feedback/error handling
-                             if (state.message) {
-                                toast({
-                                    title: state.success ? 'Success' : 'Error',
-                                    description: state.message,
-                                    variant: state.success ? 'default' : 'destructive',
-                                });
-                            }
-                            if (state.errors) {
-                                Object.entries(state.errors).forEach(([key, value]) => {
-                                    if (value) {
-                                        addressForm.setError(key as keyof AddressInput, { type: 'server', message: value.join(', ') });
-                                    }
-                                });
-                            }
-                            if (state.success) {
-                                fetchProfileAndAddresses();
-                                setIsAddressModalOpen(false);
-                                setEditingAddress(null);
-                                addressForm.reset();
-                            }
-                        }}
+                        action={addressFormAction}
                         className="space-y-4"
                     >
                       <DialogHeader>
@@ -297,7 +275,7 @@ export default function ProfilePage() {
                         </DialogDescription>
                       </DialogHeader>
                       
-                      {editingAddress && <Input type="hidden" {...addressForm.register("id")} defaultValue={editingAddress.id} />}
+                      {editingAddress && <input type="hidden" {...addressForm.register("id")} defaultValue={editingAddress.id} />}
 
                       <FormField control={addressForm.control} name="fullName" render={({ field }) => (
                         <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Priya Sharma" {...field} /></FormControl><FormMessage /></FormItem>
@@ -330,6 +308,11 @@ export default function ProfilePage() {
                        {addressFormState.errors?._form && (
                         <p className="text-sm font-medium text-destructive">{addressFormState.errors._form.join(', ')}</p>
                        )}
+                        {addressForm.formState.errors?.root?.serverError && (
+                           <p className="text-sm font-medium text-destructive">
+                             {addressForm.formState.errors.root.serverError.message}
+                           </p>
+                        )}
                       <DialogFooter>
                         <DialogClose asChild>
                             <Button type="button" variant="outline">Cancel</Button>
