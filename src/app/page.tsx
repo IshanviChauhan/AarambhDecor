@@ -157,12 +157,12 @@ export default function HomePage() {
         <section className="py-12 md:py-16 bg-secondary/30 rounded-lg shadow-inner">
           <div className="container mx-auto px-4 text-center">
             <Image
-              src="/aarambh-decor-brand-image.png"
-              alt="Aarambh Decor - Decor that tells your story!"
+              src="/aarambh-decor-brand-image-new.png"
+              alt="Aarambh Decor - Inspiring Home Styles"
               width={800}
               height={800}
               className="mx-auto rounded-lg shadow-xl mb-6 object-contain"
-              data-ai-hint="brand illustration"
+              data-ai-hint="decor arrangement"
               priority
             />
              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
