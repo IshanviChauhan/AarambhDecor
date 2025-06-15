@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
 
@@ -31,6 +31,7 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setIsClient(true); 
@@ -81,6 +82,21 @@ export default function HomePage() {
     localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
   }, [cartItems, isClient, user]);
+
+  useEffect(() => {
+    if (isClient) {
+      const welcomeMessage = searchParams.get('welcome_message');
+      if (welcomeMessage) {
+        toast({
+          title: "Login Successful",
+          description: decodeURIComponent(welcomeMessage),
+        });
+        // Remove the query parameter from the URL without reloading the page
+        const newPath = window.location.pathname;
+        router.replace(newPath, { scroll: false });
+      }
+    }
+  }, [isClient, searchParams, router, toast]);
 
   const handleToggleWishlist = (productId: string) => {
     if (!user) {
@@ -255,3 +271,4 @@ export default function HomePage() {
     </>
   );
 }
+
