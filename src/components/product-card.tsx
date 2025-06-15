@@ -19,7 +19,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart }: ProductCardProps) {
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full rounded-lg border-border/70">
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col rounded-lg border-border/70">
       <CardHeader className="p-0 relative">
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <Image
