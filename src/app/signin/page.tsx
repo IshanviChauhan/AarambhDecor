@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react'; // Changed from 'react-dom' for useFormState, useFormStatus is from react
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignInSchema, type SignInInput } from '@/lib/schemas';
@@ -31,7 +31,7 @@ export default function SignInPage() {
   const router = useRouter();
 
   const initialFormState: SignInFormState = { message: null, success: false };
-  const [formState, formAction] = useFormState(signInWithEmail, initialFormState);
+  const [formState, formAction] = useActionState(signInWithEmail, initialFormState); // Changed from useFormState
 
   const form = useForm<SignInInput>({
     resolver: zodResolver(SignInSchema),
