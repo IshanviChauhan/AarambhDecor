@@ -287,7 +287,7 @@ export default function ProductDetailPage() {
             <Separator className="my-4" />
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button size="lg" className="flex-1" onClick={() => handleAddToCart(product)}>
+              <Button size="lg" className="flex-1 h-12" onClick={() => handleAddToCart(product)}>
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {isProductInCart ? 'Add Another' : 'Add to Cart'}
               </Button>
