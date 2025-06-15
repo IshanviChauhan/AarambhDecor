@@ -64,7 +64,7 @@ export default function WelcomeLoader() {
           width={80}
           height={80}
           priority
-          className="object-contain rounded-sm mx-auto mb-4 md:mb-6 md:w-[100px] md:h-[100px] animate-pop-in"
+          className="object-contain rounded-lg mx-auto mb-4 md:mb-6 md:w-[100px] md:h-[100px] animate-pop-in"
           data-ai-hint="logo"
         />
         <h1 className="text-3xl md:text-5xl font-headline text-primary mb-3 md:mb-4 animate-fade-in-up animation-delay-200">

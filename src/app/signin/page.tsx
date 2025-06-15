@@ -67,7 +67,7 @@ export default function SignInPage() {
             width={60} 
             height={60} 
             priority 
-            className="object-contain rounded-sm transition-opacity duration-300 group-hover:opacity-80"
+            className="object-contain rounded-lg transition-opacity duration-300 group-hover:opacity-80"
           />
            <span
             className="ml-3 text-2xl font-headline text-primary opacity-0 w-0 transform -translate-x-4

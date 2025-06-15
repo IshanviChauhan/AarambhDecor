@@ -150,7 +150,7 @@ export default function CartPage() {
                     alt={item.name}
                     width={120}
                     height={120}
-                    className="object-cover rounded-md w-full sm:w-32 sm:h-32"
+                    className="object-cover rounded-lg w-full sm:w-32 sm:h-32"
                     data-ai-hint={item.imageUrls[0].dataAiHint}
                   />
                   <div className="flex-grow">

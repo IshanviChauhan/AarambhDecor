@@ -100,7 +100,7 @@ export default function Header() {
             width={50} 
             height={50} 
             priority 
-            className="object-contain rounded-sm transition-opacity group-hover:opacity-80"
+            className="object-contain rounded-lg transition-opacity group-hover:opacity-80"
           />
            <span
             className="ml-3 text-xl font-headline text-primary opacity-0 w-0 transform -translate-x-4
