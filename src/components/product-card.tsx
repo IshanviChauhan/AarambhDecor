@@ -66,7 +66,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
   return (
     <Card className={cn(
       "shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden",
-      "flex-1 min-w-[200px] max-w-[300px]",
+      "w-[calc(50%-theme(spacing.3))] sm:flex-1 sm:min-w-[200px] sm:max-w-[300px]",
       "transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl",
       "animate-pop-in",
       propClassName
