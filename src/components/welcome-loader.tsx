@@ -61,16 +61,16 @@ export default function WelcomeLoader() {
         <Image
           src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
           alt="Aarambh Decor Logo"
-          width={100}
-          height={100}
+          width={80}
+          height={80}
           priority
-          className="object-contain rounded-sm mx-auto mb-6 animate-pop-in"
+          className="object-contain rounded-sm mx-auto mb-4 md:mb-6 md:w-[100px] md:h-[100px] animate-pop-in"
           data-ai-hint="logo"
         />
-        <h1 className="text-4xl md:text-5xl font-headline text-primary mb-4 animate-fade-in-up animation-delay-200">
+        <h1 className="text-3xl md:text-5xl font-headline text-primary mb-3 md:mb-4 animate-fade-in-up animation-delay-200">
           Welcome to Aarambh Decor
         </h1>
-        <p className="text-lg md:text-xl text-muted-foreground animate-fade-in-up animation-delay-400">
+        <p className="text-base md:text-lg text-muted-foreground animate-fade-in-up animation-delay-400">
           Crafting stories, one space at a time.
         </p>
       </div>
