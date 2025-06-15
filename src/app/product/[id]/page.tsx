@@ -7,7 +7,7 @@ import type { Product, CartItem, Review, ProductImage } from '@/lib/types';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import Image from 'next/image';
+// import Image from 'next/image'; // Replaced by Lens with img
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from '@/components/wishlist-icon';
 import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send } from 'lucide-react';
@@ -28,6 +28,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Lens } from '@/components/magicui/lens';
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
@@ -241,20 +242,25 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          <Carousel className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" opts={{ loop: true }}>
+          <Carousel className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" opts={{ loop: safeImageUrls.length > 1 }}>
             <CarouselContent>
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden border border-border/50 shadow-lg">
-                    <Image
-                      src={image.url}
-                      alt={`${product.name} - Image ${index + 1}`}
-                      layout="fill"
-                      objectFit="contain"
-                      className="transition-transform duration-300"
-                      data-ai-hint={image.dataAiHint}
-                      priority={index === 0} 
-                    />
+                  <div className="relative aspect-square md:aspect-[4/3] rounded-lg overflow-hidden border border-border/50 shadow-lg bg-card">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <Lens 
+                        zoomFactor={2} 
+                        lensSize={120} 
+                        className="w-full h-full"
+                        ariaLabel={`Zoom area for ${product.name} - Image ${index + 1}`}
+                    >
+                      <img
+                        src={image.url}
+                        alt={`${product.name} - Image ${index + 1}`}
+                        data-ai-hint={image.dataAiHint}
+                        // The Lens component's internal img styling will handle w-full h-full object-contain
+                      />
+                    </Lens>
                   </div>
                 </CarouselItem>
               ))}
