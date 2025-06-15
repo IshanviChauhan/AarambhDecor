@@ -4,7 +4,7 @@
 import { useState, type FormEvent, useEffect, useCallback, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, X, Loader2 } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SearchBarProps {
@@ -23,7 +23,6 @@ export function SearchBar({
   debounceDelay = 300,
 }: SearchBarProps) {
   const [inputValue, setInputValue] = useState(initialValue);
-  const [isLoading, setIsLoading] = useState(false); 
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -40,16 +39,14 @@ export function SearchBar({
     // If input is cleared immediately by user, reflect that quickly
     if (inputValue.trim() === '' && initialValue !== '') {
         onSearch('');
-        setIsLoading(false);
         return;
     }
     
-    setIsLoading(true);
     debounceTimeoutRef.current = setTimeout(() => {
-      if (inputValue !== initialValue || inputValue === '') { // Trigger search if value changed or cleared
+      // Trigger search if value changed or if it was initially empty and now has content
+      if (inputValue !== initialValue || (initialValue === '' && inputValue !== '')) { 
         onSearch(inputValue);
       }
-      setIsLoading(false);
     }, debounceDelay);
 
     return () => {
@@ -64,7 +61,6 @@ export function SearchBar({
     if (debounceTimeoutRef.current) { // Clear any pending debounce
       clearTimeout(debounceTimeoutRef.current);
     }
-    setIsLoading(false); // Stop loading if form is submitted
     onSearch(inputValue);
   };
 
@@ -77,7 +73,6 @@ export function SearchBar({
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
-    setIsLoading(false);
     onSearch(''); 
   };
 
@@ -94,10 +89,7 @@ export function SearchBar({
             aria-label={placeholder}
           />
           <div className="absolute right-8 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center">
-            {isLoading && (
-              <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
-            )}
-            {inputValue && !isLoading && (
+            {inputValue && (
               <Button
                 type="button"
                 variant="ghost"
@@ -105,7 +97,7 @@ export function SearchBar({
                 className="h-full w-full p-0 text-muted-foreground hover:text-foreground flex items-center justify-center"
                 onClick={handleClearSearch}
                 aria-label="Clear search"
-                tabIndex={-1}
+                tabIndex={-1} 
               >
                 <X className="h-4 w-4" />
               </Button>
