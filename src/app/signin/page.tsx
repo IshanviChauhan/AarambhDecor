@@ -22,7 +22,7 @@ function SubmitButton() {
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" /> }
-      Sign In
+      Log In
     </Button>
   );
 }
@@ -65,7 +65,7 @@ export default function SignInPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-headline text-primary">Welcome Back</CardTitle>
-          <CardDescription>Sign in to continue to your Aarambh Lookbook.</CardDescription>
+          <CardDescription>Log in to continue to your Aarambh Lookbook.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

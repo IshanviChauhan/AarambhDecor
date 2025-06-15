@@ -98,7 +98,7 @@ export default function ProductDetailPage() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to manage your wishlist.",
+        description: "Please log in to manage your wishlist.",
         variant: "destructive",
       });
       router.push('/signin');
@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to add items to your cart.",
+        description: "Please log in to add items to your cart.",
         variant: "destructive",
       });
       router.push('/signin');
@@ -137,7 +137,7 @@ export default function ProductDetailPage() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to submit a review.",
+        description: "Please log in to submit a review.",
         variant: "destructive",
       });
       router.push('/signin');
@@ -406,7 +406,7 @@ export default function ProductDetailPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                     <p className="text-muted-foreground">
-                        Please <Link href="/signin" className="text-primary hover:underline font-semibold">sign in</Link> to leave a review for this product.
+                        Please <Link href="/signin" className="text-primary hover:underline font-semibold">log in</Link> to leave a review for this product.
                     </p>
                 </CardContent>
             </Card>

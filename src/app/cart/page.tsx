@@ -15,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { parsePrice } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
+import { auth } from '@/lib/firebase';
+
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -53,7 +55,8 @@ export default function CartPage() {
     } else if (isClient && !user) {
         // Ensure cart is cleared in localStorage too if user logs out
         localStorage.removeItem('aarambhCart'); // Clear old general key if any
-        if (auth.currentUser?.uid) { // Clear specific user cart if somehow still there
+        // Check if auth.currentUser is available and has uid before trying to remove specific user cart
+        if (auth.currentUser?.uid) { 
              localStorage.removeItem(`aarambhCart_${auth.currentUser.uid}`);
         }
         window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Notify header
@@ -107,9 +110,9 @@ export default function CartPage() {
         <main className="flex-grow container mx-auto px-4 py-8 md:py-12 text-center">
             <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
             <h1 className="text-3xl font-headline text-primary mb-2">Authentication Required</h1>
-            <p className="text-muted-foreground mb-6">Please sign in to view your cart.</p>
+            <p className="text-muted-foreground mb-6">Please log in to view your cart.</p>
             <Button asChild size="lg">
-              <Link href="/signin">Sign In</Link>
+              <Link href="/signin">Log In</Link>
             </Button>
         </main>
         <Footer />

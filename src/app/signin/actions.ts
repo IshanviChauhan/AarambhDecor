@@ -39,9 +39,9 @@ export async function signInWithEmail(prevState: SignInFormState, formData: Form
       return { message: 'Invalid email or password. Please try again.', success: false, errors: { _form: ['Invalid email or password.'] } };
     }
     console.error('Firebase SignIn Error:', error);
-    return { message: 'An unexpected error occurred during sign in. Please try again.', success: false, errors: { _form: ['An unexpected error occurred.'] } };
+    return { message: 'An unexpected error occurred during log in. Please try again.', success: false, errors: { _form: ['An unexpected error occurred.'] } };
   }
   
   redirect('/');
-  // return { message: 'Sign in successful! Redirecting...', success: true };
+  // return { message: 'Log in successful! Redirecting...', success: true };
 }

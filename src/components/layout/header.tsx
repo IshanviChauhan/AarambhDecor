@@ -130,9 +130,9 @@ export default function Header() {
           ) : !authLoading && !user ? (
             <>
               <Button asChild variant="ghost" className="text-foreground hover:text-primary">
-                <Link href="/signin" aria-label="Sign In">
+                <Link href="/signin" aria-label="Log In">
                   <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-                  Sign In
+                  Log In
                 </Link>
               </Button>
               <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">

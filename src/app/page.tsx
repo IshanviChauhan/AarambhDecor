@@ -85,7 +85,7 @@ export default function HomePage() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to manage your wishlist.",
+        description: "Please log in to manage your wishlist.",
         variant: "destructive",
       });
       router.push('/signin');
@@ -106,7 +106,7 @@ export default function HomePage() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to add items to your cart.",
+        description: "Please log in to add items to your cart.",
         variant: "destructive",
       });
       router.push('/signin');
