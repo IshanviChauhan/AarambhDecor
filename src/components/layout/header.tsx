@@ -106,7 +106,7 @@ export default function Header() {
             width={50} 
             height={50} 
             priority 
-            className="object-contain rounded-sm"
+            className="object-contain rounded-full"
           />
         </Link>
         <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
