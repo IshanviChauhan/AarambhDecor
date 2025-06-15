@@ -267,11 +267,11 @@ export default function ProductDetailPage() {
               <>
                 <CarouselPrevious 
                   variant="ghost"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
+                  className="absolute left-3 top-[40%] -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
                 />
                 <CarouselNext 
                   variant="ghost"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
+                  className="absolute right-3 top-[40%] -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-background/70 hover:bg-background/90 text-foreground hover:text-primary shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-in-out flex items-center justify-center border-none hover:translate-y-[-50%]" 
                 />
               </>
             )}
