@@ -18,12 +18,12 @@ body {
   }
 }
 
-@keyframes glitter-flicker {
-  0%, 100% { opacity: 0.7; } /* Base opacity of the glitter layer */
-  20% { opacity: 0.4; }
-  40% { opacity: 0.9; }
-  60% { opacity: 0.3; }
-  80% { opacity: 0.8; }
+@keyframes glitter-flicker { /* Adjusted opacities for more visibility */
+  0%, 100% { opacity: 0.8; } 
+  20% { opacity: 0.5; }
+  40% { opacity: 1.0; }
+  60% { opacity: 0.4; }
+  80% { opacity: 0.9; }
 }
 
 
@@ -142,14 +142,14 @@ body {
     z-index: -1; /* Behind all page content */
 
     background-image: 
-      /* Layer 1: Primary color glitter */
-      radial-gradient(circle at 10% 30%, hsla(var(--primary), 0.05) 0%, transparent 8%),
-      radial-gradient(circle at 50% 70%, hsla(var(--primary), 0.07) 0%, transparent 10%),
-      /* Layer 2: Accent color glitter */
-      radial-gradient(circle at 80% 20%, hsla(var(--accent), 0.04) 0%, transparent 7%),
-      radial-gradient(circle at 30% 90%, hsla(var(--accent), 0.06) 0%, transparent 9%),
-      /* Layer 3: Secondary color glitter (very subtle) */
-      radial-gradient(circle at 65% 50%, hsla(var(--secondary), 0.03) 0%, transparent 6%);
+      /* Layer 1: Primary color glitter - Increased alpha */
+      radial-gradient(circle at 10% 30%, hsla(var(--primary), 0.25) 0%, transparent 8%),
+      radial-gradient(circle at 50% 70%, hsla(var(--primary), 0.35) 0%, transparent 10%),
+      /* Layer 2: Accent color glitter - Increased alpha */
+      radial-gradient(circle at 80% 20%, hsla(var(--accent), 0.20) 0%, transparent 7%),
+      radial-gradient(circle at 30% 90%, hsla(var(--accent), 0.30) 0%, transparent 9%),
+      /* Layer 3: Secondary color glitter (very subtle) - Increased alpha */
+      radial-gradient(circle at 65% 50%, hsla(var(--secondary), 0.15) 0%, transparent 6%);
     
     background-repeat: repeat; /* Ensure gradients tile */
     
