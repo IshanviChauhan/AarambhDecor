@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
-import { getProducts } from '@/app/products/actions';
+import { MOCK_PRODUCTS } from '@/lib/mock-data'; // Import MOCK_PRODUCTS
 
 
 const MIN_PRICE_DEFAULT = 0;
@@ -32,9 +32,9 @@ const MAX_PRICE_DEFAULT = 10000; // Default max, will be updated from actual pro
 function CollectionsPageContent() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allProducts] = useState<Product[]>(MOCK_PRODUCTS); // Use MOCK_PRODUCTS directly
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true); // For initial price calculation and UI consistency
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -58,48 +58,54 @@ function CollectionsPageContent() {
   
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  // Effect for syncing searchTerm from URL
+  useEffect(() => {
     const currentSearchFromUrl = searchParams.get('search') || '';
     if (currentSearchFromUrl !== searchTerm) {
       setSearchTerm(currentSearchFromUrl);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
-    async function fetchAndSetProducts() {
-      setIsLoadingProducts(true);
-      try {
-        const productsFromDb = await getProducts();
-        setAllProducts(productsFromDb);
+  // Effect for setting up price range based on allProducts (MOCK_PRODUCTS) and URL params
+  useEffect(() => {
+    setIsLoadingProducts(true); 
+
+    if (allProducts.length > 0) {
+        const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && p !== undefined && !isNaN(p));
+        const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
+        const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
+        setMinProductPrice(minP);
+        setMaxProductPrice(maxP);
+
+        const urlMinPriceStr = searchParams.get('minPrice');
+        const urlMaxPriceStr = searchParams.get('maxPrice');
         
-        if (productsFromDb.length > 0) {
-            const prices = productsFromDb.map(p => parsePrice(p.price)).filter(p => p > 0);
-            const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
-            const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
-            setMinProductPrice(minP);
-            setMaxProductPrice(maxP);
+        let initialMin = urlMinPriceStr ? parseInt(urlMinPriceStr, 10) : minP;
+        let initialMax = urlMaxPriceStr ? parseInt(urlMaxPriceStr, 10) : maxP;
+        
+        initialMin = isNaN(initialMin) ? minP : initialMin;
+        initialMax = isNaN(initialMax) ? maxP : initialMax;
 
-            const urlMinPrice = searchParams.get('minPrice');
-            const urlMaxPrice = searchParams.get('maxPrice');
-            setPriceRange([
-                urlMinPrice ? parseInt(urlMinPrice) : minP,
-                urlMaxPrice ? parseInt(urlMaxPrice) : maxP
-            ]);
-        } else {
-             setMinProductPrice(MIN_PRICE_DEFAULT);
-             setMaxProductPrice(MAX_PRICE_DEFAULT);
-             setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
-        }
+        initialMin = Math.max(minP, Math.min(maxP, initialMin));
+        initialMax = Math.max(minP, Math.min(maxP, initialMax));
+        
+        if (initialMin > initialMax) initialMin = initialMax;
 
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-        toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
-        setAllProducts([]);
-      } finally {
-        setIsLoadingProducts(false);
-      }
+        setPriceRange([initialMin, initialMax]);
+    } else {
+         setMinProductPrice(MIN_PRICE_DEFAULT);
+         setMaxProductPrice(MAX_PRICE_DEFAULT);
+         setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
     }
     
-    fetchAndSetProducts();
+    setIsLoadingProducts(false); 
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]); // Re-fetch if searchParams change (e.g. URL-based filters might imply re-eval of price range)
+  }, [allProducts, searchParams]);
+
 
   useEffect(() => {
     if (isLoadingProducts || !isClient) return;
@@ -164,26 +170,26 @@ function CollectionsPageContent() {
   }, [cartItems, isClient, user]);
 
   useEffect(() => {
-    let products = allProducts;
+    let productsToFilter = allProducts;
 
     if (selectedCategory && selectedCategory !== 'All') {
-      products = products.filter(p => p.category === selectedCategory);
+      productsToFilter = productsToFilter.filter(p => p.category === selectedCategory);
     }
 
-    products = products.filter(p => {
+    productsToFilter = productsToFilter.filter(p => {
       const price = parsePrice(p.price);
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
     if (searchTerm.trim()) {
       const lowerSearchTerm = searchTerm.toLowerCase();
-      products = products.filter(p => 
+      productsToFilter = productsToFilter.filter(p => 
         p.name.toLowerCase().includes(lowerSearchTerm) ||
         p.description.toLowerCase().includes(lowerSearchTerm) ||
         (p.category && p.category.toLowerCase().includes(lowerSearchTerm))
       );
     }
-    setFilteredProducts(products);
+    setFilteredProducts(productsToFilter);
   }, [selectedCategory, allProducts, priceRange, searchTerm]);
 
   const handleToggleWishlist = (productId: string) => {
@@ -249,7 +255,7 @@ function CollectionsPageContent() {
   };
 
   const handlePriceChange = (newRange: [number, number]) => {
-    setPriceRange(newRange); // Optimistic update for slider UI responsiveness
+    setPriceRange(newRange); 
     const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
     currentParams.set('minPrice', newRange[0].toString());
     currentParams.set('maxPrice', newRange[1].toString());
@@ -344,7 +350,7 @@ function CollectionsPageContent() {
                   debounceDelay={300} 
                 />
             </div>
-            {isLoadingProducts && !allProducts.length ? (
+            {isLoadingProducts && !allProducts.length ? ( // Check allProducts length here as it's MOCK_PRODUCTS
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
