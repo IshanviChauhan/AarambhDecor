@@ -110,7 +110,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
           />
         </div>
       </CardHeader>
-      <CardContent className="p-4 flex flex-col flex-grow min-w-0">
+      <CardContent className="p-3 flex flex-col flex-grow min-w-0">
         <div>
           <CardTitle className="font-headline text-lg mb-2 leading-tight break-words">
             <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
@@ -121,7 +121,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         </div>
         {product.price && <p className="font-semibold text-primary text-lg mt-auto pt-2">{product.price}</p>}
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex flex-col gap-2">
+      <CardFooter className="px-3 pb-3 pt-0 flex flex-col gap-2">
         <Button
           variant="default"
           className="w-full"
