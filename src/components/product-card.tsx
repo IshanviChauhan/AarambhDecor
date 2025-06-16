@@ -16,7 +16,7 @@ interface ProductCardProps {
   isWishlisted: boolean;
   onToggleWishlist: (productId: string) => void;
   onAddToCart: (product: Product) => void;
-  isProductInCart?: boolean;
+  isProductInCart?: boolean; // Kept for potential future use, but not directly used by new icon
   className?: string;
 }
 
@@ -119,18 +119,25 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground mb-2 line-clamp-3">{product.description}</CardDescription>
         </div>
-        {product.price && <p className="font-semibold text-primary text-lg mt-auto pt-2">{product.price}</p>}
+        {product.price && (
+          <div className="flex justify-between items-center mt-auto pt-2">
+            <p className="font-semibold text-primary text-lg">{product.price}</p>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8" // Smaller icon button for a cleaner look
+              onClick={() => onAddToCart(product)}
+              aria-label="Add to cart"
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </CardContent>
-      <CardFooter className="px-3 pb-3 pt-0 flex flex-col gap-2">
-        <Button
-          variant="default"
-          className="w-full"
-          onClick={() => onAddToCart(product)}
-        >
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          {isProductInCart ? 'Added to Cart' : 'Add to Cart'}
-        </Button>
+      <CardFooter className="px-3 pb-3 pt-0">
+        {/* Add to Cart button removed from here */}
       </CardFooter>
     </Card>
   );
 }
+
