@@ -60,7 +60,7 @@ export const MOCK_PRODUCTS: Product[] = [
         url: 'https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/506294256_17843713923510460_482927659032378126_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QG4C2z8WDV8_p4pCL47RpA8QF9BGc-5A7-ysOvygWrlG62kTRvpj1rV1l38g0Ez5vqrrxrc1huvIzmEHK_A0Tl7&_nc_ohc=cvHGGBedIEsQ7kNvwGEVXrJ&_nc_gid=nQjJp0gaIB6aSR60PMpgbQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NDY3MjI3NDE4MDkxOTUxMQ%3D%3D.3-ccb7-5&oh=00_AfPUnmbV1DNSMY9JSYW7dK_8Q6ZJ9O_3m2fxe9Rc7MAG7w&oe=68545D4E&_nc_sid=22de04',
         dataAiHint: 'metal floral',
       },
-      { url: 'https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/506415043_17843713932510460_7854610303872801084_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFLe0zybFRZKHHr0m_mokIv88kxhdEUx-l2h_eakkUzqoGhndcHCVhHkBqGu_G6ogp8TOArxma3roper3VlPa0d&_nc_ohc=u4hey3qw3NoQ7kNvwGagas4&_nc_gid=GLy7feFQSYv7wkZBvzGNqQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NDY3MjI3Mzg3OTAzMzEwNw%3D%3D.3-ccb7-5&oh=00_AfNvuZ0kYIZGN7F6ixHVA7N0ORr27M4m0EGnjY57equo5g&oe=68547D9B&_nc_sid=22de04', 
+      { url: 'https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/506415043_17843713932510460_7854610303872801084_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFLe0zybFRZKHHr0m_mokIv88kxhdEUx-l2h_eakkUzqoGhndcHCVhHkBqGu_G6ogp8TOArxma3roper3VlPa0d&_nc_ohc=u4hey3qw3NoQ7kNvwGagas4&_nc_gid=GLy7feFQSYv7wkZBvzGNqQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NDY3MjI3Mzg3MDMwMzEwNw%3D%3D.3-ccb7-5&oh=00_AfNvuZ0kYIZGN7F6ixHVA7N0ORr27M4m0EGnjY57equo5g&oe=68547D9B&_nc_sid=22de04', 
         dataAiHint: 'metal floral' 
       },
     ],
@@ -358,3 +358,4 @@ export const MOCK_PRODUCTS: Product[] = [
     reviews: [],
   }
 ];
+

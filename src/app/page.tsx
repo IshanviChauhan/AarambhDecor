@@ -16,7 +16,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
-import { getLatestProducts, getProducts } from '@/app/products/actions'; // MOCK_PRODUCTS removed
+import { getLatestProducts, getProducts } from '@/app/products/actions'; 
 
 const LATEST_PRODUCTS_COUNT = 3;
 
@@ -281,3 +281,4 @@ export default function HomePage() {
     </>
   );
 }
+

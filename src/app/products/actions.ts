@@ -162,3 +162,4 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
     return [];
   }
 }
+
