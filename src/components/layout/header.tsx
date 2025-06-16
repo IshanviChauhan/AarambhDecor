@@ -77,6 +77,8 @@ export default function Header() {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
         } else if (!user && event.key && event.key.startsWith('aarambhCart_')) {
+            // If user logs out, cart for that UID might be cleared, recalculate.
+            // This also covers general cart updates if a generic key was used (though we use UID specific)
             calculateTotalItems();
         }
     };
@@ -93,11 +95,15 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      if (user) {
+      if (user) { // Clear user-specific data from localStorage
         localStorage.removeItem(`aarambhCart_${user.uid}`);
         localStorage.removeItem(`aarambhWishlist_${user.uid}`);
       }
       await signOut(auth);
+      // Dispatch cart update event *after* user state is nullified from AuthProvider,
+      // so header re-renders and calculateTotalItems sees user as null.
+      // The AuthProvider's onAuthStateChanged will set user to null, triggering a re-render.
+      // The cart update event then ensures count becomes 0.
       window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); 
       router.push('/');
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
@@ -116,12 +122,13 @@ export default function Header() {
       }
     }
     // If not on homepage, Link component's default behavior will navigate and scroll
+    setIsMobileMenuOpen(false); // Close mobile menu if open
   };
 
   return (
     <header className="py-4 px-2 md:px-4 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="flex items-center group" aria-label="Aarambh Decor Home">
+        <Link href="/" className="flex items-center group" aria-label="Aarambh Decor Home" onClick={() => setIsMobileMenuOpen(false)}>
           <Image
             src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
             alt="Aarambh Decor Logo"
@@ -142,10 +149,10 @@ export default function Header() {
         {/* Navigation and Actions Wrapper */}
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 sm:gap-0"> {/* Reduced gap for desktop */}
+          <nav className="hidden md:flex items-center gap-1 sm:gap-0">
             <Button asChild variant="ghost">
               <Link href="/" aria-label="Home">
-                <Home className="mr-2 h-4 w-4" /> {/* Icon always visible on desktop links */}
+                <Home className="mr-2 h-4 w-4" />
                 Home
               </Link>
             </Button>
@@ -197,12 +204,19 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : !authLoading && !user ? (
-              <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
-                <Link href="/signin" aria-label="Log In">
-                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> {/* Icon hidden on sm for login button */}
-                  Log In
-                </Link>
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
+                  <Link href="/signin" aria-label="Log In">
+                    <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                    Log In
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" size="icon" aria-label="View Profile">
+                    <Link href="/profile">
+                        <UserCircle className="h-5 w-5" />
+                    </Link>
+                </Button>
+              </div>
           ) : (
              <div className="w-10 h-10"></div> 
           )}
@@ -254,16 +268,7 @@ export default function Header() {
                     </Link>
                   </Button>
                   <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2">
-                    <Link href="/#ai-decor-advisor" aria-label="AI Advisor"
-                      onClick={(e) => {
-                        setIsMobileMenuOpen(false);
-                        if (pathname === '/') { 
-                          e.preventDefault();
-                          document.getElementById('ai-decor-advisor')?.scrollIntoView({ behavior: 'smooth' });
-                        }
-                        // If not on homepage, Link component navigates, and browser handles hash scroll.
-                      }}
-                    >
+                    <Link href="/#ai-decor-advisor" aria-label="AI Advisor" onClick={handleAiAdvisorClick}>
                       <Sparkles className="mr-3 h-5 w-5 text-primary" /> AI Advisor
                     </Link>
                   </Button>
@@ -276,3 +281,4 @@ export default function Header() {
     </header>
   );
 }
+
