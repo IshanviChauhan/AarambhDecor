@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AlertTriangle, Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info, Phone } from 'lucide-react';
+import { Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile, Address, Order } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
@@ -50,8 +50,9 @@ function ProfileSubmitButton({ pending, text = "Save Changes", icon }: { pending
 }
 
 export default function ProfilePage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { user } // We still get user to potentially pass to actions or re-fetch data if it changes
+    = useAuth();
+  const router = useRouter(); // Keep for potential future use, not for auth redirection here
   const { toast } = useToast();
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -65,7 +66,6 @@ export default function ProfilePage() {
   const initialFormState: FormState = { message: null, success: false, errors: undefined };
   const [profileFormState, profileFormAction, isProfileSubmitting] = useActionState(updateUserProfile, initialFormState);
   
-  // Separate action states for add and update address
   const [addAddressState, addAddressAction, isAddingAddress] = useActionState(addShippingAddress, initialFormState);
   const [updateAddressState, updateAddressAction, isUpdatingAddress] = useActionState(updateShippingAddress, initialFormState);
   
@@ -83,12 +83,13 @@ export default function ProfilePage() {
   });
 
   const fetchProfileData = async () => {
-    if (!user) return;
     setIsLoadingData(true);
     try {
+      // Pass the current user object from useAuth() if available.
+      // getUserProfile will internally use auth.currentUser if no argument is passed or if user is null.
       const [profileData, addressesData, ordersData] = await Promise.all([
-        getUserProfile(),
-        getShippingAddresses(),
+        getUserProfile(user), 
+        getShippingAddresses(), // These actions will use auth.currentUser internally
         getOrderHistory()
       ]);
       
@@ -111,13 +112,10 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/signin');
-    } else if (user) {
-      fetchProfileData();
-    }
+    // Fetch data on component mount and when user state potentially changes
+    fetchProfileData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading, router]);
+  }, [user]); // Re-fetch if the user object from AuthProvider changes
 
 
   useEffect(() => {
@@ -141,7 +139,7 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState]);
 
-  const handleAddressFormSuccess = (state: FormState, formType: 'add' | 'update') => {
+  const handleAddressFormSuccess = (state: FormState) => { // Removed formType as it's not used
      if (state.message) {
       toast({
         title: state.success ? 'Success' : 'Error',
@@ -168,12 +166,12 @@ export default function ProfilePage() {
   }
 
   useEffect(() => {
-    handleAddressFormSuccess(addAddressState, 'add');
+    handleAddressFormSuccess(addAddressState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addAddressState]);
 
   useEffect(() => {
-    handleAddressFormSuccess(updateAddressState, 'update');
+    handleAddressFormSuccess(updateAddressState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateAddressState]);
 
@@ -212,7 +210,7 @@ export default function ProfilePage() {
   const onAddressFormSubmit: SubmitHandler<AddressInput> = (data) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) { // Allow empty string for optional fields
+        if (value !== undefined && value !== null) {
              formData.append(key, String(value));
         }
     });
@@ -225,28 +223,13 @@ export default function ProfilePage() {
     }
   };
   
-  if (authLoading || (isLoadingData && !userProfile && user)) { 
+  if (isLoadingData) { 
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow container mx-auto px-2 py-8 md:py-12 flex justify-center items-center">
           <Loader2 className="h-12 w-12 text-primary animate-spin" />
-          <p className="ml-4 text-lg text-muted-foreground">Loading your profile...</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!user) { 
-    return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <Header />
-        <main className="flex-grow container mx-auto px-2 py-8 md:py-12 text-center">
-          <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h1 className="text-3xl font-headline text-primary mb-2">Access Denied</h1>
-          <p className="text-muted-foreground mb-6">Please log in to view your profile.</p>
-           <Button asChild><Link href="/signin">Log In</Link></Button>
+          <p className="ml-4 text-lg text-muted-foreground">Loading profile data...</p>
         </main>
         <Footer />
       </div>
@@ -312,8 +295,10 @@ export default function ProfilePage() {
                     />
                 <div>
                   <Label>Email</Label>
-                  <Input type="email" value={userProfile?.email || user.email || ''} disabled className="mt-1 bg-muted/50"/>
-                  <p className="text-sm text-muted-foreground mt-1">Email cannot be changed.</p>
+                  <Input type="email" value={userProfile?.email || user?.email || 'Not logged in'} disabled={!!userProfile?.email || !!user?.email} className="mt-1 bg-muted/50"/>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {userProfile?.email || user?.email ? "Email cannot be changed." : "Log in to see your email."}
+                  </p>
                 </div>
                  {profileFormState.errors?._form && (
                   <p className="text-sm font-medium text-destructive">{profileFormState.errors._form.join(', ')}</p>
@@ -408,15 +393,10 @@ export default function ProfilePage() {
             </Dialog>
           </CardHeader>
           <CardContent>
-            {isLoadingData ? (
-                 <div className="flex justify-center items-center py-6">
-                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                    <p className="ml-3 text-muted-foreground">Loading addresses...</p>
-                 </div>
-            ) : addresses.length === 0 ? (
+            {addresses.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
                 <Home className="mx-auto h-10 w-10 mb-3 opacity-50" />
-                <p>You haven't added any shipping addresses yet.</p>
+                <p>{user ? "You haven't added any shipping addresses yet." : "Log in to manage your shipping addresses."}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -461,18 +441,15 @@ export default function ProfilePage() {
             </div>
           </CardHeader>
           <CardContent>
-            {isLoadingData ? (
-                <div className="flex justify-center items-center py-6">
-                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                    <p className="ml-3 text-muted-foreground">Loading order history...</p>
-                </div>
-            ) : orders.length === 0 ? (
+            {orders.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
                 <ShoppingBag className="mx-auto h-10 w-10 mb-3 opacity-50" />
-                <p>You haven't placed any orders yet.</p>
-                <Button asChild variant="link" className="mt-2">
-                    <Link href="/collections">Start Shopping</Link>
-                </Button>
+                 <p>{user ? "You haven't placed any orders yet." : "Log in to see your order history."}</p>
+                {user && (
+                    <Button asChild variant="link" className="mt-2">
+                        <Link href="/collections">Start Shopping</Link>
+                    </Button>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -488,7 +465,6 @@ export default function ProfilePage() {
                             {order.items.map(item => item.productName).join(', ')}
                         </div>
                       </div>
-                       {/* This link will be non-functional until order detail page is created */}
                        <Button variant="outline" size="sm" asChild disabled> 
                           <Link href={`/profile/orders/${order.id}`}>View Details</Link>
                        </Button>
