@@ -50,9 +50,9 @@ function ProfileSubmitButton({ pending, text = "Save Changes", icon }: { pending
 }
 
 export default function ProfilePage() {
-  const { user } // We still get user to potentially pass to actions or re-fetch data if it changes
+  const { user } 
     = useAuth();
-  const router = useRouter(); // Keep for potential future use, not for auth redirection here
+  const router = useRouter(); 
   const { toast } = useToast();
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -85,11 +85,9 @@ export default function ProfilePage() {
   const fetchProfileData = async () => {
     setIsLoadingData(true);
     try {
-      // Pass the current user object from useAuth() if available.
-      // getUserProfile will internally use auth.currentUser if no argument is passed or if user is null.
       const [profileData, addressesData, ordersData] = await Promise.all([
         getUserProfile(user), 
-        getShippingAddresses(), // These actions will use auth.currentUser internally
+        getShippingAddresses(), 
         getOrderHistory()
       ]);
       
@@ -112,10 +110,9 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    // Fetch data on component mount and when user state potentially changes
     fetchProfileData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]); // Re-fetch if the user object from AuthProvider changes
+  }, [user]); 
 
 
   useEffect(() => {
@@ -139,7 +136,7 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState]);
 
-  const handleAddressFormSuccess = (state: FormState) => { // Removed formType as it's not used
+  const handleAddressFormSuccess = (state: FormState) => { 
      if (state.message) {
       toast({
         title: state.success ? 'Success' : 'Error',
@@ -260,7 +257,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your first name" {...field} value={field.value || ''} />
+                            <Input placeholder="Your first name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -273,7 +270,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your last name" {...field} value={field.value || ''} />
+                            <Input placeholder="Your last name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -287,7 +284,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>Phone Number (Optional)</FormLabel>
                           <FormControl>
-                            <Input type="tel" placeholder="e.g. +911234567890" {...field} value={field.value || ''} />
+                            <Input type="tel" placeholder="e.g. +911234567890" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -369,11 +366,11 @@ export default function ProfilePage() {
                             <FormItem><FormLabel>Postal Code</FormLabel><FormControl><Input placeholder="400001" {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <FormField control={addressForm.control} name="country" render={({ field }) => (
-                            <FormItem><FormLabel>Country</FormLabel><FormControl><Input placeholder="India" {...field} value={field.value || 'India'} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Country</FormLabel><FormControl><Input placeholder="India" {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                       </div>
                       <FormField control={addressForm.control} name="phoneNumber" render={({ field }) => (
-                        <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="e.g. +919876543210" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="e.g. +919876543210" {...field} /></FormControl><FormMessage /></FormItem>
                       )}/>
                        {(addAddressState.errors?._form && !editingAddress) && (
                         <p className="text-sm font-medium text-destructive">{addAddressState.errors._form.join(', ')}</p>
