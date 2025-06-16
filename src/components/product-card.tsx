@@ -112,7 +112,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
       </CardHeader>
       <CardContent className="p-4 flex flex-col flex-grow min-w-0">
         <div>
-          <CardTitle className="font-headline text-xl mb-2 leading-tight break-words">
+          <CardTitle className="font-headline text-lg mb-2 leading-tight break-words">
             <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
               {product.name}
             </Link>
