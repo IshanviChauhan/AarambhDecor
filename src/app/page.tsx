@@ -13,10 +13,11 @@ import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, ImageUp } from 'l
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
-import { getLatestProducts, getProducts } from '@/app/products/actions'; 
+import { getProducts } from '@/app/products/actions'; 
+import { MOCK_PRODUCTS } from '@/lib/mock-data';
 
 const LATEST_PRODUCTS_COUNT = 3;
 
@@ -25,34 +26,36 @@ export default function HomePage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true); // Primarily for allProductsForSearch
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true); 
-    async function fetchInitialProducts() {
+    async function fetchInitialData() {
       setIsLoadingProducts(true);
       try {
-        const [latest, all] = await Promise.all([
-          getLatestProducts(LATEST_PRODUCTS_COUNT),
-          getProducts() // Fetch all products for search category matching
-        ]);
-        setLatestProducts(latest);
+        // Derive latestProducts directly from MOCK_PRODUCTS
+        const latestMockProducts = MOCK_PRODUCTS.filter(p => p.isLatest === true).slice(0, LATEST_PRODUCTS_COUNT);
+        setLatestProducts(latestMockProducts);
+
+        // Fetch all products from Firestore for search functionality
+        const all = await getProducts(); 
         setAllProductsForSearch(all);
+
       } catch (error) {
-        console.error("Failed to fetch products for homepage:", error);
-        toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
-        setLatestProducts([]);
-        setAllProductsForSearch([]);
+        console.error("Failed to fetch all products for search:", error);
+        toast({ title: "Error", description: "Could not load all products for search.", variant: "destructive" });
+        setAllProductsForSearch([]); // Ensure it's an empty array on error
       } finally {
-        setIsLoadingProducts(false);
+        setIsLoadingProducts(false); // Signifies allProductsForSearch is loaded
       }
     }
-    fetchInitialProducts();
+    fetchInitialData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -169,7 +172,7 @@ export default function HomePage() {
     }
   
     const lowerSearchTerm = trimmedSearchTerm.toLowerCase();
-    // Use allProductsForSearch which is fetched from DB
+    // Use allProductsForSearch which is fetched from DB/Firestore
     const uniqueProductCategories = Array.from(new Set(allProductsForSearch.map(p => p.category).filter(Boolean) as string[]));
     
     const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
@@ -180,6 +183,18 @@ export default function HomePage() {
       router.push(`/collections?search=${encodeURIComponent(trimmedSearchTerm)}`);
     }
   };
+  
+  const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === '/') {
+      e.preventDefault(); 
+      const section = document.getElementById('ai-decor-advisor');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    // If not on homepage, Link component's default behavior will navigate
+  };
+
 
   return (
     <>
@@ -234,7 +249,9 @@ export default function HomePage() {
                 New Arrivals
               </h2>
             </div>
-            {isLoadingProducts ? (
+            {/* The isLoadingProducts now primarily reflects loading of allProductsForSearch. 
+                latestProducts from MOCK_DATA will be available quickly. */}
+            {isLoadingProducts && !latestProducts.length ? ( // Show loader if allProductsForSearch is loading AND latestProducts isn't ready (unlikely with mock)
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading newest treasures...</p>
