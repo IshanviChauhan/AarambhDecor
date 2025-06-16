@@ -122,9 +122,6 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         {product.price && <p className="font-semibold text-primary text-lg mt-auto pt-2">{product.price}</p>}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex flex-col gap-2">
-        <Button variant="outline" className="w-full" asChild>
-          <Link href={`/product/${product.id}`}>View Details</Link>
-        </Button>
         <Button
           variant="default"
           className="w-full"
