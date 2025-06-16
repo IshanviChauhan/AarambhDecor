@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -20,6 +20,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function Header() {
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -28,6 +35,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -112,8 +120,8 @@ export default function Header() {
 
   return (
     <header className="py-4 px-2 md:px-4 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
-      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
-        <Link href="/" className="flex items-center group mb-4 sm:mb-0" aria-label="Aarambh Decor Home">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/" className="flex items-center group" aria-label="Aarambh Decor Home">
           <Image
             src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
             alt="Aarambh Decor Logo"
@@ -130,28 +138,32 @@ export default function Header() {
             Aarambh Decor
           </span>
         </Link>
-        <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
-          <Button asChild variant="ghost">
-            <Link href="/" aria-label="Home">
-              <Home className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-              Home
-            </Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link href="/collections" aria-label="Collections">
-              <LayoutGrid className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-              Collections
-            </Link>
-          </Button>
-          
-          <Button asChild variant="ghost">
-            <Link href="/#ai-decor-advisor" onClick={handleAiAdvisorClick} aria-label="AI Advisor">
-              <Sparkles className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
-              AI Advisor
-            </Link>
-          </Button>
-         
 
+        {/* Navigation and Actions Wrapper */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 sm:gap-0"> {/* Reduced gap for desktop */}
+            <Button asChild variant="ghost">
+              <Link href="/" aria-label="Home">
+                <Home className="mr-2 h-4 w-4" /> {/* Icon always visible on desktop links */}
+                Home
+              </Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/collections" aria-label="Collections">
+                <LayoutGrid className="mr-2 h-4 w-4" />
+                Collections
+              </Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/#ai-decor-advisor" onClick={handleAiAdvisorClick} aria-label="AI Advisor">
+                <Sparkles className="mr-2 h-4 w-4" />
+                AI Advisor
+              </Link>
+            </Button>
+          </nav>
+
+          {/* Auth and Cart Icons */}
           {!authLoading && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -187,7 +199,7 @@ export default function Header() {
           ) : !authLoading && !user ? (
               <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
                 <Link href="/signin" aria-label="Log In">
-                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                  <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" /> {/* Icon hidden on sm for login button */}
                   Log In
                 </Link>
               </Button>
@@ -205,9 +217,62 @@ export default function Header() {
               )}
             </Link>
           </Button>
-        </nav>
+
+          {/* Mobile Menu Trigger */}
+          <div className="md:hidden">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Open menu">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[300px] p-4">
+                <SheetHeader className="mb-6 pb-3 border-b border-border">
+                  <SheetTitle>
+                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center group">
+                      <Image
+                        src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
+                        alt="Aarambh Decor Logo"
+                        width={36}
+                        height={36}
+                        priority
+                        className="object-contain rounded-lg"
+                      />
+                      <span className="ml-2 text-lg font-headline text-primary">Aarambh Decor</span>
+                    </Link>
+                  </SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col space-y-1">
+                  <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link href="/" aria-label="Home">
+                      <Home className="mr-3 h-5 w-5 text-primary" /> Home
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link href="/collections" aria-label="Collections">
+                      <LayoutGrid className="mr-3 h-5 w-5 text-primary" /> Collections
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2">
+                    <Link href="/#ai-decor-advisor" aria-label="AI Advisor"
+                      onClick={(e) => {
+                        setIsMobileMenuOpen(false);
+                        if (pathname === '/') { 
+                          e.preventDefault();
+                          document.getElementById('ai-decor-advisor')?.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        // If not on homepage, Link component navigates, and browser handles hash scroll.
+                      }}
+                    >
+                      <Sparkles className="mr-3 h-5 w-5 text-primary" /> AI Advisor
+                    </Link>
+                  </Button>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div> {/* End of Navigation and Actions Wrapper */}
       </div>
     </header>
   );
 }
-
