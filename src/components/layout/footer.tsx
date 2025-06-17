@@ -39,9 +39,9 @@ export default function Footer() {
   return (
     <footer className="py-12 md:py-16 px-4 md:px-8 border-t border-border/50 mt-auto bg-secondary/30 text-foreground">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 mb-12">
           {/* Column 1: Aarambh Decor */}
-          <div className="sm:col-span-2 lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <h3 className="font-headline text-xl text-primary mb-4">Aarambh Decor</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Celebrating tradition, creativity, and individuality through thoughtfully curated home decor.
@@ -86,7 +86,7 @@ export default function Footer() {
           </div>
 
           {/* Column 4: Connect With Us */}
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
             <div className="flex space-x-4 mb-5">
               <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-muted-foreground hover:text-primary transition-colors"><Instagram size={20} /></a>
