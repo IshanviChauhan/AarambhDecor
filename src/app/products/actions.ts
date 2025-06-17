@@ -176,7 +176,6 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
           }
         } else {
           console.error(`getLatestProducts: Seeding failed or yielded no products: ${seedResult.message}.`);
-          // No immediate return [], will fall through to fallback if productsSnap remains empty
         }
       }
       
@@ -214,3 +213,4 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
     return [];
   }
 }
+
