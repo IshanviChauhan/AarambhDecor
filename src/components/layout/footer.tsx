@@ -42,7 +42,7 @@ export default function Footer() {
       <div className="container mx-auto">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 mb-12">
           {/* Column 1: Aarambh Decor */}
-          <div className="col-span-2 lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1 text-center lg:text-left">
             <h3 className="font-headline text-xl text-primary mb-4">Aarambh Decor</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Celebrating tradition, creativity, and individuality through thoughtfully curated home decor.
@@ -50,7 +50,7 @@ export default function Footer() {
           </div>
 
           {/* Column 2: Quick Links */}
-          <div>
+          <div className="text-center lg:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Links</h3>
             <ul className="space-y-2.5">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
@@ -63,7 +63,7 @@ export default function Footer() {
           </div>
 
           {/* Column 3: Collections */}
-          <div>
+          <div className="text-center lg:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Collections</h3>
             <ul className="space-y-2.5">
               {productCategories.length > 0 ? (
@@ -87,9 +87,9 @@ export default function Footer() {
           </div>
 
           {/* Column 4: Connect With Us */}
-          <div className="col-span-2 lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1 text-center lg:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
-            <div className="flex flex-col space-y-3">
+            <div className="flex flex-col space-y-3 items-center lg:items-start">
               <a 
                 href="#" 
                 target="_blank" 
