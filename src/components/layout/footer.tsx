@@ -1,5 +1,6 @@
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Instagram, Heart } from 'lucide-react';
 import { useMemo } from 'react';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
@@ -90,26 +91,39 @@ export default function Footer() {
           <div className="col-span-2 lg:col-span-1 text-center lg:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
             <div className="flex flex-col space-y-3 items-center lg:items-start">
-              <a 
-                href="#" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                aria-label="Join our WhatsApp Community" 
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Join our WhatsApp Community"
                 className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 group"
               >
                 <WhatsAppIcon />
                 <span>Join our WhatsApp Community</span>
               </a>
-              <a 
-                href="#" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                aria-label="Join us on Instagram" 
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Join us on Instagram"
                 className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 group"
               >
                 <Instagram className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
                 <span>Join us on Instagram</span>
               </a>
+              <div className="mt-4 flex justify-center lg:justify-start">
+                <Link href="/" aria-label="Aarambh Decor Home">
+                  <Image
+                    src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
+                    alt="Aarambh Decor Logo"
+                    width={60}
+                    height={60}
+                    priority
+                    className="object-contain rounded-lg transition-opacity hover:opacity-80"
+                    data-ai-hint="logo"
+                  />
+                </Link>
+              </div>
             </div>
             {/* Future newsletter input can go here */}
           </div>
