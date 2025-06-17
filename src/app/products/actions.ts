@@ -56,12 +56,12 @@ export async function getProducts(): Promise<Product[]> {
     if (productsSnap.empty) {
       console.log('No products found in Firestore. Attempting to seed database with mock data...');
       const seedResult = await seedProductsToFirestore();
-      if (seedResult.success) {
+      if (seedResult.success && seedResult.count && seedResult.count > 0) {
         console.log(`Seeding successful: ${seedResult.message}. Re-fetching products.`);
-        productsSnap = await getDocs(productsColRef); // Re-fetch after seeding
+        productsSnap = await getDocs(productsColRef); 
       } else {
-        console.error(`Seeding failed: ${seedResult.message}. Returning empty product list.`);
-        return []; // Return empty if seeding failed
+        console.error(`Seeding failed or yielded no products: ${seedResult.message}. Returning empty product list.`);
+        return []; 
       }
     }
     
@@ -109,7 +109,36 @@ export async function getProductById(id: string): Promise<Product | null> {
         reviews: data.reviews || [],
       } as Product;
     } else {
-      console.log(`Product with ID ${id} not found.`);
+      console.log(`Product with ID ${id} not found in Firestore.`);
+      // Check if the collection is generally empty and try seeding if it's the case.
+      // This is a soft check; ideally, seeding is triggered by getProducts on main pages.
+      const productsColRef = collection(db, 'products');
+      const quickCheckSnap = await getDocs(query(productsColRef, limit(1)));
+      if (quickCheckSnap.empty) {
+        console.log(`Product ${id} not found, and products collection seems empty. Attempting to seed...`);
+        await seedProductsToFirestore();
+        // Try fetching again after potential seed
+        const productSnapAfterSeed = await getDoc(productDocRef);
+        if (productSnapAfterSeed.exists()) {
+          console.log(`Product ${id} found after seeding.`);
+          const data = productSnapAfterSeed.data();
+           return {
+            id: productSnapAfterSeed.id,
+            name: data.name || '',
+            description: data.description || '',
+            careInstructions: data.careInstructions || '',
+            imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
+            price: data.price || 'Rs. 0',
+            category: data.category || 'Uncategorized',
+            isLatest: data.isLatest || false,
+            sizeAndDimensions: data.sizeAndDimensions || 'N/A',
+            material: data.material || 'N/A',
+            reviews: data.reviews || [],
+          } as Product;
+        } else {
+          console.log(`Product ${id} still not found after attempting to seed.`);
+        }
+      }
       return null;
     }
   } catch (error) {
@@ -121,23 +150,37 @@ export async function getProductById(id: string): Promise<Product | null> {
 export async function getLatestProducts(count: number): Promise<Product[]> {
   try {
     const productsColRef = collection(db, 'products');
-    // Assuming products might have a 'createdAt' timestamp field for more robust latest sorting
-    // For now, using 'isLatest' and limiting. If you add 'createdAt', order by that.
-    let q = query(productsColRef, where('isLatest', '==', true), limit(count));
-    let productsSnap = await getDocs(q);
+    let latestProductsQuery = query(productsColRef, where('isLatest', '==', true), limit(count));
+    let productsSnap = await getDocs(latestProductsQuery);
 
     if (productsSnap.empty) {
-        console.log("'isLatest' query returned no results or collection is empty. Falling back to general query for latest products.");
-        // Fallback if no products are marked 'isLatest' or if collection is empty
-        const allProductsQuery = query(productsColRef, orderBy('name'), limit(count)); // Example fallback: order by name
-        const fallbackSnap = await getDocs(allProductsQuery);
-        if (fallbackSnap.empty) {
-          console.log("Fallback query for latest products also returned no results. Seeding might be needed or collection is truly empty.");
-          // Potentially call getProducts() here to trigger seeding if absolutely no products are found
-          // However, to avoid circular calls or too much magic, let's assume getProducts will be called elsewhere first
+      console.log("'isLatest' query returned no results. Checking if entire collection is empty for seeding...");
+      // Check if the entire collection is empty
+      const allProductsCheckQuery = query(productsColRef, limit(1));
+      const anyProductSnap = await getDocs(allProductsCheckQuery);
+
+      if (anyProductSnap.empty) {
+        console.log('Products collection is entirely empty. Attempting to seed database with mock data...');
+        const seedResult = await seedProductsToFirestore();
+        if (seedResult.success && seedResult.count && seedResult.count > 0) {
+          console.log(`Seeding successful: ${seedResult.message}. Re-fetching latest products.`);
+          productsSnap = await getDocs(latestProductsQuery); // Try fetching 'isLatest' again
+        } else {
+          console.error(`Seeding failed or yielded no products: ${seedResult.message}. Returning empty latest products list.`);
           return [];
         }
-        productsSnap = fallbackSnap; // Use fallback results
+      }
+      // If still empty after potential seeding (e.g. no products are marked 'isLatest', or seeding failed to add 'isLatest' products)
+      // or if the collection was not empty but just had no 'isLatest' products, fall back to a general query.
+      if (productsSnap.empty) {
+         console.log("No 'isLatest' products found (even after potential seed). Falling back to a general query for latest products.");
+         const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); // Example: order by name
+         productsSnap = await getDocs(fallbackQuery);
+         if (productsSnap.empty) {
+           console.log("Fallback query for latest products also returned no results. The collection might be truly empty or only contains non-latest items after seeding.");
+           return []; // Truly no products to show as "latest"
+         }
+      }
     }
     
     const products: Product[] = productsSnap.docs.map(docSnap => {

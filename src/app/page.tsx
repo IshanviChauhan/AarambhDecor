@@ -9,15 +9,14 @@ import { ProductCard } from '@/components/product-card';
 import { ImageBasedProductRecommender } from '@/components/image-based-product-recommender';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, Star } from 'lucide-react';
+import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
-import { getProducts } from '@/app/products/actions';
-import { MOCK_PRODUCTS } from '@/lib/mock-data';
+import { getProducts, getLatestProducts } from '@/app/products/actions';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 
@@ -41,15 +40,18 @@ export default function HomePage() {
     async function fetchInitialData() {
       setIsLoadingProducts(true);
       try {
-        const latestMockProducts = MOCK_PRODUCTS.filter(p => p.isLatest === true).slice(0, FEATURED_PRODUCTS_COUNT);
-        setFeaturedProducts(latestMockProducts);
-
-        const all = await getProducts();
-        setAllProductsForSearch(all);
+        const [latestFetchedProducts, allFetchedProducts] = await Promise.all([
+          getLatestProducts(FEATURED_PRODUCTS_COUNT),
+          getProducts()
+        ]);
+        
+        setFeaturedProducts(latestFetchedProducts);
+        setAllProductsForSearch(allFetchedProducts);
 
       } catch (error) {
-        console.error("Failed to fetch all products for search:", error);
-        toast({ title: "Error", description: "Could not load all products for search.", variant: "destructive" });
+        console.error("Failed to fetch products for homepage:", error);
+        toast({ title: "Error", description: "Could not load products for the homepage.", variant: "destructive" });
+        setFeaturedProducts([]);
         setAllProductsForSearch([]);
       } finally {
         setIsLoadingProducts(false);
@@ -241,12 +243,12 @@ export default function HomePage() {
 
           <section id="featured-product-showcase" aria-labelledby="featured-product-showcase-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
-              <Star className="h-10 w-10 text-accent" />
+              <Sparkles className="h-10 w-10 text-accent" />
               <h2 id="featured-product-showcase-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
                 Featured Products
               </h2>
             </div>
-            {isLoadingProducts && !featuredProducts.length ? (
+            {isLoadingProducts ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading featured items...</p>
@@ -255,7 +257,7 @@ export default function HomePage() {
               <Carousel
                 opts={{
                   align: "start",
-                  loop: featuredProducts.length > 3,
+                  loop: featuredProducts.length > 3, // Enable loop if more than 3 items
                 }}
                 className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
@@ -275,7 +277,7 @@ export default function HomePage() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious
+                 <CarouselPrevious
                     variant="ghost"
                     className={cn(
                       "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",

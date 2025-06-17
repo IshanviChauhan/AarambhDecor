@@ -23,18 +23,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
-import { MOCK_PRODUCTS } from '@/lib/mock-data'; // Import MOCK_PRODUCTS
+import { getProducts } from '@/app/products/actions';
 
 
 const MIN_PRICE_DEFAULT = 0;
-const MAX_PRICE_DEFAULT = 10000; // Default max, will be updated from actual products
+const MAX_PRICE_DEFAULT = 10000;
 
 function CollectionsPageContent() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [allProducts] = useState<Product[]>(MOCK_PRODUCTS); // Use MOCK_PRODUCTS directly
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true); // For initial price calculation and UI consistency
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -51,15 +51,31 @@ function CollectionsPageContent() {
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
 
-  const categories = useMemo(() => {
-    const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
-    return ['All', ...Array.from(uniqueCategories).sort()];
-  }, [allProducts]);
-  
   useEffect(() => {
     setIsClient(true);
+    async function fetchInitialProducts() {
+      setIsLoadingProducts(true);
+      try {
+        const productsFromDb = await getProducts();
+        setAllProducts(productsFromDb);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
+        setAllProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    }
+    fetchInitialProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const categories = useMemo(() => {
+    if (isLoadingProducts || allProducts.length === 0) return ['All'];
+    const uniqueCategories = new Set(allProducts.map(p => p.category).filter(Boolean) as string[]);
+    return ['All', ...Array.from(uniqueCategories).sort()];
+  }, [allProducts, isLoadingProducts]);
+  
   // Effect for syncing searchTerm from URL
   useEffect(() => {
     const currentSearchFromUrl = searchParams.get('search') || '';
@@ -69,9 +85,9 @@ function CollectionsPageContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  // Effect for setting up price range based on allProducts (MOCK_PRODUCTS) and URL params
+  // Effect for setting up price range based on fetched allProducts and URL params
   useEffect(() => {
-    setIsLoadingProducts(true); 
+    if (isLoadingProducts) return; // Wait for products to load
 
     if (allProducts.length > 0) {
         const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && p !== undefined && !isNaN(p));
@@ -100,11 +116,8 @@ function CollectionsPageContent() {
          setMaxProductPrice(MAX_PRICE_DEFAULT);
          setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
     }
-    
-    setIsLoadingProducts(false); 
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allProducts, searchParams]);
+  }, [allProducts, searchParams, isLoadingProducts]);
 
 
   useEffect(() => {
@@ -121,9 +134,12 @@ function CollectionsPageContent() {
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
-        const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
-        currentParams.delete('category');
-        router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
+        // Only remove from URL if category is invalid AND not loading
+        if (!isLoadingProducts) {
+            const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+            currentParams.delete('category');
+            router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
+        }
       }
     } else {
       if (selectedCategory !== null) { 
@@ -170,6 +186,10 @@ function CollectionsPageContent() {
   }, [cartItems, isClient, user]);
 
   useEffect(() => {
+    if (isLoadingProducts) {
+        setFilteredProducts([]); // Clear filtered products while loading main set
+        return;
+    }
     let productsToFilter = allProducts;
 
     if (selectedCategory && selectedCategory !== 'All') {
@@ -190,7 +210,7 @@ function CollectionsPageContent() {
       );
     }
     setFilteredProducts(productsToFilter);
-  }, [selectedCategory, allProducts, priceRange, searchTerm]);
+  }, [selectedCategory, allProducts, priceRange, searchTerm, isLoadingProducts]);
 
   const handleToggleWishlist = (productId: string) => {
     if (!user) {
@@ -350,7 +370,7 @@ function CollectionsPageContent() {
                   debounceDelay={300} 
                 />
             </div>
-            {isLoadingProducts && !allProducts.length ? ( // Check allProducts length here as it's MOCK_PRODUCTS
+            {isLoadingProducts ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
