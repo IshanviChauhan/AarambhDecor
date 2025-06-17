@@ -320,7 +320,7 @@ export default function HomePage() {
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
               <ImageUp className="h-10 w-10 text-primary" />
               <h2 id="ai-decor-advisor-title" className="text-2xl md:text-3xl font-headline text-center text-foreground">
-                Need Inspiration? Try Our AI Advisor!
+                Need Inspiration?<br />Try Our AI Advisor!
               </h2>
             </div>
             <div className="animate-fade-in-up animation-delay-400">
