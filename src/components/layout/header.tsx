@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu, LogInIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -27,6 +27,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Separator } from '@/components/ui/separator';
 
 export default function Header() {
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -77,8 +78,6 @@ export default function Header() {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
         } else if (!user && event.key && event.key.startsWith('aarambhCart_')) {
-            // If user logs out, cart for that UID might be cleared, recalculate.
-            // This also covers general cart updates if a generic key was used (though we use UID specific)
             calculateTotalItems();
         }
     };
@@ -95,15 +94,11 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      if (user) { // Clear user-specific data from localStorage
+      if (user) { 
         localStorage.removeItem(`aarambhCart_${user.uid}`);
         localStorage.removeItem(`aarambhWishlist_${user.uid}`);
       }
       await signOut(auth);
-      // Dispatch cart update event *after* user state is nullified from AuthProvider,
-      // so header re-renders and calculateTotalItems sees user as null.
-      // The AuthProvider's onAuthStateChanged will set user to null, triggering a re-render.
-      // The cart update event then ensures count becomes 0.
       window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); 
       router.push('/');
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
@@ -111,6 +106,7 @@ export default function Header() {
       console.error("Error signing out: ", error);
       toast({ title: "Sign Out Error", description: "Failed to sign out. Please try again.", variant: "destructive" });
     }
+    setIsMobileMenuOpen(false); // Close menu after action
   };
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -121,8 +117,7 @@ export default function Header() {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-    // If not on homepage, Link component's default behavior will navigate and scroll
-    setIsMobileMenuOpen(false); // Close mobile menu if open
+    setIsMobileMenuOpen(false); 
   };
 
   return (
@@ -146,9 +141,7 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Navigation and Actions Wrapper */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-1 sm:gap-0">
             <Button asChild variant="ghost">
               <Link href="/" aria-label="Home">
@@ -170,7 +163,6 @@ export default function Header() {
             </Button>
           </nav>
 
-          {/* Auth and Cart Icons */}
           {!authLoading && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -204,21 +196,16 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : !authLoading && !user ? (
-              <div className="flex items-center gap-1">
+              <div className="hidden md:flex items-center"> {/* Only show on md screens and up */}
                 <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
                   <Link href="/signin" aria-label="Log In">
-                    <LogIn className="mr-2 h-4 w-4 sm:hidden md:inline-block" />
+                    <LogIn className="mr-2 h-4 w-4" />
                     Log In
                   </Link>
                 </Button>
-                <Button asChild variant="ghost" size="icon" aria-label="View Profile">
-                    <Link href="/profile">
-                        <UserCircle className="h-5 w-5" />
-                    </Link>
-                </Button>
               </div>
           ) : (
-             <div className="w-10 h-10"></div> 
+             <div className="w-10 h-10 md:w-auto"></div> // Placeholder for auth icon space, md:w-auto for desktop login button potentially
           )}
 
           <Button asChild variant="ghost" className="relative" size="icon">
@@ -232,7 +219,6 @@ export default function Header() {
             </Link>
           </Button>
 
-          {/* Mobile Menu Trigger */}
           <div className="md:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -240,7 +226,7 @@ export default function Header() {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[300px] p-4">
+              <SheetContent side="right" className="w-[280px] sm:w-[300px] p-4 flex flex-col">
                 <SheetHeader className="mb-6 pb-3 border-b border-border">
                   <SheetTitle>
                     <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center group">
@@ -256,7 +242,7 @@ export default function Header() {
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
-                <nav className="flex flex-col space-y-1">
+                <nav className="flex flex-col space-y-1 flex-grow">
                   <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <Link href="/" aria-label="Home">
                       <Home className="mr-3 h-5 w-5 text-primary" /> Home
@@ -273,11 +259,34 @@ export default function Header() {
                     </Link>
                   </Button>
                 </nav>
+                
+                <Separator className="my-4" />
+                <div className="flex flex-col space-y-1">
+                  {!authLoading && user ? (
+                    <>
+                      <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/profile" aria-label="Profile">
+                          <UserCircle className="mr-3 h-5 w-5 text-primary" /> Profile
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 text-destructive focus:text-destructive hover:text-destructive" onClick={handleSignOut}>
+                        <LogOut className="mr-3 h-5 w-5" /> Log Out
+                      </Button>
+                    </>
+                  ) : !authLoading && !user ? (
+                    <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link href="/signin" aria-label="Log In">
+                        <LogIn className="mr-3 h-5 w-5 text-primary" /> Log In
+                      </Link>
+                    </Button>
+                  ) : null }
+                </div>
               </SheetContent>
             </Sheet>
           </div>
-        </div> {/* End of Navigation and Actions Wrapper */}
+        </div> 
       </div>
     </header>
   );
 }
+
