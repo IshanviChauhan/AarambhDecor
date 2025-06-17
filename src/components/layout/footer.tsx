@@ -52,9 +52,9 @@ export default function Footer() {
         {/* Links and Logo Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 md:gap-x-8 items-start mb-12">
           {/* Column 1: Quick Links */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Links</h3>
-            <ul className="space-y-2.5">
+          <div className="flex flex-col items-center">
+            <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Quick Links</h3>
+            <ul className="space-y-2.5 text-left">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
               <li><Link href="/faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">FAQs</Link></li>
@@ -65,9 +65,9 @@ export default function Footer() {
           </div>
 
           {/* Column 2: Collections */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold text-lg mb-4 text-foreground">Collections</h3>
-            <ul className="space-y-2.5">
+          <div className="flex flex-col items-center">
+            <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Collections</h3>
+            <ul className="space-y-2.5 text-left">
               {productCategories.length > 0 ? (
                 productCategories.map(category => (
                   <li key={category}>
@@ -89,9 +89,9 @@ export default function Footer() {
           </div>
 
           {/* Column 3: Connect With Us */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
-            <div className="flex flex-col space-y-3 items-center md:items-start">
+          <div className="flex flex-col items-center">
+            <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Connect With Us</h3>
+            <div className="flex flex-col space-y-3 items-start">
               <a
                 href="https://chat.whatsapp.com/F7s9qoIos56HiZBbN1H2O3"
                 target="_blank"
@@ -116,7 +116,7 @@ export default function Footer() {
           </div>
 
           {/* Column 4: Footer Logo */}
-          <div className="col-span-2 md:col-span-1 flex justify-center md:justify-start items-start">
+          <div className="col-span-2 md:col-span-1 flex justify-center items-start">
             <Link href="/" aria-label="Aarambh Decor Home" className="block w-full max-w-[120px] sm:max-w-[150px] md:max-w-full">
                 <Image
                 src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
@@ -142,3 +142,4 @@ export default function Footer() {
     </footer>
   );
 }
+
