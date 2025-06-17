@@ -148,9 +148,9 @@ export function ImageBasedProductRecommender() {
       <CardHeader>
         <div className="flex items-center space-x-3">
           <ImageUp className="h-8 w-8 text-primary" />
-          <CardTitle className="font-headline text-2xl">AI Decor Advisor</CardTitle>
+          <CardTitle className="font-headline text-xl md:text-2xl">AI Decor Advisor</CardTitle>
         </div>
-        <CardDescription className="pt-2">
+        <CardDescription className="pt-2 text-sm md:text-base">
           Upload an image of your space, and our AI will recommend Aarambh Decor products that complement your style!
         </CardDescription>
       </CardHeader>
@@ -216,8 +216,8 @@ export function ImageBasedProductRecommender() {
         {overallFeedback && !isLoading && (
             <Alert className="mt-6 text-left bg-secondary/30 border-secondary/50">
                 <Info className="h-5 w-5 text-primary" />
-                <AlertTitle className="font-headline text-lg text-primary">AI Observations</AlertTitle>
-                <AlertDescription className="mt-2 whitespace-pre-wrap font-body text-foreground">
+                <AlertTitle className="font-headline text-base md:text-lg text-primary">AI Observations</AlertTitle>
+                <AlertDescription className="mt-2 whitespace-pre-wrap font-body text-foreground text-sm">
                 {overallFeedback}
                 </AlertDescription>
             </Alert>
@@ -227,7 +227,7 @@ export function ImageBasedProductRecommender() {
           <div className="mt-8 space-y-6">
             <div className="flex items-center space-x-2">
                 <CheckCircle className="h-6 w-6 text-green-600" />
-                <h3 className="text-xl font-headline text-foreground">Our AI Recommends:</h3>
+                <h3 className="text-lg md:text-xl font-headline text-foreground">Our AI Recommends:</h3>
             </div>
             {recommendations.map((rec, index) => {
               const product = getFullProductDetails(rec.productId);
@@ -248,10 +248,10 @@ export function ImageBasedProductRecommender() {
                       />
                     </div>
                     <div className="md:w-2/3 p-4 flex flex-col">
-                      <CardTitle className="font-headline text-lg text-primary mb-1">{rec.productName}</CardTitle>
-                      <p className="text-sm text-muted-foreground mb-2 font-semibold">AI's Reason:</p>
-                      <CardDescription className="text-sm text-foreground mb-3 flex-grow">{rec.reason}</CardDescription>
-                      <Button asChild variant="outline" size="sm" className="mt-auto self-start">
+                      <CardTitle className="font-headline text-base md:text-lg text-primary mb-1">{rec.productName}</CardTitle>
+                      <p className="text-xs md:text-sm text-muted-foreground mb-2 font-semibold">AI's Reason:</p>
+                      <CardDescription className="text-xs md:text-sm text-foreground mb-3 flex-grow">{rec.reason}</CardDescription>
+                      <Button asChild variant="outline" size="sm" className="mt-auto self-start text-xs md:text-sm">
                         <Link href={`/product/${rec.productId}`}>View Product</Link>
                       </Button>
                     </div>
