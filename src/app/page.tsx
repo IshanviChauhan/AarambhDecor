@@ -21,7 +21,7 @@ import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 
-const LATEST_PRODUCTS_COUNT = 6; // Updated to 6
+const LATEST_PRODUCTS_COUNT = 6;
 
 export default function HomePage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
@@ -253,13 +253,13 @@ export default function HomePage() {
               <Carousel
                 opts={{
                   align: "start",
-                  loop: latestProducts.length > 3,
+                  loop: latestProducts.length > 3, // Loop if more than 3 items
                 }}
-                className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400"
+                className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
                 <CarouselContent className="-ml-4">
                   {latestProducts.map((product) => (
-                    <CarouselItem key={product.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3">
+                    <CarouselItem key={product.id} className="pl-4 basis-1/2 md:basis-1/3"> {/* basis-1/2 for 2 cards, md:basis-1/3 for 3 cards */}
                       <div className="p-1 h-full flex"> {/* Added flex and h-full for consistent card height */}
                         <ProductCard
                           product={product}
