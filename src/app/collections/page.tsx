@@ -54,16 +54,19 @@ function CollectionsPageContent() {
   useEffect(() => {
     setIsClient(true);
     async function fetchInitialProducts() {
+      console.log("CollectionsPage: Fetching initial products...");
       setIsLoadingProducts(true);
       try {
         const productsFromDb = await getProducts();
+        console.log(`CollectionsPage: Fetched ${productsFromDb.length} products from DB.`);
         setAllProducts(productsFromDb);
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("CollectionsPage: Failed to fetch products:", error);
         toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
         setAllProducts([]);
       } finally {
         setIsLoadingProducts(false);
+        console.log("CollectionsPage: Finished fetching initial products.");
       }
     }
     fetchInitialProducts();
@@ -76,7 +79,6 @@ function CollectionsPageContent() {
     return ['All', ...Array.from(uniqueCategories).sort()];
   }, [allProducts, isLoadingProducts]);
   
-  // Effect for syncing searchTerm from URL
   useEffect(() => {
     const currentSearchFromUrl = searchParams.get('search') || '';
     if (currentSearchFromUrl !== searchTerm) {
@@ -85,12 +87,11 @@ function CollectionsPageContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  // Effect for setting up price range based on fetched allProducts and URL params
   useEffect(() => {
-    if (isLoadingProducts) return; // Wait for products to load
+    if (isLoadingProducts) return; 
 
     if (allProducts.length > 0) {
-        const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && p !== undefined && !isNaN(p));
+        const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && !isNaN(p));
         const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
         const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
         setMinProductPrice(minP);
@@ -134,7 +135,6 @@ function CollectionsPageContent() {
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
-        // Only remove from URL if category is invalid AND not loading
         if (!isLoadingProducts) {
             const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
             currentParams.delete('category');
@@ -187,10 +187,10 @@ function CollectionsPageContent() {
 
   useEffect(() => {
     if (isLoadingProducts) {
-        setFilteredProducts([]); // Clear filtered products while loading main set
+        setFilteredProducts([]); 
         return;
     }
-    let productsToFilter = allProducts;
+    let productsToFilter = [...allProducts];
 
     if (selectedCategory && selectedCategory !== 'All') {
       productsToFilter = productsToFilter.filter(p => p.category === selectedCategory);

@@ -14,6 +14,7 @@ interface SeedResult {
 
 export async function seedProductsToFirestore(): Promise<SeedResult> {
   if (MOCK_PRODUCTS.length === 0) {
+    console.warn("seedProductsToFirestore: No mock products found to seed.");
     return { success: false, message: "No mock products found to seed." };
   }
 
@@ -40,6 +41,7 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
 
   try {
     await batch.commit();
+    console.log(`seedProductsToFirestore: Successfully seeded ${seededCount} products.`);
     return { success: true, message: `Successfully seeded ${seededCount} products to Firestore.`, count: seededCount };
   } catch (error) {
     console.error("Error seeding products to Firestore:", error);
@@ -54,13 +56,16 @@ export async function getProducts(): Promise<Product[]> {
     let productsSnap = await getDocs(productsColRef);
     
     if (productsSnap.empty) {
-      console.log('No products found in Firestore. Attempting to seed database with mock data...');
+      console.log('getProducts: No products found in Firestore. Attempting to seed database with mock data...');
       const seedResult = await seedProductsToFirestore();
       if (seedResult.success && seedResult.count && seedResult.count > 0) {
-        console.log(`Seeding successful: ${seedResult.message}. Re-fetching products.`);
+        console.log(`getProducts: Seeding successful: ${seedResult.message}. Re-fetching products.`);
         productsSnap = await getDocs(productsColRef); 
+        if (productsSnap.empty) {
+            console.warn("getProducts: Firestore is still empty after successful seeding and re-fetch. This might indicate an issue with data propagation or rules.");
+        }
       } else {
-        console.error(`Seeding failed or yielded no products: ${seedResult.message}. Returning empty product list.`);
+        console.error(`getProducts: Seeding failed or yielded no products: ${seedResult.message}. Returning empty product list.`);
         return []; 
       }
     }
@@ -81,9 +86,10 @@ export async function getProducts(): Promise<Product[]> {
         reviews: data.reviews || [],
       } as Product;
     });
+    console.log(`getProducts: Fetched ${products.length} products.`);
     return products;
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("getProducts: Error fetching products:", error);
     return [];
   }
 }
@@ -109,40 +115,41 @@ export async function getProductById(id: string): Promise<Product | null> {
         reviews: data.reviews || [],
       } as Product;
     } else {
-      console.log(`Product with ID ${id} not found in Firestore.`);
-      // Check if the collection is generally empty and try seeding if it's the case.
-      // This is a soft check; ideally, seeding is triggered by getProducts on main pages.
+      console.log(`getProductById: Product with ID ${id} not found in Firestore.`);
       const productsColRef = collection(db, 'products');
       const quickCheckSnap = await getDocs(query(productsColRef, limit(1)));
       if (quickCheckSnap.empty) {
-        console.log(`Product ${id} not found, and products collection seems empty. Attempting to seed...`);
-        await seedProductsToFirestore();
-        // Try fetching again after potential seed
-        const productSnapAfterSeed = await getDoc(productDocRef);
-        if (productSnapAfterSeed.exists()) {
-          console.log(`Product ${id} found after seeding.`);
-          const data = productSnapAfterSeed.data();
-           return {
-            id: productSnapAfterSeed.id,
-            name: data.name || '',
-            description: data.description || '',
-            careInstructions: data.careInstructions || '',
-            imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
-            price: data.price || 'Rs. 0',
-            category: data.category || 'Uncategorized',
-            isLatest: data.isLatest || false,
-            sizeAndDimensions: data.sizeAndDimensions || 'N/A',
-            material: data.material || 'N/A',
-            reviews: data.reviews || [],
-          } as Product;
+        console.log(`getProductById: Product ${id} not found, and products collection seems empty. Attempting to seed...`);
+        const seedResult = await seedProductsToFirestore();
+         if (seedResult.success && seedResult.count && seedResult.count > 0) {
+            const productSnapAfterSeed = await getDoc(productDocRef);
+            if (productSnapAfterSeed.exists()) {
+              console.log(`getProductById: Product ${id} found after seeding.`);
+              const data = productSnapAfterSeed.data();
+              return {
+                id: productSnapAfterSeed.id,
+                name: data.name || '',
+                description: data.description || '',
+                careInstructions: data.careInstructions || '',
+                imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
+                price: data.price || 'Rs. 0',
+                category: data.category || 'Uncategorized',
+                isLatest: data.isLatest || false,
+                sizeAndDimensions: data.sizeAndDimensions || 'N/A',
+                material: data.material || 'N/A',
+                reviews: data.reviews || [],
+              } as Product;
+            } else {
+              console.log(`getProductById: Product ${id} still not found after attempting to seed.`);
+            }
         } else {
-          console.log(`Product ${id} still not found after attempting to seed.`);
+             console.error(`getProductById: Seeding failed or yielded no products when trying to find ${id}: ${seedResult.message}.`);
         }
       }
       return null;
     }
   } catch (error) {
-    console.error(`Error fetching product with ID ${id}:`, error);
+    console.error(`getProductById: Error fetching product with ID ${id}:`, error);
     return null;
   }
 }
@@ -154,31 +161,32 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
     let productsSnap = await getDocs(latestProductsQuery);
 
     if (productsSnap.empty) {
-      console.log("'isLatest' query returned no results. Checking if entire collection is empty for seeding...");
-      // Check if the entire collection is empty
+      console.log("getLatestProducts: 'isLatest' query returned no results. Checking if entire collection is empty for seeding...");
       const allProductsCheckQuery = query(productsColRef, limit(1));
       const anyProductSnap = await getDocs(allProductsCheckQuery);
 
       if (anyProductSnap.empty) {
-        console.log('Products collection is entirely empty. Attempting to seed database with mock data...');
+        console.log('getLatestProducts: Products collection is entirely empty. Attempting to seed database with mock data...');
         const seedResult = await seedProductsToFirestore();
         if (seedResult.success && seedResult.count && seedResult.count > 0) {
-          console.log(`Seeding successful: ${seedResult.message}. Re-fetching latest products.`);
-          productsSnap = await getDocs(latestProductsQuery); // Try fetching 'isLatest' again
+          console.log(`getLatestProducts: Seeding successful: ${seedResult.message}. Re-fetching latest products.`);
+          productsSnap = await getDocs(latestProductsQuery); 
+          if (productsSnap.empty) {
+              console.warn("getLatestProducts: 'isLatest' query still empty after successful seed. Falling back.");
+          }
         } else {
-          console.error(`Seeding failed or yielded no products: ${seedResult.message}. Returning empty latest products list.`);
-          return [];
+          console.error(`getLatestProducts: Seeding failed or yielded no products: ${seedResult.message}.`);
+          // No immediate return [], will fall through to fallback if productsSnap remains empty
         }
       }
-      // If still empty after potential seeding (e.g. no products are marked 'isLatest', or seeding failed to add 'isLatest' products)
-      // or if the collection was not empty but just had no 'isLatest' products, fall back to a general query.
+      
       if (productsSnap.empty) {
-         console.log("No 'isLatest' products found (even after potential seed). Falling back to a general query for latest products.");
-         const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); // Example: order by name
+         console.log("getLatestProducts: No 'isLatest' products found (even after potential seed). Falling back to a general query for latest products.");
+         const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); 
          productsSnap = await getDocs(fallbackQuery);
          if (productsSnap.empty) {
-           console.log("Fallback query for latest products also returned no results. The collection might be truly empty or only contains non-latest items after seeding.");
-           return []; // Truly no products to show as "latest"
+           console.log("getLatestProducts: Fallback query also returned no results. The collection might be truly empty.");
+           return []; 
          }
       }
     }
@@ -199,10 +207,10 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
         reviews: data.reviews || [],
       } as Product;
     });
+    console.log(`getLatestProducts: Fetched ${products.length} products.`);
     return products;
   } catch (error) {
-    console.error("Error fetching latest products:", error);
+    console.error("getLatestProducts: Error fetching latest products:", error);
     return [];
   }
 }
-
