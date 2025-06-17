@@ -9,26 +9,26 @@ import { ProductCard } from '@/components/product-card';
 import { ImageBasedProductRecommender } from '@/components/image-based-product-recommender';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, ImageUp } from 'lucide-react';
+import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, ImageUp, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
-import { getProducts } from '@/app/products/actions'; 
+import { getProducts } from '@/app/products/actions';
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 
-const LATEST_PRODUCTS_COUNT = 6;
+const FEATURED_PRODUCTS_COUNT = 6;
 
 export default function HomePage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [latestProducts, setLatestProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true); 
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
@@ -37,22 +37,22 @@ export default function HomePage() {
   const pathname = usePathname();
 
   useEffect(() => {
-    setIsClient(true); 
+    setIsClient(true);
     async function fetchInitialData() {
       setIsLoadingProducts(true);
       try {
-        const latestMockProducts = MOCK_PRODUCTS.filter(p => p.isLatest === true).slice(0, LATEST_PRODUCTS_COUNT);
-        setLatestProducts(latestMockProducts);
+        const latestMockProducts = MOCK_PRODUCTS.filter(p => p.isLatest === true).slice(0, FEATURED_PRODUCTS_COUNT);
+        setFeaturedProducts(latestMockProducts);
 
-        const all = await getProducts(); 
+        const all = await getProducts();
         setAllProductsForSearch(all);
 
       } catch (error) {
         console.error("Failed to fetch all products for search:", error);
         toast({ title: "Error", description: "Could not load all products for search.", variant: "destructive" });
-        setAllProductsForSearch([]); 
+        setAllProductsForSearch([]);
       } finally {
-        setIsLoadingProducts(false); 
+        setIsLoadingProducts(false);
       }
     }
     fetchInitialData();
@@ -154,7 +154,7 @@ export default function HomePage() {
       description: `${product.name} has been added to your cart.`,
     });
   };
-  
+
   const isProductInCart = (productId: string) => {
     if (!isClient || !user) return false;
     return cartItems.some(item => item.id === productId);
@@ -162,29 +162,29 @@ export default function HomePage() {
 
   const handleHomepageSearch = (searchTerm: string) => {
     const trimmedSearchTerm = searchTerm.trim();
-    
+
     if (!trimmedSearchTerm) {
       if (window.location.pathname.includes('/collections') && window.location.search.includes('search=')) {
-        router.push('/collections'); 
+        router.push('/collections');
       }
       return;
     }
-  
+
     const lowerSearchTerm = trimmedSearchTerm.toLowerCase();
     const uniqueProductCategories = Array.from(new Set(allProductsForSearch.map(p => p.category).filter(Boolean) as string[]));
-    
+
     const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
-  
+
     if (matchedCategory) {
       router.push(`/collections?category=${encodeURIComponent(matchedCategory)}&search=${encodeURIComponent(trimmedSearchTerm)}`);
     } else {
       router.push(`/collections?search=${encodeURIComponent(trimmedSearchTerm)}`);
     }
   };
-  
+
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
-      e.preventDefault(); 
+      e.preventDefault();
       const section = document.getElementById('ai-decor-advisor');
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -198,13 +198,13 @@ export default function HomePage() {
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
-          
+
           <section className="text-center pt-8 pb-12 md:pt-12 md:pb-16">
             <h1 className="text-5xl md:text-6xl font-headline text-primary mb-6 animate-fade-in-down">
               Discover Your Signature Style
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in-up">
-              Explore Aarambh Decor's curated collection of home decor that tells a story. 
+              Explore Aarambh Decor's curated collection of home decor that tells a story.
               Find pieces that resonate with your soul and transform your space.
             </p>
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground animate-fade-in-up animation-delay-200">
@@ -226,54 +226,54 @@ export default function HomePage() {
               <p className="text-lg text-muted-foreground max-w-xl mx-auto text-center">
                 Search our collections by product name or category to quickly find what you're looking for.
               </p>
-              <SearchBar 
-                onSearch={handleHomepageSearch} 
+              <SearchBar
+                onSearch={handleHomepageSearch}
                 placeholder="Search products or categories..."
                 className="mt-4"
-                debounceDelay={500} 
+                debounceDelay={500}
               />
             </div>
           </section>
 
           <Separator className="my-12 md:my-16 border-border/70" />
 
-          <section id="latest-product-showcase" aria-labelledby="latest-product-showcase-title" className="py-8">
+          <section id="featured-product-showcase" aria-labelledby="featured-product-showcase-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
-              <Sparkles className="h-10 w-10 text-accent" />
-              <h2 id="latest-product-showcase-title" className="text-4xl font-headline text-center text-foreground">
-                New Arrivals
+              <Star className="h-10 w-10 text-accent" />
+              <h2 id="featured-product-showcase-title" className="text-4xl font-headline text-center text-foreground">
+                Featured Products
               </h2>
             </div>
-            {isLoadingProducts && !latestProducts.length ? (
+            {isLoadingProducts && !featuredProducts.length ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                <p className="ml-4 text-lg text-muted-foreground">Loading newest treasures...</p>
+                <p className="ml-4 text-lg text-muted-foreground">Loading featured items...</p>
               </div>
-            ) : latestProducts.length > 0 ? (
+            ) : featuredProducts.length > 0 ? (
               <Carousel
                 opts={{
                   align: "start",
-                  loop: latestProducts.length > 3, // Loop if more than 3 items
+                  loop: featuredProducts.length > 3,
                 }}
                 className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
                 <CarouselContent className="-ml-4">
-                  {latestProducts.map((product) => (
-                    <CarouselItem key={product.id} className="pl-4 basis-1/2 md:basis-1/3"> {/* basis-1/2 for 2 cards, md:basis-1/3 for 3 cards */}
-                      <div className="p-1 h-full flex"> {/* Added flex and h-full for consistent card height */}
+                  {featuredProducts.map((product) => (
+                    <CarouselItem key={product.id} className="pl-4 basis-1/2 md:basis-1/3">
+                      <div className="p-1 h-full flex">
                         <ProductCard
                           product={product}
                           isWishlisted={isClient && user ? wishlist.has(product.id) : false}
                           onToggleWishlist={handleToggleWishlist}
                           onAddToCart={handleAddToCart}
                           isProductInCart={isProductInCart(product.id)}
-                          className="w-full flex flex-col" // Ensure card takes full width and is flex col
+                          className="w-full flex flex-col"
                         />
                       </div>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious 
+                <CarouselPrevious
                     variant="ghost"
                     className={cn(
                       "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
@@ -283,11 +283,11 @@ export default function HomePage() {
                       "shadow-md",
                       "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
                       "transition-opacity duration-200 ease-in-out",
-                      "md:left-[-20px]", 
+                      "md:left-[-20px]",
                       "disabled:opacity-30 disabled:cursor-not-allowed"
                     )}
                 />
-                <CarouselNext 
+                <CarouselNext
                     variant="ghost"
                     className={cn(
                       "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
@@ -303,7 +303,7 @@ export default function HomePage() {
                 />
               </Carousel>
             ) : (
-              <p className="text-center text-muted-foreground text-lg">No new products to display at the moment. Please check back soon!</p>
+              <p className="text-center text-muted-foreground text-lg">No featured products to display at the moment. Please check back soon!</p>
             )}
             <div className="text-center mt-12 animate-fade-in-up">
               <Button asChild variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10">
@@ -331,3 +331,4 @@ export default function HomePage() {
     </>
   );
 }
+
