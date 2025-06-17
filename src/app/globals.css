@@ -29,13 +29,13 @@ body {
 
 @layer base {
   :root {
-    --background: 5 50% 92%; /* Light pinkish-red */
+    --background: 5 50% 95%; /* Lightened pinkish-red */
     --foreground: 0 0% 20%; /* Dark Gray for text on light background */
 
-    --card: 5 50% 92%; /* Same as background */
+    --card: 5 50% 95%; /* Lightened */
     --card-foreground: 0 0% 20%;
 
-    --popover: 5 50% 94%; /* Slightly lighter than background */
+    --popover: 5 50% 96%; /* Lightened */
     --popover-foreground: 0 0% 20%;
 
     --primary: 14 70% 62%; /* Warm terracotta #E07A5F */
@@ -44,7 +44,7 @@ body {
     --secondary: 14 60% 75%; /* Lighter terracotta */
     --secondary-foreground: 0 0% 20%;
 
-    --muted: 5 40% 87%; /* Lighter pinkish-red */
+    --muted: 5 40% 90%; /* Lightened pinkish-red */
     --muted-foreground: 0 0% 40%; /* Grayer text */
 
     --accent: 43 91% 38%; /* Muted gold #B8860B */
@@ -53,8 +53,8 @@ body {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 5 30% 81%; /* Neutral border for pinkish-red theme */
-    --input: 5 30% 81%; /* Neutral input for pinkish-red theme */
+    --border: 5 30% 85%; /* Lightened neutral border */
+    --input: 5 30% 85%; /* Lightened neutral input */
     --ring: 43 91% 38%; /* Accent color for rings */
 
     --chart-1: 12 76% 61%;
