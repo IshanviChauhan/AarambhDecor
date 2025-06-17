@@ -54,7 +54,7 @@ export default function Footer() {
           {/* Column 1: Quick Links */}
           <div className="flex flex-col items-center">
             <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Quick Links</h3>
-            <ul className="space-y-2.5 text-left">
+            <ul className="space-y-2.5 text-center md:text-left">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
               <li><Link href="/faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">FAQs</Link></li>
@@ -67,7 +67,7 @@ export default function Footer() {
           {/* Column 2: Collections */}
           <div className="flex flex-col items-center">
             <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Collections</h3>
-            <ul className="space-y-2.5 text-left">
+            <ul className="space-y-2.5 text-center md:text-left">
               {productCategories.length > 0 ? (
                 productCategories.map(category => (
                   <li key={category}>
