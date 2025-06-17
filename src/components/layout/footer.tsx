@@ -42,7 +42,7 @@ export default function Footer() {
     <footer className="py-12 md:py-16 px-4 md:px-8 border-t border-border/50 mt-auto bg-secondary/30 text-foreground">
       <div className="container mx-auto">
         {/* Aarambh Decor Introduction */}
-        <div className="mb-10 text-center md:text-left">
+        <div className="mb-10 text-center">
           <h3 className="font-headline text-xl text-primary mb-4">Aarambh Decor</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
             Celebrating tradition, creativity, and individuality through thoughtfully curated home decor.
@@ -142,4 +142,3 @@ export default function Footer() {
     </footer>
   );
 }
-
