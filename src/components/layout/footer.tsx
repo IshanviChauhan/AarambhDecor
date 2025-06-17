@@ -17,6 +17,7 @@ const WhatsAppIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className="h-5 w-5 group-hover:scale-110 transition-transform duration-300"
   >
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
   </svg>
@@ -88,9 +89,27 @@ export default function Footer() {
           {/* Column 4: Connect With Us */}
           <div className="col-span-2 lg:col-span-1">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
-            <div className="flex space-x-4 mb-5">
-              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-muted-foreground hover:text-primary transition-colors"><Instagram size={20} /></a>
-              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="text-muted-foreground hover:text-primary transition-colors"><WhatsAppIcon /></a>
+            <div className="flex flex-col space-y-3">
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Join our WhatsApp Community" 
+                className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 group"
+              >
+                <WhatsAppIcon />
+                <span>Join our WhatsApp Community</span>
+              </a>
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Join us on Instagram" 
+                className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-all duration-300 group"
+              >
+                <Instagram className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                <span>Join us on Instagram</span>
+              </a>
             </div>
             {/* Future newsletter input can go here */}
           </div>
