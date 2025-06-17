@@ -145,16 +145,22 @@ export default function CartPage() {
             <div className="md:col-span-2 space-y-6">
               {cartItems.map((item) => (
                 <Card key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-md rounded-lg border-border/70">
-                  <Image
-                    src={item.imageUrls[0].url}
-                    alt={item.name}
-                    width={120}
-                    height={120}
-                    className="object-cover rounded-lg w-full sm:w-32 sm:h-32"
-                    data-ai-hint={item.imageUrls[0].dataAiHint}
-                  />
+                  <Link href={`/product/${item.id}`} aria-label={`View details for ${item.name}`}>
+                    <Image
+                      src={item.imageUrls[0].url}
+                      alt={item.name}
+                      width={120}
+                      height={120}
+                      className="object-cover rounded-lg w-full sm:w-32 sm:h-32"
+                      data-ai-hint={item.imageUrls[0].dataAiHint}
+                    />
+                  </Link>
                   <div className="flex-grow">
-                    <CardTitle className="font-headline text-lg mb-1">{item.name}</CardTitle>
+                    <CardTitle className="font-headline text-lg mb-1">
+                      <Link href={`/product/${item.id}`} className="hover:text-primary transition-colors">
+                        {item.name}
+                      </Link>
+                    </CardTitle>
                     <CardDescription className="text-sm text-muted-foreground mb-2">
                       {item.price}
                     </CardDescription>
