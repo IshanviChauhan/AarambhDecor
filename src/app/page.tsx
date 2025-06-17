@@ -240,7 +240,7 @@ export default function HomePage() {
           <section id="featured-product-showcase" aria-labelledby="featured-product-showcase-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
               <Star className="h-10 w-10 text-accent" />
-              <h2 id="featured-product-showcase-title" className="text-4xl font-headline text-center text-foreground">
+              <h2 id="featured-product-showcase-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
                 Featured Products
               </h2>
             </div>
@@ -253,7 +253,7 @@ export default function HomePage() {
               <Carousel
                 opts={{
                   align: "start",
-                  loop: featuredProducts.length > 3,
+                  loop: featuredProducts.length > 3, // Loop if more than 3 items
                 }}
                 className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
@@ -317,7 +317,7 @@ export default function HomePage() {
           <section id="ai-decor-advisor" aria-labelledby="ai-decor-advisor-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
               <ImageUp className="h-10 w-10 text-primary" />
-              <h2 id="ai-decor-advisor-title" className="text-4xl font-headline text-center text-foreground">
+              <h2 id="ai-decor-advisor-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
                 Need Inspiration? Try Our AI Advisor!
               </h2>
             </div>
