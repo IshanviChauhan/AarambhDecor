@@ -36,7 +36,7 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => {
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
-          className={`h-5 w-5 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}`}
+          className={`h-5 w-5 ${i < rating ? 'text-accent fill-accent' : 'text-muted-foreground'}`}
         />
       ))}
     </div>
@@ -438,11 +438,11 @@ export default function ProductDetailPage() {
                           size="icon"
                           onClick={() => setNewReviewRating(star)}
                           className={`h-8 w-8 p-0 ${
-                            star <= newReviewRating ? 'text-yellow-400' : 'text-muted-foreground'
-                          } hover:text-yellow-400`}
+                            star <= newReviewRating ? 'text-accent' : 'text-muted-foreground'
+                          } hover:text-accent`}
                           aria-label={`Rate ${star} out of 5 stars`}
                         >
-                          <Star className={`h-6 w-6 ${star <= newReviewRating ? 'fill-yellow-400' : ''}`} />
+                          <Star className={`h-6 w-6 ${star <= newReviewRating ? 'fill-accent' : ''}`} />
                         </Button>
                       ))}
                     </div>
@@ -493,3 +493,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+

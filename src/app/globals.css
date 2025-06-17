@@ -47,7 +47,7 @@ body {
     --muted: 5 40% 90%; /* Lightened pinkish-red */
     --muted-foreground: 0 0% 40%; /* Grayer text */
 
-    --accent: 43 91% 38%; /* Muted gold #B8860B */
+    --accent: 10 70% 72%; /* Light Coral / Soft Salmon - NEW */
     --accent-foreground: 0 0% 98%; /* White/very light for text on accent */
 
     --destructive: 0 84.2% 60.2%;
@@ -55,12 +55,12 @@ body {
 
     --border: 5 30% 85%; /* Lightened neutral border */
     --input: 5 30% 85%; /* Lightened neutral input */
-    --ring: 43 91% 38%; /* Accent color for rings */
+    --ring: 10 70% 72%; /* Accent color for rings - NEW */
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
+    --chart-4: 10 65% 68%; /* Slightly deeper version of new accent - NEW */
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
 
@@ -94,20 +94,20 @@ body {
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 60%;
 
-    --accent: 43 85% 42%; /* Slightly adjusted gold for dark */
-    --accent-foreground: 0 0% 10%;
+    --accent: 10 65% 60%; /* Adjusted for dark mode - NEW */
+    --accent-foreground: 0 0% 10%; /* Dark text on dark mode accent */
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 25%;
     --input: 0 0% 25%;
-    --ring: 43 85% 42%;
+    --ring: 10 65% 60%; /* Accent color for rings in dark mode - NEW */
 
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
+    --chart-4: 280 65% 60%; /* Remains purple in dark mode */
     --chart-5: 340 75% 55%;
 
     /* Sidebar variables for dark mode - kept from original */
