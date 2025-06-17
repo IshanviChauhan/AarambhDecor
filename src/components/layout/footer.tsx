@@ -41,7 +41,7 @@ export default function Footer() {
   return (
     <footer className="py-12 md:py-16 px-4 md:px-8 border-t border-border/50 mt-auto bg-secondary/30 text-foreground">
       <div className="container mx-auto">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 text-center lg:text-left">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
           {/* Column 1: Aarambh Decor */}
           <div className="col-span-2 lg:col-span-1 text-center lg:text-left">
             <h3 className="font-headline text-xl text-primary mb-4">Aarambh Decor</h3>
@@ -120,8 +120,8 @@ export default function Footer() {
                 <Image
                 src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
                 alt="Aarambh Decor Logo"
-                width={80}
-                height={80}
+                width={100}
+                height={100}
                 priority
                 className="object-contain rounded-lg transition-opacity hover:opacity-80"
                 data-ai-hint="logo"
