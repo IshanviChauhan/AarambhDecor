@@ -92,7 +92,7 @@ export default function Footer() {
             <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
             <div className="flex flex-col space-y-3 items-center lg:items-start">
               <a
-                href="#"
+                href="https://chat.whatsapp.com/F7s9qoIos56HiZBbN1H2O3"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Join our WhatsApp Community"
