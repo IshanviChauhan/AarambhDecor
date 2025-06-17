@@ -41,17 +41,18 @@ export default function Footer() {
   return (
     <footer className="py-12 md:py-16 px-4 md:px-8 border-t border-border/50 mt-auto bg-secondary/30 text-foreground">
       <div className="container mx-auto">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-          {/* Column 1: Aarambh Decor */}
-          <div className="col-span-2 lg:col-span-1 text-center lg:text-left">
-            <h3 className="font-headline text-xl text-primary mb-4">Aarambh Decor</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Celebrating tradition, creativity, and individuality through thoughtfully curated home decor.
-            </p>
-          </div>
+        {/* Aarambh Decor Introduction */}
+        <div className="mb-10 text-center md:text-left">
+          <h3 className="font-headline text-xl text-primary mb-4">Aarambh Decor</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Celebrating tradition, creativity, and individuality through thoughtfully curated home decor.
+          </p>
+        </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="text-center lg:text-left">
+        {/* Links and Logo Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10 md:gap-x-8 items-start mb-12">
+          {/* Column 1: Quick Links */}
+          <div className="text-center md:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Links</h3>
             <ul className="space-y-2.5">
               <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
@@ -63,8 +64,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Collections */}
-          <div className="text-center lg:text-left">
+          {/* Column 2: Collections */}
+          <div className="text-center md:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Collections</h3>
             <ul className="space-y-2.5">
               {productCategories.length > 0 ? (
@@ -87,10 +88,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Connect With Us */}
-          <div className="col-span-2 lg:col-span-1 text-center lg:text-left">
+          {/* Column 3: Connect With Us */}
+          <div className="text-center md:text-left">
             <h3 className="font-semibold text-lg mb-4 text-foreground">Connect With Us</h3>
-            <div className="flex flex-col space-y-3 items-center lg:items-start">
+            <div className="flex flex-col space-y-3 items-center md:items-start">
               <a
                 href="https://chat.whatsapp.com/F7s9qoIos56HiZBbN1H2O3"
                 target="_blank"
@@ -113,9 +114,11 @@ export default function Footer() {
               </a>
             </div>
           </div>
-        </div>
-        
-        <div className="flex justify-center my-12">
+
+          {/* Column 4: Footer Logo */}
+          {/* On small screens (grid-cols-2), this takes full width due to col-span-2 and appears below Connect With Us */}
+          {/* On medium screens (md:grid-cols-4), this is the 4th column */}
+          <div className="col-span-2 md:col-span-1 flex justify-center md:justify-start items-start">
             <Link href="/" aria-label="Aarambh Decor Home">
                 <Image
                 src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
@@ -127,9 +130,11 @@ export default function Footer() {
                 data-ai-hint="logo"
                 />
             </Link>
+          </div>
         </div>
-
-        <div className="border-t border-border/30 text-center">
+        
+        {/* Copyright Section */}
+        <div className="border-t border-border/30 pt-8 text-center">
           <p className="text-sm text-muted-foreground">&copy; {currentYear} Aarambh Decor. All rights reserved.</p>
           <p className="text-xs text-muted-foreground mt-2 flex items-center justify-center">
             Designed with <Heart className="h-3.5 w-3.5 mx-1 text-primary fill-primary" aria-hidden="true" /> by a lover of tradition.
@@ -139,4 +144,3 @@ export default function Footer() {
     </footer>
   );
 }
-
