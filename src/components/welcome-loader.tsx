@@ -5,9 +5,6 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils'; // Import cn utility
 
-// WELCOME_SHOWN_KEY is no longer used
-// const WELCOME_SHOWN_KEY = 'aarambhWelcomeShown';
-
 export default function WelcomeLoader() {
   const [isVisible, setIsVisible] = useState(false); // Start as not visible, set true in useEffect
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -26,17 +23,17 @@ export default function WelcomeLoader() {
     setIsVisible(true); // Make it visible immediately to start content animations
 
     // Timer to start fade-out of the entire loader
+    // Content shown for 1.5 seconds, then 0.5s fade-out for a total of 2 seconds.
     const displayTimer = setTimeout(() => {
       setIsFadingOut(true); // Trigger fade-out animation for the loader
 
       // Timer to actually hide the loader after fade-out animation completes
       const fadeOutCompletionTimer = setTimeout(() => {
         setIsVisible(false); // Fully hide the loader component
-        // localStorage.setItem(WELCOME_SHOWN_KEY, 'true'); // No longer needed
       }, 500); // This duration should match your fade-out animation (0.5s)
 
       return () => clearTimeout(fadeOutCompletionTimer);
-    }, 3000); // Show content for 3 seconds before starting loader fade-out
+    }, 1500); // Show content for 1.5 seconds before starting loader fade-out
 
     return () => clearTimeout(displayTimer);
   }, [isMounted]);
