@@ -29,39 +29,39 @@ body {
 
 @layer base {
   :root {
-    --background: 5 50% 95%; /* Lightened pinkish-red */
-    --foreground: 0 0% 20%; /* Dark Gray for text on light background */
+    --background: 30 60% 96%; /* Very Light Warm Cream */
+    --foreground: 20 15% 25%; /* Dark, Slightly Warm Gray/Brown */
 
-    --card: 5 50% 95%; /* Lightened */
-    --card-foreground: 0 0% 20%;
+    --card: 30 60% 96%; /* Matches background or slightly off */
+    --card-foreground: 20 15% 25%;
 
-    --popover: 5 50% 96%; /* Lightened */
-    --popover-foreground: 0 0% 20%;
+    --popover: 30 60% 97%; /* Slightly Lighter Cream */
+    --popover-foreground: 20 15% 25%;
 
-    --primary: 14 70% 62%; /* Warm terracotta #E07A5F */
-    --primary-foreground: 0 0% 98%; /* White/very light for text on primary */
+    --primary: 20 80% 58%; /* Rich Orange-Red Terracotta */
+    --primary-foreground: 0 0% 98%; /* White/Very Light for text on primary */
 
-    --secondary: 14 60% 75%; /* Lighter terracotta */
-    --secondary-foreground: 0 0% 20%;
+    --secondary: 20 70% 70%; /* Softer, Lighter Orange-Red */
+    --secondary-foreground: 20 15% 25%;
 
-    --muted: 5 40% 90%; /* Lightened pinkish-red */
-    --muted-foreground: 0 0% 40%; /* Grayer text */
+    --muted: 30 50% 92%; /* Light Warm Gray/Cream */
+    --muted-foreground: 20 15% 45%; /* Medium Warm Gray/Brown */
 
-    --accent: 10 70% 72%; /* Light Coral / Soft Salmon - NEW */
-    --accent-foreground: 0 0% 98%; /* White/very light for text on accent */
+    --accent: 35 85% 65%; /* Vibrant Warm Orange-Yellow */
+    --accent-foreground: 0 0% 15%; /* Dark text for accent */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 5 30% 85%; /* Lightened neutral border */
-    --input: 5 30% 85%; /* Lightened neutral input */
-    --ring: 10 70% 72%; /* Accent color for rings - NEW */
+    --border: 30 40% 88%; /* Light Warm Gray Border */
+    --input: 30 40% 88%; /* Light Warm Gray Input */
+    --ring: 35 85% 65%; /* Accent color for rings */
 
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 10 65% 68%; /* Slightly deeper version of new accent - NEW */
-    --chart-5: 27 87% 67%;
+    --chart-1: 15 80% 60%; /* Red-Orange */
+    --chart-2: 30 75% 55%; /* Orange */
+    --chart-3: 40 70% 50%; /* Yellow-Orange */
+    --chart-4: 5 70% 58%;  /* Deeper Red */
+    --chart-5: 25 85% 65%; /* Orangey */
     --radius: 0.5rem;
 
     /* Sidebar variables - kept from original for completeness */
@@ -76,39 +76,39 @@ body {
   }
 
   .dark {
-    --background: 0 0% 10%; /* Dark background */
-    --foreground: 0 0% 95%; /* Light text for dark mode */
+    --background: 20 15% 10%; /* Very Dark Warm Brown/Gray */
+    --foreground: 30 30% 95%; /* Light Warm Cream for text */
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 95%;
+    --card: 20 15% 12%;
+    --card-foreground: 30 30% 95%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 20 15% 12%;
+    --popover-foreground: 30 30% 95%;
 
-    --primary: 14 65% 58%; /* Slightly adjusted terracotta for dark */
-    --primary-foreground: 0 0% 10%;
+    --primary: 20 70% 55%; /* Adjusted Orange-Red for Dark Mode */
+    --primary-foreground: 20 10% 15%; /* Dark text on dark primary */
 
-    --secondary: 14 55% 68%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 20 60% 65%; /* Lighter Orange-Red for Dark Mode */
+    --secondary-foreground: 20 10% 15%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 20 15% 20%;
+    --muted-foreground: 30 30% 70%;
 
-    --accent: 10 65% 60%; /* Adjusted for dark mode - NEW */
-    --accent-foreground: 0 0% 10%; /* Dark text on dark mode accent */
+    --accent: 35 75% 60%; /* Adjusted Warm Orange-Yellow for Dark Mode */
+    --accent-foreground: 35 15% 10%; /* Dark text on dark accent */
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
-    --ring: 10 65% 60%; /* Accent color for rings in dark mode - NEW */
+    --border: 20 15% 25%;
+    --input: 20 15% 25%;
+    --ring: 35 75% 60%; /* Accent color for rings in dark mode */
 
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%; /* Remains purple in dark mode */
-    --chart-5: 340 75% 55%;
+    --chart-1: 15 70% 58%;
+    --chart-2: 30 65% 53%;
+    --chart-3: 40 60% 48%;
+    --chart-4: 5 60% 55%;
+    --chart-5: 25 75% 63%;
 
     /* Sidebar variables for dark mode - kept from original */
     --sidebar-background: 240 5.9% 10%;
