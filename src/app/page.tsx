@@ -318,7 +318,7 @@ export default function HomePage() {
 
           <section id="ai-decor-advisor" aria-labelledby="ai-decor-advisor-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
-              <h2 id="ai-decor-advisor-title" className="text-2xl md:text-3xl font-headline text-center text-foreground">
+              <h2 id="ai-decor-advisor-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
                 Need Inspiration?<br />Try Our AI Advisor!
               </h2>
             </div>
@@ -332,3 +332,5 @@ export default function HomePage() {
     </>
   );
 }
+
+    
