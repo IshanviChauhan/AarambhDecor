@@ -91,7 +91,7 @@ export default function Footer() {
           {/* Column 3: Connect With Us */}
           <div className="flex flex-col items-center">
             <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Connect With Us</h3>
-            <div className="flex flex-col space-y-3 items-start">
+            <div className="flex flex-col space-y-3 items-center md:items-start">
               <a
                 href="https://chat.whatsapp.com/F7s9qoIos56HiZBbN1H2O3"
                 target="_blank"
@@ -142,3 +142,4 @@ export default function Footer() {
     </footer>
   );
 }
+
