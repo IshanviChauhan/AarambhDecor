@@ -89,7 +89,7 @@ export default function Footer() {
           </div>
 
           {/* Column 3: Connect With Us */}
-          <div className="flex flex-col items-center">
+          <div className="col-span-2 md:col-span-1 flex flex-col items-center">
             <h3 className="font-semibold text-lg mb-4 text-foreground text-center">Connect With Us</h3>
             <div className="flex flex-col space-y-3 items-center md:items-start">
               <a
