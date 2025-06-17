@@ -19,7 +19,7 @@ body {
 }
 
 @keyframes glitter-flicker { /* Adjusted opacities for more visibility */
-  0%, 100% { opacity: 0.8; } 
+  0%, 100% { opacity: 0.8; }
   20% { opacity: 0.5; }
   40% { opacity: 1.0; }
   60% { opacity: 0.4; }
@@ -29,13 +29,13 @@ body {
 
 @layer base {
   :root {
-    --background: 60 56% 91%; /* Light beige #F5F5DC */
-    --foreground: 0 0% 20%; /* Dark Gray for text on light beige */
+    --background: 5 50% 92%; /* Light pinkish-red */
+    --foreground: 0 0% 20%; /* Dark Gray for text on light background */
 
-    --card: 60 56% 91%; /* Same as background or slightly whiter */
+    --card: 5 50% 92%; /* Same as background */
     --card-foreground: 0 0% 20%;
 
-    --popover: 60 56% 93%; /* Slightly whiter than background */
+    --popover: 5 50% 94%; /* Slightly lighter than background */
     --popover-foreground: 0 0% 20%;
 
     --primary: 14 70% 62%; /* Warm terracotta #E07A5F */
@@ -44,7 +44,7 @@ body {
     --secondary: 14 60% 75%; /* Lighter terracotta */
     --secondary-foreground: 0 0% 20%;
 
-    --muted: 60 40% 85%; /* Lighter beige */
+    --muted: 5 40% 87%; /* Lighter pinkish-red */
     --muted-foreground: 0 0% 40%; /* Grayer text */
 
     --accent: 43 91% 38%; /* Muted gold #B8860B */
@@ -53,8 +53,8 @@ body {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 60 30% 80%; /* Neutral border */
-    --input: 60 30% 80%; /* Neutral input background */
+    --border: 5 30% 81%; /* Neutral border for pinkish-red theme */
+    --input: 5 30% 81%; /* Neutral input for pinkish-red theme */
     --ring: 43 91% 38%; /* Accent color for rings */
 
     --chart-1: 12 76% 61%;
@@ -141,7 +141,7 @@ body {
     pointer-events: none; /* Don't interfere with content */
     z-index: -1; /* Behind all page content */
 
-    background-image: 
+    background-image:
       /* Layer 1: Primary color glitter - Increased alpha */
       radial-gradient(circle at 10% 30%, hsla(var(--primary), 0.25) 0%, transparent 8%),
       radial-gradient(circle at 50% 70%, hsla(var(--primary), 0.35) 0%, transparent 10%),
@@ -150,19 +150,19 @@ body {
       radial-gradient(circle at 30% 90%, hsla(var(--accent), 0.30) 0%, transparent 9%),
       /* Layer 3: Secondary color glitter (very subtle) - Increased alpha */
       radial-gradient(circle at 65% 50%, hsla(var(--secondary), 0.15) 0%, transparent 6%);
-    
+
     background-repeat: repeat; /* Ensure gradients tile */
-    
+
     /* Different sizes for each layer of gradients to create a more complex, less uniform pattern */
-    background-size: 
+    background-size:
       250px 250px, /* Layer 1 particles */
       300px 300px, /* Layer 1 particles */
       200px 200px, /* Layer 2 particles */
       350px 350px, /* Layer 2 particles */
       180px 180px;  /* Layer 3 particles */
-    
-    animation: 
-      glitter-drift 50s linear infinite, 
+
+    animation:
+      glitter-drift 50s linear infinite,
       glitter-flicker 7s ease-in-out infinite;
   }
 }
