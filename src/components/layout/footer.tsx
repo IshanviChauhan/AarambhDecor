@@ -103,7 +103,7 @@ export default function Footer() {
                 <span>Join our WhatsApp Community</span>
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/_aarambh_decor/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Join us on Instagram"
