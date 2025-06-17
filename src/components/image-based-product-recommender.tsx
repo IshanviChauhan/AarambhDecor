@@ -170,11 +170,13 @@ export function ImageBasedProductRecommender() {
           <Button
             variant="outline"
             onClick={triggerFileInput}
-            className="w-full border-dashed border-primary/50 hover:border-primary text-primary/80 hover:text-primary-foreground"
+            className="w-full border-dashed border-primary/50 hover:border-primary text-primary/80 hover:text-primary-foreground flex justify-start items-center gap-1"
             aria-label="Upload an image of your space"
           >
-            <FileImage className="mr-2 h-5 w-5" />
-            {selectedFile ? `Selected: ${selectedFile.name}` : "Choose an image (PNG, JPG, WEBP, max 5MB)"}
+            <FileImage className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate overflow-hidden whitespace-nowrap">
+              {selectedFile ? `Selected: ${selectedFile.name}` : "Choose an image (PNG, JPG, WEBP, max 5MB)"}
+            </span>
           </Button>
         </div>
 
@@ -266,3 +268,4 @@ export function ImageBasedProductRecommender() {
     </Card>
   );
 }
+
