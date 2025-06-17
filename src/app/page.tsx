@@ -70,7 +70,10 @@ export default function HomePage() {
           setWishlist(new Set(JSON.parse(storedWishlist)));
         } catch (e) {
           console.error("Failed to parse wishlist from localStorage", e);
+          setWishlist(new Set()); 
         }
+      } else {
+        setWishlist(new Set());
       }
       const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
       if (storedCart) {
@@ -78,7 +81,10 @@ export default function HomePage() {
           setCartItems(JSON.parse(storedCart));
         } catch (e) {
           console.error("Failed to parse cart from localStorage", e);
+          setCartItems([]);
         }
+      } else {
+        setCartItems([]);
       }
     } else {
       setWishlist(new Set());
@@ -87,12 +93,12 @@ export default function HomePage() {
   }, [isClient, user]);
 
   useEffect(() => {
-    if (!isClient || !user) return;
+    if (!isClient || !user) return; // Only save if user is logged in
     localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
   }, [wishlist, isClient, user]);
 
   useEffect(() => {
-    if (!isClient || !user) return;
+    if (!isClient || !user) return; // Only save if user is logged in
     localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
   }, [cartItems, isClient, user]);
@@ -105,8 +111,10 @@ export default function HomePage() {
           title: "Login Successful",
           description: decodeURIComponent(welcomeMessage),
         });
-        const newPath = window.location.pathname;
-        router.replace(newPath, { scroll: false });
+        const newPath = window.location.pathname; // Or router.asPath
+        const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+        currentParams.delete('welcome_message');
+        router.replace(`${newPath}?${currentParams.toString()}`, { scroll: false });
       }
     }
   }, [isClient, searchParams, router, toast]);
@@ -257,7 +265,7 @@ export default function HomePage() {
               <Carousel
                 opts={{
                   align: "start",
-                  loop: featuredProducts.length > 3, // Enable loop if more than 3 items
+                  loop: featuredProducts.length > 3, 
                 }}
                 className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
@@ -334,5 +342,3 @@ export default function HomePage() {
     </>
   );
 }
-
-    

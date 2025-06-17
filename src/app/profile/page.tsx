@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info } from 'lucide-react';
+import { Loader2, UserCircle2, Home, Edit3, Trash2, PlusCircle, ShoppingBag, Info, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile, Address, Order } from '@/lib/types';
 import { UserProfileSchema, AddressSchema, type UserProfileInput, type AddressInput } from '@/lib/schemas';
@@ -50,7 +50,7 @@ function ProfileSubmitButton({ pending, text = "Save Changes", icon }: { pending
 }
 
 export default function ProfilePage() {
-  const { user } 
+  const { user, loading: authLoading } 
     = useAuth();
   const router = useRouter(); 
   const { toast } = useToast();
@@ -58,7 +58,7 @@ export default function ProfilePage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isLoadingPageData, setIsLoadingPageData] = useState(true); // Renamed from isLoadingData for clarity
   
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -82,9 +82,32 @@ export default function ProfilePage() {
     },
   });
 
+  // Route Protection and Initial Data Fetch
+  useEffect(() => {
+    if (!authLoading) { // Only proceed once auth state is resolved
+      if (!user) {
+        toast({
+          title: "Access Denied",
+          description: "Please log in to view your profile.",
+          variant: "destructive"
+        });
+        router.replace('/signin?redirect=/profile');
+      } else {
+        // User is logged in, fetch their data
+        fetchProfileData();
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, router]);
+
   const fetchProfileData = async () => {
-    setIsLoadingData(true);
+    setIsLoadingPageData(true);
     try {
+      // Ensure user is available for these calls, though route protection should handle it
+      if (!user) {
+        setIsLoadingPageData(false);
+        return;
+      }
       const [profileData, addressesData, ordersData] = await Promise.all([
         getUserProfile(user), 
         getShippingAddresses(), 
@@ -105,16 +128,11 @@ export default function ProfilePage() {
       console.error("Failed to load profile data:", error)
       toast({ title: "Error", description: "Failed to load profile data.", variant: "destructive" });
     } finally {
-      setIsLoadingData(false);
+      setIsLoadingPageData(false);
     }
   };
 
-  useEffect(() => {
-    fetchProfileData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]); 
-
-
+  // Handle Profile Form Server Action State
   useEffect(() => {
     if (profileFormState.message) {
       toast({
@@ -136,6 +154,7 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState]);
 
+  // Handle Address Form Server Action State (Add/Update)
   const handleAddressFormSuccess = (state: FormState) => { 
      if (state.message) {
       toast({
@@ -220,13 +239,30 @@ export default function ProfilePage() {
     }
   };
   
-  if (isLoadingData) { 
+  if (authLoading || isLoadingPageData) { 
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow container mx-auto px-2 py-8 md:py-12 flex justify-center items-center">
           <Loader2 className="h-12 w-12 text-primary animate-spin" />
           <p className="ml-4 text-lg text-muted-foreground">Loading profile data...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) { // Should be caught by useEffect redirect, but as a fallback
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <Header />
+        <main className="flex-grow container mx-auto px-2 py-8 md:py-12 text-center">
+            <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
+            <h1 className="text-3xl font-headline text-primary mb-2">Access Denied</h1>
+            <p className="text-muted-foreground mb-6">Please log in to view your profile.</p>
+            <Button asChild size="lg">
+              <Link href="/signin">Log In</Link>
+            </Button>
         </main>
         <Footer />
       </div>
@@ -257,7 +293,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your first name" {...field} />
+                            <Input placeholder="Your first name" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -270,7 +306,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your last name" {...field} />
+                            <Input placeholder="Your last name" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -284,7 +320,7 @@ export default function ProfilePage() {
                         <FormItem>
                           <FormLabel>Phone Number (Optional)</FormLabel>
                           <FormControl>
-                            <Input type="tel" placeholder="e.g. +911234567890" {...field} />
+                            <Input type="tel" placeholder="e.g. +911234567890" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -292,9 +328,9 @@ export default function ProfilePage() {
                     />
                 <div>
                   <Label>Email</Label>
-                  <Input type="email" value={userProfile?.email || user?.email || 'Not logged in'} disabled={!!userProfile?.email || !!user?.email} className="mt-1 bg-muted/50"/>
+                  <Input type="email" value={userProfile?.email || user?.email || ''} disabled className="mt-1 bg-muted/50"/>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {userProfile?.email || user?.email ? "Email cannot be changed." : "Log in to see your email."}
+                    Email cannot be changed.
                   </p>
                 </div>
                  {profileFormState.errors?._form && (
@@ -351,7 +387,7 @@ export default function ProfilePage() {
                         <FormItem><FormLabel>Address Line 1</FormLabel><FormControl><Input placeholder="123, Lotus Lane" {...field} /></FormControl><FormMessage /></FormItem>
                       )}/>
                       <FormField control={addressForm.control} name="addressLine2" render={({ field }) => (
-                        <FormItem><FormLabel>Address Line 2 (Optional)</FormLabel><FormControl><Input placeholder="Near Rose Garden" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Address Line 2 (Optional)</FormLabel><FormControl><Input placeholder="Near Rose Garden" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                       )}/>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField control={addressForm.control} name="city" render={({ field }) => (
@@ -370,7 +406,7 @@ export default function ProfilePage() {
                         )}/>
                       </div>
                       <FormField control={addressForm.control} name="phoneNumber" render={({ field }) => (
-                        <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="e.g. +919876543210" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="e.g. +919876543210" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                       )}/>
                        {(addAddressState.errors?._form && !editingAddress) && (
                         <p className="text-sm font-medium text-destructive">{addAddressState.errors._form.join(', ')}</p>
@@ -393,7 +429,7 @@ export default function ProfilePage() {
             {addresses.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
                 <Home className="mx-auto h-10 w-10 mb-3 opacity-50" />
-                <p>{user ? "You haven't added any shipping addresses yet." : "Log in to manage your shipping addresses."}</p>
+                <p>You haven&apos;t added any shipping addresses yet.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -441,12 +477,10 @@ export default function ProfilePage() {
             {orders.length === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
                 <ShoppingBag className="mx-auto h-10 w-10 mb-3 opacity-50" />
-                 <p>{user ? "You haven't placed any orders yet." : "Log in to see your order history."}</p>
-                {user && (
-                    <Button asChild variant="link" className="mt-2">
-                        <Link href="/collections">Start Shopping</Link>
-                    </Button>
-                )}
+                 <p>You haven&apos;t placed any orders yet.</p>
+                <Button asChild variant="link" className="mt-2">
+                    <Link href="/collections">Start Shopping</Link>
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -483,4 +517,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

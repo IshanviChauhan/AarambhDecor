@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu, LogInIcon } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -46,14 +46,11 @@ export default function Header() {
     if (!isClient) return;
 
     const calculateTotalItems = () => {
-      let storedCart = null;
-      if (user) {
-        storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
-      } else {
+      if (!user) { // If no user, cart count is 0
         setCartItemCount(0);
         return;
       }
-
+      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
       if (storedCart) {
         try {
           const items: CartItem[] = JSON.parse(storedCart);
@@ -68,20 +65,21 @@ export default function Header() {
       }
     };
 
-    calculateTotalItems();
+    calculateTotalItems(); // Initial calculation
 
     const handleCartUpdateEvent = () => {
       calculateTotalItems();
     };
 
+    // Listen for storage changes (e.g., from other tabs)
     const handleStorageChange = (event: StorageEvent) => {
         if (user && event.key === `aarambhCart_${user.uid}`) {
             calculateTotalItems();
-        } else if (!user && event.key && event.key.startsWith('aarambhCart_')) {
+        } else if (event.key && event.key.startsWith('aarambhCart_') && !user) {
+            // If user logged out on another tab, this tab's user would be null
             calculateTotalItems();
         }
     };
-
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('aarambhCartUpdated', handleCartUpdateEvent as EventListener);
@@ -90,7 +88,7 @@ export default function Header() {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('aarambhCartUpdated', handleCartUpdateEvent as EventListener);
     };
-  }, [isClient, user]);
+  }, [isClient, user]); // Re-run if user state changes
 
   const handleSignOut = async () => {
     try {
@@ -99,14 +97,16 @@ export default function Header() {
         localStorage.removeItem(`aarambhWishlist_${user.uid}`);
       }
       await signOut(auth);
-      window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); 
+      // setUser(null) will be handled by onAuthStateChanged in AuthProvider
+      setCartItemCount(0); // Explicitly set cart count to 0 on UI
+      window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Notify other components
       router.push('/');
       toast({ title: "Signed Out", description: "You have been successfully signed out." });
     } catch (error) {
       console.error("Error signing out: ", error);
       toast({ title: "Sign Out Error", description: "Failed to sign out. Please try again.", variant: "destructive" });
     }
-    setIsMobileMenuOpen(false); // Close menu after action
+    setIsMobileMenuOpen(false);
   };
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -196,7 +196,7 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : !authLoading && !user ? (
-              <div className="hidden md:flex items-center"> {/* Only show on md screens and up */}
+              <div className="hidden md:flex items-center">
                 <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
                   <Link href="/signin" aria-label="Log In">
                     <LogIn className="mr-2 h-4 w-4" />
@@ -205,7 +205,7 @@ export default function Header() {
                 </Button>
               </div>
           ) : (
-             <div className="w-10 h-10 md:w-auto"></div> // Placeholder for auth icon space, md:w-auto for desktop login button potentially
+             <div className="w-10 h-10 md:w-auto md:min-w-[88px]"></div> 
           )}
 
           <Button asChild variant="ghost" className="relative" size="icon">
@@ -289,4 +289,3 @@ export default function Header() {
     </header>
   );
 }
-

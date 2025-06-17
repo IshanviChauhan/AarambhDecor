@@ -15,7 +15,6 @@ import { useToast } from '@/hooks/use-toast';
 import { parsePrice } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/firebase';
 
 
 export default function CartPage() {
@@ -40,41 +39,38 @@ export default function CartPage() {
           setCartItems([]);
         }
       } else {
-        setCartItems([]);
+        setCartItems([]); // No cart for this user yet
       }
     } else if (isClient && !user && !authLoading) {
-      // If user is not logged in and auth is resolved, clear cart
+      // If user is not logged in and auth is resolved, clear cart state.
+      // LocalStorage for the *previous* user should be cleared by the signOut action in Header.
       setCartItems([]);
     }
   }, [isClient, user, authLoading]);
 
   useEffect(() => {
-    if(isClient && user) {
+    if(isClient && user) { // Only save if user is logged in
       localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
       window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
     } else if (isClient && !user) {
-        // Ensure cart is cleared in localStorage too if user logs out
-        localStorage.removeItem('aarambhCart'); // Clear old general key if any
-        // Check if auth.currentUser is available and has uid before trying to remove specific user cart
-        if (auth.currentUser?.uid) { 
-             localStorage.removeItem(`aarambhCart_${auth.currentUser.uid}`);
-        }
-        window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Notify header
+        // If no user, ensure the cart update event is still fired so header can update (to 0)
+        // This assumes that if !user, cartItems state would have been cleared by the loading effect.
+        window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
     }
   }, [cartItems, isClient, user]);
 
   const handleRemoveFromCart = (productId: string) => {
-    if (!user) return; // Should not happen if cart is user-specific
+    if (!user) return; 
     setCartItems((prevCartItems) => prevCartItems.filter(item => item.id !== productId));
     toast({
       title: "Item Removed",
       description: "The item has been removed from your cart.",
-      variant: "destructive"
+      variant: "destructive" 
     });
   };
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
-    if (!user) return; // Should not happen
+    if (!user) return; 
     if (newQuantity < 1) {
       handleRemoveFromCart(productId);
       return;

@@ -88,13 +88,23 @@ export default function ProductDetailPage() {
       if (storedWishlist) {
         try {
           setWishlist(new Set(JSON.parse(storedWishlist)));
-        } catch (e) { console.error("Failed to parse wishlist", e); }
+        } catch (e) { 
+          console.error("Failed to parse wishlist", e); 
+          setWishlist(new Set());
+        }
+      } else {
+        setWishlist(new Set());
       }
       const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
       if (storedCart) {
          try {
           setCartItems(JSON.parse(storedCart));
-        } catch (e) { console.error("Failed to parse cart", e); }
+        } catch (e) { 
+          console.error("Failed to parse cart", e); 
+          setCartItems([]);
+        }
+      } else {
+        setCartItems([]);
       }
     } else {
       setWishlist(new Set());
@@ -103,12 +113,12 @@ export default function ProductDetailPage() {
   }, [isClient, user]);
 
   useEffect(() => {
-    if (!isClient || !user) return;
+    if (!isClient || !user) return; // Only save if user is logged in
     localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
   }, [wishlist, isClient, user]);
 
   useEffect(() => {
-    if (!isClient || !user) return;
+    if (!isClient || !user) return; // Only save if user is logged in
     localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
     window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
   }, [cartItems, isClient, user]);
@@ -180,7 +190,6 @@ export default function ProductDetailPage() {
       date: new Date().toISOString().split('T')[0], 
     };
 
-    // TODO: Persist review to Firestore instead of local state
     setTimeout(() => {
       setProduct(prevProduct => {
         if (!prevProduct) return null;
@@ -288,8 +297,8 @@ export default function ProductDetailPage() {
                   "transition-opacity duration-200 ease-in-out",
                   "flex items-center justify-center",
                   "border-none p-0",
-                  "transition-transform-none",
-                  "hover:translate-y-[-50%] active:translate-y-[-50%]" 
+                  "transition-transform-none", 
+                  "hover:translate-y-[-50%] active:translate-y-[-50%]"
                 )}
               />
               <CarouselNext
@@ -493,4 +502,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
