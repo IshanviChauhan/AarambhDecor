@@ -218,11 +218,13 @@ export default function HomePage() {
           <Separator className="my-12 md:my-16 border-border/70" />
 
           <section id="homepage-search" aria-labelledby="homepage-search-title" className="py-8 md:py-12">
-            <div className="flex flex-col items-center justify-center space-y-4 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
-              <SearchIcon className="h-10 w-10 text-primary" />
-              <h2 id="homepage-search-title" className="text-3xl md:text-4xl font-headline text-center text-foreground">
-                Find Your Perfect Piece
-              </h2>
+            <div className="flex flex-col items-center justify-center space-y-6 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
+              <div className="flex flex-row items-center justify-center space-x-3">
+                <SearchIcon className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 text-primary" />
+                <h2 id="homepage-search-title" className="text-2xl sm:text-3xl md:text-4xl font-headline text-center text-foreground">
+                  Find Your Perfect Piece
+                </h2>
+              </div>
               <p className="text-lg text-muted-foreground max-w-xl mx-auto text-center">
                 Search our collections by product name or category to quickly find what you're looking for.
               </p>
@@ -253,7 +255,7 @@ export default function HomePage() {
               <Carousel
                 opts={{
                   align: "start",
-                  loop: featuredProducts.length > 3, // Loop if more than 3 items
+                  loop: featuredProducts.length > 3,
                 }}
                 className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
