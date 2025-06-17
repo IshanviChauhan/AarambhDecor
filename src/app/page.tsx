@@ -18,15 +18,17 @@ import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
 import { getProducts } from '@/app/products/actions'; 
 import { MOCK_PRODUCTS } from '@/lib/mock-data';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { cn } from '@/lib/utils';
 
-const LATEST_PRODUCTS_COUNT = 3;
+const LATEST_PRODUCTS_COUNT = 6; // Updated to 6
 
 export default function HomePage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true); // Primarily for allProductsForSearch
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true); 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { user } = useAuth();
@@ -39,20 +41,18 @@ export default function HomePage() {
     async function fetchInitialData() {
       setIsLoadingProducts(true);
       try {
-        // Derive latestProducts directly from MOCK_PRODUCTS
         const latestMockProducts = MOCK_PRODUCTS.filter(p => p.isLatest === true).slice(0, LATEST_PRODUCTS_COUNT);
         setLatestProducts(latestMockProducts);
 
-        // Fetch all products from Firestore for search functionality
         const all = await getProducts(); 
         setAllProductsForSearch(all);
 
       } catch (error) {
         console.error("Failed to fetch all products for search:", error);
         toast({ title: "Error", description: "Could not load all products for search.", variant: "destructive" });
-        setAllProductsForSearch([]); // Ensure it's an empty array on error
+        setAllProductsForSearch([]); 
       } finally {
-        setIsLoadingProducts(false); // Signifies allProductsForSearch is loaded
+        setIsLoadingProducts(false); 
       }
     }
     fetchInitialData();
@@ -103,7 +103,6 @@ export default function HomePage() {
           title: "Login Successful",
           description: decodeURIComponent(welcomeMessage),
         });
-        // Remove the query parameter from the URL without reloading the page
         const newPath = window.location.pathname;
         router.replace(newPath, { scroll: false });
       }
@@ -172,7 +171,6 @@ export default function HomePage() {
     }
   
     const lowerSearchTerm = trimmedSearchTerm.toLowerCase();
-    // Use allProductsForSearch which is fetched from DB/Firestore
     const uniqueProductCategories = Array.from(new Set(allProductsForSearch.map(p => p.category).filter(Boolean) as string[]));
     
     const matchedCategory = uniqueProductCategories.find(cat => cat.toLowerCase() === lowerSearchTerm);
@@ -192,9 +190,7 @@ export default function HomePage() {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-    // If not on homepage, Link component's default behavior will navigate
   };
-
 
   return (
     <>
@@ -239,7 +235,6 @@ export default function HomePage() {
             </div>
           </section>
 
-
           <Separator className="my-12 md:my-16 border-border/70" />
 
           <section id="latest-product-showcase" aria-labelledby="latest-product-showcase-title" className="py-8">
@@ -249,26 +244,64 @@ export default function HomePage() {
                 New Arrivals
               </h2>
             </div>
-            {/* The isLoadingProducts now primarily reflects loading of allProductsForSearch. 
-                latestProducts from MOCK_DATA will be available quickly. */}
-            {isLoadingProducts && !latestProducts.length ? ( // Show loader if allProductsForSearch is loading AND latestProducts isn't ready (unlikely with mock)
+            {isLoadingProducts && !latestProducts.length ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading newest treasures...</p>
               </div>
             ) : latestProducts.length > 0 ? (
-              <div className="flex flex-wrap justify-center gap-6 md:gap-8 animate-fade-in-up animation-delay-400">
-                {latestProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isWishlisted={isClient && user ? wishlist.has(product.id) : false}
-                    onToggleWishlist={handleToggleWishlist}
-                    onAddToCart={handleAddToCart}
-                    isProductInCart={isProductInCart(product.id)}
-                  />
-                ))}
-              </div>
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: latestProducts.length > 3,
+                }}
+                className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400"
+              >
+                <CarouselContent className="-ml-4">
+                  {latestProducts.map((product) => (
+                    <CarouselItem key={product.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3">
+                      <div className="p-1 h-full flex"> {/* Added flex and h-full for consistent card height */}
+                        <ProductCard
+                          product={product}
+                          isWishlisted={isClient && user ? wishlist.has(product.id) : false}
+                          onToggleWishlist={handleToggleWishlist}
+                          onAddToCart={handleAddToCart}
+                          isProductInCart={isProductInCart(product.id)}
+                          className="w-full flex flex-col" // Ensure card takes full width and is flex col
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious 
+                    variant="ghost"
+                    className={cn(
+                      "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
+                      "h-10 w-10 rounded-full",
+                      "bg-background/70 text-foreground/70",
+                      "hover:bg-background/90 hover:text-primary",
+                      "shadow-md",
+                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                      "transition-opacity duration-200 ease-in-out",
+                      "md:left-[-20px]", 
+                      "disabled:opacity-30 disabled:cursor-not-allowed"
+                    )}
+                />
+                <CarouselNext 
+                    variant="ghost"
+                    className={cn(
+                      "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
+                      "h-10 w-10 rounded-full",
+                      "bg-background/70 text-foreground/70",
+                      "hover:bg-background/90 hover:text-primary",
+                      "shadow-md",
+                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                      "transition-opacity duration-200 ease-in-out",
+                      "md:right-[-20px]",
+                      "disabled:opacity-30 disabled:cursor-not-allowed"
+                    )}
+                />
+              </Carousel>
             ) : (
               <p className="text-center text-muted-foreground text-lg">No new products to display at the moment. Please check back soon!</p>
             )}
@@ -298,4 +331,3 @@ export default function HomePage() {
     </>
   );
 }
-
