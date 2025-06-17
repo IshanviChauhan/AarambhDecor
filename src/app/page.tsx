@@ -9,7 +9,7 @@ import { ProductCard } from '@/components/product-card';
 import { ImageBasedProductRecommender } from '@/components/image-based-product-recommender';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, ImageUp, Star } from 'lucide-react';
+import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
@@ -318,7 +318,6 @@ export default function HomePage() {
 
           <section id="ai-decor-advisor" aria-labelledby="ai-decor-advisor-title" className="py-8">
             <div className="flex items-center justify-center space-x-3 mb-10 md:mb-12 animate-fade-in-up animation-delay-200">
-              <ImageUp className="h-10 w-10 text-primary" />
               <h2 id="ai-decor-advisor-title" className="text-2xl md:text-3xl font-headline text-center text-foreground">
                 Need Inspiration?<br />Try Our AI Advisor!
               </h2>
@@ -333,4 +332,3 @@ export default function HomePage() {
     </>
   );
 }
-
