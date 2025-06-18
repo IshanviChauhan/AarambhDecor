@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from '@/contexts/auth-context'; // Keep import for now if other parts rely on it, but it's a stub.
+// import { AuthProvider } from '@/contexts/auth-context'; // Removed
 
 export const metadata: Metadata = {
   title: 'Aarambh Decor',
@@ -23,11 +23,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col" suppressHydrationWarning={true}>
-        {/* AuthProvider is now a stub and doesn't manage real auth state */}
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        {/* AuthProvider was a stub and has been removed */}
+        {children}
+        <Toaster />
       </body>
     </html>
   );
