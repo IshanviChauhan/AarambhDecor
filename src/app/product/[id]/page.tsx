@@ -3,7 +3,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import type { Product, Review, ProductImage }_from '@/lib/types'; // Removed CartItem
+import type { Product, Review, ProductImage } from '@/lib/types'; // Removed CartItem
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Image from 'next/image';
