@@ -14,9 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, AlertTriangle } from 'lucide-react';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 
 import { SignUpSchemaWithAddress, type SignUpWithAddressInput } from '@/lib/schemas';
 import { registerUserAction, type RegisterUserFormState } from './actions';
@@ -231,5 +232,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-    
