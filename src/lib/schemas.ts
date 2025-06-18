@@ -68,3 +68,28 @@ export const ProductFormSchema = z.object({
 });
 
 export type ProductFormInput = z.infer<typeof ProductFormSchema>;
+
+
+// --- Registration Schema ---
+export const SignUpSchemaWithAddress = z.object({
+  firstName: z.string().min(1, { message: 'First name is required.' }).max(50, { message: 'First name is too long.' }),
+  lastName: z.string().min(1, { message: 'Last name is required.' }).max(50, { message: 'Last name is too long.' }),
+  email: z.string().email({ message: 'Invalid email address.' }),
+  phoneNumber: z.string()
+    .max(20, { message: 'Phone number must be 20 characters or less.' })
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
+    .optional().or(z.literal('')),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters long.' }),
+  confirmPassword: z.string(),
+  addressStreet: z.string().min(1, 'Street address is required.').max(200, 'Street address is too long.'),
+  addressCity: z.string().min(1, 'City is required.').max(100, 'City name is too long.'),
+  addressState: z.string().min(1, 'State/Province is required.').max(100, 'State/Province name is too long.'),
+  addressPostalCode: z.string().min(1, 'Postal code is required.').max(20, 'Postal code is too long.'),
+  addressCountry: z.string().min(1, 'Country is required.').max(100, 'Country name is too long.'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match.",
+  path: ['confirmPassword'],
+});
+export type SignUpWithAddressInput = z.infer<typeof SignUpSchemaWithAddress>;
+
+    

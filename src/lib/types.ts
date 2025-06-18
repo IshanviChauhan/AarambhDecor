@@ -32,28 +32,26 @@ export interface CartItem extends Product {
 }
 
 
-// --- User Profile & Address Types (Commented out as auth is removed) ---
-/*
-export interface Address {
-  id?: string;
-  fullName: string;
-  addressLine1: string;
-  addressLine2?: string | null;
+// --- User Profile & Address Types ---
+// Address structure for user profiles
+export interface UserAddress {
+  street: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
-  phoneNumber?: string | null;
 }
 
 export interface UserProfile {
-  uid: string;
+  uid: string; // Firestore document ID (auto-generated in this case)
   email: string;
-  firstName?: string | null;
-  lastName?: string | null;
+  firstName: string;
+  lastName: string;
   phoneNumber?: string | null;
+  address: UserAddress;
+  createdAt?: any; // Firestore serverTimestamp
 }
-*/
+
 
 // --- Order Related Types (Commented out as they depend on users) ---
 /*
@@ -75,3 +73,5 @@ export interface Order {
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
 }
 */
+
+    
