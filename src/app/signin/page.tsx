@@ -9,8 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useActionState } from 'react';
 import { useRouter } from 'next/navigation'; 
 
-// import Header from '@/components/layout/header'; // Header not typically shown on dedicated sign-in/up
-// import Footer from '@/components/layout/footer'; // Footer not typically shown
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -53,8 +51,6 @@ export default function SignInPage() {
       }
       if (formState.success) {
         form.reset();
-        // TEMPORARY: Store userId in localStorage for profile page access
-        // This is NOT secure for real auth tokens/sessions
         if (formState.userId && typeof window !== 'undefined') {
           localStorage.setItem('tempUserId', formState.userId);
         }
@@ -64,12 +60,11 @@ export default function SignInPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState, toast, router]);
 
-  const onSubmit = (data: SignInInput) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    formAction(formData);
+  // This handler is called by react-hook-form after client-side validation.
+  // If validation passes, react-hook-form allows the form to submit to its `action` prop.
+  const handleClientValidationOnly = (data: SignInInput) => {
+    // console.log('Client-side validation passed for sign-in:', data);
+    // No need to manually call formAction here. It's handled by the form's `action` prop.
   };
 
   return (
@@ -105,7 +100,11 @@ export default function SignInPage() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form 
+                onSubmit={form.handleSubmit(handleClientValidationOnly)} 
+                action={formAction}
+                className="space-y-6"
+              >
                 <FormField control={form.control} name="email" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>

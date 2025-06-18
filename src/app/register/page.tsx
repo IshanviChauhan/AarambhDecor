@@ -13,7 +13,6 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, AlertTriangle } from 'lucide-react';
@@ -66,12 +65,9 @@ export default function RegisterPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState, toast]);
 
-  const onSubmit = (data: SignUpWithAddressInput) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    formAction(formData);
+  const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
+    // console.log('Client-side validation passed for registration:', data);
+    // No need to manually call formAction here. It's handled by the form's `action` prop.
   };
 
   return (
@@ -109,7 +105,11 @@ export default function RegisterPage() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form 
+                  onSubmit={form.handleSubmit(handleClientValidationOnly)} 
+                  action={formAction}
+                  className="space-y-6"
+                >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="firstName" render={({ field }) => (
                       <FormItem>
@@ -221,7 +221,7 @@ export default function RegisterPage() {
               <p className="text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link href="/signin" className="font-medium text-primary hover:underline">
-                  Login (Disabled)
+                  Login
                 </Link>
               </p>
             </CardFooter>

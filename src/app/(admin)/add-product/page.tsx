@@ -1,12 +1,11 @@
 
 'use client';
 
-import { useState, useEffect, useActionState } from 'react';
+import { useState, useEffect, useActionState, startTransition as ReactStartTransition } from 'react'; // Import ReactStartTransition
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ProductFormSchema, type ProductFormInput } from '@/lib/schemas';
 import { addProduct, type AddProductFormState } from './actions';
-// Removed useAuth and router for auth check
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -33,13 +32,11 @@ interface ImagePreview {
 }
 
 export default function AddProductPage() {
-  // Removed user, authLoading, router for auth check
   const { toast } = useToast();
 
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(false); // Default to false as no auth check needed before render
-
+  
   const initialFormState: AddProductFormState = { message: null, success: false, errors: undefined };
   const [formState, formAction, isActionPending] = useActionState(addProduct, initialFormState);
 
@@ -57,8 +54,6 @@ export default function AddProductPage() {
       imageUrls: [],
     },
   });
-
-  // Removed useEffect for auth check
 
   useEffect(() => {
     if (formState.message) {
@@ -120,6 +115,9 @@ export default function AddProductPage() {
     setIsUploading(true);
     const uploadedImageDetails: { url: string; dataAiHint: string }[] = [];
     const uploadPromises = imagePreviews.map((imgPreview, index) => {
+      if (imgPreview.downloadUrl) { // Already uploaded or a placeholder URL
+          return Promise.resolve({ url: imgPreview.downloadUrl, dataAiHint: imgPreview.aiHint });
+      }
       const uniqueFileName = `${uuidv4()}-${imgPreview.file.name}`;
       const storagePath = `product-images/${uniqueFileName}`;
       const imageRef = ref(storage, storagePath);
@@ -164,13 +162,15 @@ export default function AddProductPage() {
         formDataToSubmit.append(`imageUrls[${index}].dataAiHint`, img.dataAiHint);
       });
       
-      formAction(formDataToSubmit);
+      ReactStartTransition(() => {
+        formAction(formDataToSubmit);
+      });
 
     } catch (error) {
       console.error("Error uploading images or submitting form:", error);
       toast({ title: "Submission Error", description: "Could not upload all images or save product details.", variant: "destructive" });
       imagePreviews.forEach(img => {
-        if (img.storagePath) {
+        if (img.storagePath && !img.downloadUrl) { // Only attempt to delete if upload failed and path exists
           const imageRef = ref(storage, img.storagePath);
           deleteObject(imageRef).catch(err => console.error("Cleanup: Error deleting image from storage:", err));
         }
@@ -179,9 +179,6 @@ export default function AddProductPage() {
       setIsUploading(false);
     }
   };
-
-  // Removed loading state based on authLoading or isPageLoading if it was tied to auth check
-  // if (authLoading || isPageLoading) { ... } 
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

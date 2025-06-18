@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useActionState } from 'react';
+import { useEffect, useActionState, useState } from 'react'; // Added useState
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Header from '@/components/layout/header';
@@ -15,14 +15,12 @@ import { UserCircle2, MapPin, ShoppingBag, AlertTriangle, Loader2, Save, PlusCir
 import { useToast } from '@/hooks/use-toast';
 import { UserProfileUpdateSchema, AddressSchema, type UserProfileUpdateInput, type AddressInput } from '@/lib/schemas';
 import { updateUserProfileAction, addShippingAddressAction, type FormState } from './actions';
-// import { useAuth } from '@/contexts/auth-context'; // Auth context is stubbed
 
 const initialFormState: FormState = { message: null, success: false, errors: undefined };
 
-// Helper to extract userId from localStorage (TEMPORARY & INSECURE for real apps)
 const getTemporaryUserId = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('tempUserId'); // Assuming userId might be stored here after simulated login
+    return localStorage.getItem('tempUserId');
   }
   return null;
 };
@@ -30,24 +28,20 @@ const getTemporaryUserId = (): string | null => {
 
 export default function ProfilePage() {
   const { toast } = useToast();
-  // const { user, loading: authLoading } = useAuth(); // Auth context is stubbed
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Attempt to get userId (e.g., from localStorage after simulated login)
-    // THIS IS NOT SECURE and only for bridging the gap with stubbed auth
     const tempId = getTemporaryUserId();
     if (tempId) {
       setCurrentUserId(tempId);
     }
   }, []);
 
-  // Profile Update Form
   const [profileFormState, profileFormAction, isProfileUpdatePending] = useActionState(updateUserProfileAction, initialFormState);
   const profileForm = useForm<UserProfileUpdateInput>({
     resolver: zodResolver(UserProfileUpdateSchema),
     defaultValues: {
-      userId: '', // Will be set from currentUserId
+      userId: '', 
       firstName: '',
       lastName: '',
       phoneNumber: '',
@@ -73,23 +67,23 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState]);
   
-  const onProfileSubmit = (data: UserProfileUpdateInput) => {
+  const handleProfileClientValidationOnly = (data: UserProfileUpdateInput) => {
     if (!currentUserId) {
       toast({ title: "Error", description: "User ID not found. Cannot update profile.", variant: "destructive" });
+      // Prevent form submission by throwing an error or returning false if RHF supports it
+      // For now, the action itself will also check for userId.
       return;
     }
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value as string));
-    formData.set('userId', currentUserId); // Ensure currentUserId is set
-    profileFormAction(formData);
+    // If we need to set userId into form data before RHF submits it to the action, it's tricky.
+    // The server action should ideally get userId from a secure session, not the form.
+    // For now, we ensure the hidden field has the value, and RHF will include it.
   };
 
-  // Add Shipping Address Form
   const [addressFormState, addressFormAction, isAddressAddPending] = useActionState(addShippingAddressAction, initialFormState);
   const addressForm = useForm<AddressInput>({
     resolver: zodResolver(AddressSchema),
     defaultValues: {
-      userId: '', // Will be set from currentUserId
+      userId: '', 
       fullName: '', street: '', city: '', state: '', postalCode: '', country: '', phoneNumber: ''
     },
   });
@@ -113,20 +107,22 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressFormState]);
 
-  const onAddressSubmit = (data: AddressInput) => {
+  const handleAddressClientValidationOnly = (data: AddressInput) => {
      if (!currentUserId) {
       toast({ title: "Error", description: "User ID not found. Cannot add address.", variant: "destructive" });
       return;
     }
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value as string));
-    formData.set('userId', currentUserId); // Ensure currentUserId is set
-    addressFormAction(formData);
   };
 
-  // Note: Pre-filling forms with user data (e.g., email) would require fetching
-  // `getUserProfile(currentUserId)` and setting form values. This is omitted for now
-  // due to the complexities with stubbed client-side auth state.
+  // Update defaultValues when currentUserId is available
+  useEffect(() => {
+    if (currentUserId) {
+      profileForm.reset({ ...profileForm.getValues(), userId: currentUserId });
+      addressForm.reset({ ...addressForm.getValues(), userId: currentUserId });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -150,7 +146,7 @@ export default function ProfilePage() {
                 Please log in to view your profile. User ID is not available.
               </p>
               <Button asChild>
-                <a href="/signin">Go to Login</a>
+                <Link href="/signin">Go to Login</Link>
               </Button>
             </CardContent>
           </Card>
@@ -172,7 +168,11 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <Form {...profileForm}>
-                  <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+                  <form 
+                    onSubmit={profileForm.handleSubmit(handleProfileClientValidationOnly)} 
+                    action={profileFormAction}
+                    className="space-y-6"
+                  >
                     <input type="hidden" {...profileForm.register('userId')} value={currentUserId || ''} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField control={profileForm.control} name="firstName" render={({ field }) => (
@@ -220,13 +220,16 @@ export default function ProfilePage() {
                 <div>
                     <h3 className="text-lg font-semibold mb-4 text-foreground">Your Addresses</h3>
                     <p className="text-muted-foreground">Displaying existing addresses is under development.</p>
-                    {/* TODO: List addresses here */}
                 </div>
                 <hr/>
                 <div>
                     <h3 className="text-lg font-semibold mb-4 text-foreground">Add New Address</h3>
                      <Form {...addressForm}>
-                        <form onSubmit={addressForm.handleSubmit(onAddressSubmit)} className="space-y-6">
+                        <form 
+                          onSubmit={addressForm.handleSubmit(handleAddressClientValidationOnly)} 
+                          action={addressFormAction}
+                          className="space-y-6"
+                        >
                         <input type="hidden" {...addressForm.register('userId')} value={currentUserId || ''} />
                         <FormField control={addressForm.control} name="fullName" render={({ field }) => (
                             <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Recipient's full name" {...field} /></FormControl><FormMessage /></FormItem>
