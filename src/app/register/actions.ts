@@ -60,9 +60,9 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
 
     if (!querySnapshot.empty) {
       return {
-        message: 'An account with this email address already exists.',
+        message: 'An account with this email address already exists. Please try a different email or login.',
         success: false,
-        errors: { email: ['Email already in use.'] }
+        errors: { email: ['This email address is already registered.'] }
       };
     }
 
@@ -93,7 +93,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     // revalidatePath('/some-admin-users-page');
     
     return { 
-      message: 'User registered successfully! Profile data stored in userProfile collection (authentication is disabled).', 
+      message: 'Registration successful! Your profile data has been stored (authentication is disabled).', 
       success: true 
     };
 
@@ -103,7 +103,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     return { 
       message: `Failed to register user: ${errorMessage}`, 
       success: false, 
-      errors: { _form: [`Failed to register user: ${errorMessage}`] } 
+      errors: { _form: [`Failed to register user due to a server error: ${errorMessage}`] } 
     };
   }
 }
