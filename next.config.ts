@@ -37,6 +37,12 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  allowedDevOrigins: [
+    // Add the origin that was detected in the warning
+    // Assuming HTTP for local/dev environments. If your Cloud Workstation uses HTTPS, adjust accordingly.
+    'http://9003-firebase-studio-1749974562802.cluster-fdkw7vjj7bgguspe3fbbc25tra.cloudworkstations.dev'
+    // You might also need to add 'http://localhost:9003' if you access it directly sometimes.
+  ],
 };
 
 export default nextConfig;
