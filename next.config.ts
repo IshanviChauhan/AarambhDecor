@@ -1,6 +1,10 @@
 
 import type {NextConfig} from 'next';
 
+console.log("--- Evaluating next.config.ts ---");
+
+const cloudWorkstationOriginBase = '9003-firebase-studio-1749974562802.cluster-fdkw7vjj7bgguspe3fbbc25tra.cloudworkstations.dev';
+
 const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
@@ -38,11 +42,13 @@ const nextConfig: NextConfig = {
     ],
   },
   allowedDevOrigins: [
-    'http://9003-firebase-studio-1749974562802.cluster-fdkw7vjj7bgguspe3fbbc25tra.cloudworkstations.dev',
-    'https://9003-firebase-studio-1749974562802.cluster-fdkw7vjj7bgguspe3fbbc25tra.cloudworkstations.dev',
-    // You might also need to add 'http://localhost:9003' if you sometimes access it directly.
-    'http://localhost:9003'
+    `http://${cloudWorkstationOriginBase}`,
+    `https://${cloudWorkstationOriginBase}`,
+    'http://localhost:9003' // For local access
   ],
 };
+
+console.log("--- next.config.ts loaded ---");
+console.log("Allowed Dev Origins set to:", nextConfig.allowedDevOrigins);
 
 export default nextConfig;
