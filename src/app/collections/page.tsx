@@ -57,13 +57,17 @@ function CollectionsPageContent() {
       console.log("CollectionsPage: Fetching initial products...");
       setIsLoadingProducts(true);
       try {
-        const productsFromDb = await getProducts();
-        console.log(`CollectionsPage: Fetched ${productsFromDb.length} products from DB.`);
-        setAllProducts(productsFromDb);
+        const productsFromSource = await getProducts(); // This will try Firestore then fallback to MOCK_PRODUCTS
+        console.log(`CollectionsPage: Fetched ${productsFromSource.length} products.`);
+        setAllProducts(productsFromSource);
+         if (productsFromSource.length === 0) {
+          console.warn("CollectionsPage: No products were loaded from any source.");
+           toast({ title: "No Products", description: "Could not load any products at this time.", variant: "default" });
+        }
       } catch (error) {
         console.error("CollectionsPage: Failed to fetch products:", error);
         toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
-        setAllProducts([]);
+        setAllProducts([]); // Ensure it's an empty array on error
       } finally {
         setIsLoadingProducts(false);
         console.log("CollectionsPage: Finished fetching initial products.");
@@ -71,7 +75,7 @@ function CollectionsPageContent() {
     }
     fetchInitialProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Only on mount
 
   const categories = useMemo(() => {
     if (isLoadingProducts || allProducts.length === 0) return ['All'];
@@ -94,6 +98,9 @@ function CollectionsPageContent() {
         const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && !isNaN(p));
         const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
         const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
+        
+        console.log(`CollectionsPage: Calculated minPrice: ${minP}, maxPrice: ${maxP} from ${allProducts.length} products.`);
+        
         setMinProductPrice(minP);
         setMaxProductPrice(maxP);
 
@@ -110,9 +117,11 @@ function CollectionsPageContent() {
         initialMax = Math.max(minP, Math.min(maxP, initialMax));
         
         if (initialMin > initialMax) initialMin = initialMax;
-
+        
+        console.log(`CollectionsPage: Setting initial priceRange: [${initialMin}, ${initialMax}]`);
         setPriceRange([initialMin, initialMax]);
     } else {
+         console.log("CollectionsPage: No products available to calculate price range. Using defaults.");
          setMinProductPrice(MIN_PRICE_DEFAULT);
          setMaxProductPrice(MAX_PRICE_DEFAULT);
          setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
@@ -135,7 +144,8 @@ function CollectionsPageContent() {
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
-        if (!isLoadingProducts) {
+        // Only attempt to update URL if categories are loaded and the category is truly invalid
+        if (!isLoadingProducts && categories.length > 1) { // categories.length > 1 means actual categories are loaded beyond 'All'
             const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
             currentParams.delete('category');
             router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });

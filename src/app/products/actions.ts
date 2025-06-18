@@ -17,6 +17,7 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
     console.warn("seedProductsToFirestore: No mock products found to seed.");
     return { success: false, message: "No mock products found to seed." };
   }
+  console.log(`seedProductsToFirestore: Attempting to seed ${MOCK_PRODUCTS.length} products...`);
 
   const batch = writeBatch(db);
   let seededCount = 0;
@@ -52,21 +53,23 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
 
 export async function getProducts(): Promise<Product[]> {
   try {
+    console.log('getProducts: Attempting to fetch products from Firestore...');
     const productsColRef = collection(db, 'products');
     let productsSnap = await getDocs(productsColRef);
-    
+
     if (productsSnap.empty) {
-      console.log('getProducts: No products found in Firestore. Attempting to seed database with mock data...');
+      console.log('getProducts: Firestore is empty. Attempting to seed database with mock data from products.json...');
       const seedResult = await seedProductsToFirestore();
       if (seedResult.success && seedResult.count && seedResult.count > 0) {
-        console.log(`getProducts: Seeding successful: ${seedResult.message}. Re-fetching products.`);
-        productsSnap = await getDocs(productsColRef); 
+        console.log(`getProducts: Seeding successful: ${seedResult.message}. Re-fetching products from Firestore.`);
+        productsSnap = await getDocs(productsColRef);
         if (productsSnap.empty) {
-            console.warn("getProducts: Firestore is still empty after successful seeding and re-fetch. This might indicate an issue with data propagation or rules.");
+          console.warn("getProducts: Firestore is still empty after successful seeding and re-fetch. This might indicate an issue with data propagation or Firestore rules. Falling back to MOCK_PRODUCTS (from products.json).");
+          return MOCK_PRODUCTS;
         }
       } else {
-        console.error(`getProducts: Seeding failed or yielded no products: ${seedResult.message}. Returning empty product list.`);
-        return []; 
+        console.error(`getProducts: Seeding failed or yielded no products: ${seedResult.message}. Falling back to MOCK_PRODUCTS (from products.json).`);
+        return MOCK_PRODUCTS;
       }
     }
     
@@ -86,20 +89,22 @@ export async function getProducts(): Promise<Product[]> {
         reviews: data.reviews || [],
       } as Product;
     });
-    console.log(`getProducts: Fetched ${products.length} products.`);
+    console.log(`getProducts: Successfully fetched ${products.length} products from Firestore.`);
     return products;
   } catch (error) {
-    console.error("getProducts: Error fetching products:", error);
-    return [];
+    console.error("getProducts: Error during Firestore operation:", error, "Falling back to MOCK_PRODUCTS (from products.json).");
+    return MOCK_PRODUCTS;
   }
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
   try {
+    console.log(`getProductById: Attempting to fetch product with ID ${id} from Firestore...`);
     const productDocRef = doc(db, 'products', id);
     const productSnap = await getDoc(productDocRef);
 
     if (productSnap.exists()) {
+      console.log(`getProductById: Product ${id} found in Firestore.`);
       const data = productSnap.data();
       return {
         id: productSnap.id,
@@ -122,6 +127,7 @@ export async function getProductById(id: string): Promise<Product | null> {
         console.log(`getProductById: Product ${id} not found, and products collection seems empty. Attempting to seed...`);
         const seedResult = await seedProductsToFirestore();
          if (seedResult.success && seedResult.count && seedResult.count > 0) {
+            console.log(`getProductById: Seeding successful after ${id} not found. Re-fetching product ${id}.`);
             const productSnapAfterSeed = await getDoc(productDocRef);
             if (productSnapAfterSeed.exists()) {
               console.log(`getProductById: Product ${id} found after seeding.`);
@@ -140,25 +146,31 @@ export async function getProductById(id: string): Promise<Product | null> {
                 reviews: data.reviews || [],
               } as Product;
             } else {
-              console.log(`getProductById: Product ${id} still not found after attempting to seed.`);
+              console.log(`getProductById: Product ${id} still not found after attempting to seed. Returning null.`);
+              return null;
             }
         } else {
-             console.error(`getProductById: Seeding failed or yielded no products when trying to find ${id}: ${seedResult.message}.`);
+             console.error(`getProductById: Seeding failed or yielded no products when trying to find ${id}: ${seedResult.message}. Returning null.`);
+             return null;
         }
       }
+      console.log(`getProductById: Product ${id} not found and collection was not empty or seeding did not find it. Returning null.`);
       return null;
     }
   } catch (error) {
-    console.error(`getProductById: Error fetching product with ID ${id}:`, error);
+    console.error(`getProductById: Error fetching product with ID ${id}:`, error, "Returning null.");
     return null;
   }
 }
 
 export async function getLatestProducts(count: number): Promise<Product[]> {
   try {
+    console.log(`getLatestProducts: Attempting to fetch ${count} latest products from Firestore...`);
     const productsColRef = collection(db, 'products');
     let latestProductsQuery = query(productsColRef, where('isLatest', '==', true), limit(count));
     let productsSnap = await getDocs(latestProductsQuery);
+
+    let productsToReturn: Product[] = [];
 
     if (productsSnap.empty) {
       console.log("getLatestProducts: 'isLatest' query returned no results. Checking if entire collection is empty for seeding...");
@@ -170,27 +182,27 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
         const seedResult = await seedProductsToFirestore();
         if (seedResult.success && seedResult.count && seedResult.count > 0) {
           console.log(`getLatestProducts: Seeding successful: ${seedResult.message}. Re-fetching latest products.`);
-          productsSnap = await getDocs(latestProductsQuery); 
+          productsSnap = await getDocs(latestProductsQuery);
           if (productsSnap.empty) {
-              console.warn("getLatestProducts: 'isLatest' query still empty after successful seed. Falling back.");
+              console.warn("getLatestProducts: 'isLatest' query still empty after successful seed.");
           }
         } else {
           console.error(`getLatestProducts: Seeding failed or yielded no products: ${seedResult.message}.`);
         }
       }
       
-      if (productsSnap.empty) {
-         console.log("getLatestProducts: No 'isLatest' products found (even after potential seed). Falling back to a general query for latest products.");
+      if (productsSnap.empty) { // If still empty after potential seed, or if collection wasn't empty but no 'isLatest'
+         console.log("getLatestProducts: No 'isLatest' products found. Falling back to a general query for any products.");
          const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); 
          productsSnap = await getDocs(fallbackQuery);
          if (productsSnap.empty) {
-           console.log("getLatestProducts: Fallback query also returned no results. The collection might be truly empty.");
-           return []; 
+           console.log("getLatestProducts: Fallback query also returned no results. The collection might be truly empty or seeding failed. Falling back to MOCK_PRODUCTS.");
+           return MOCK_PRODUCTS.slice(0, count); // Fallback to mock data
          }
       }
     }
     
-    const products: Product[] = productsSnap.docs.map(docSnap => {
+    productsToReturn = productsSnap.docs.map(docSnap => {
        const data = docSnap.data();
       return {
         id: docSnap.id,
@@ -206,11 +218,17 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
         reviews: data.reviews || [],
       } as Product;
     });
-    console.log(`getLatestProducts: Fetched ${products.length} products.`);
-    return products;
+
+    if (productsToReturn.length === 0 && MOCK_PRODUCTS.length > 0) {
+        console.warn("getLatestProducts: All Firestore fetches resulted in no products. Falling back to MOCK_PRODUCTS for latest products.");
+        return MOCK_PRODUCTS.filter(p => p.isLatest).slice(0, count);
+    }
+    
+    console.log(`getLatestProducts: Fetched ${productsToReturn.length} products.`);
+    return productsToReturn;
+
   } catch (error) {
-    console.error("getLatestProducts: Error fetching latest products:", error);
-    return [];
+    console.error("getLatestProducts: Error fetching latest products:", error, "Falling back to MOCK_PRODUCTS.");
+    return MOCK_PRODUCTS.filter(p => p.isLatest).slice(0, count); // Fallback to mock data on error
   }
 }
-
