@@ -36,39 +36,47 @@ export default function SignInPage() {
   });
 
   useEffect(() => {
+    // Check if there's a message from the server action (either success or error)
     if (formState.message) {
-      toast({
-        title: formState.success ? 'Login Status' : 'Login Error',
-        description: formState.message,
-        variant: formState.success ? 'default' : 'destructive',
-      });
-
-      if (formState.errors) {
-        Object.entries(formState.errors).forEach(([field, messages]) => {
-          if (messages && field !== '_form') {
-            form.setError(field as keyof SignInInput, { type: 'server', message: messages.join(', ') });
-          }
+      if (formState.success) {
+        // Display a welcome toast on successful login
+        toast({
+          title: 'Login Successful',
+          description: 'Welcome! You will be redirected shortly.',
+          variant: 'default',
         });
-      }
 
-      if (formState.success && formState.userId) {
-        form.reset();
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('tempUserId', formState.userId); // Store UID for profile page
-          router.push('/profile'); // Redirect to profile page
-        }
-      } else if (formState.success && !formState.userId) {
-          // This case should ideally not happen if Firebase Auth succeeds
+        if (formState.userId) {
+          form.reset(); // Reset form fields
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('tempUserId', formState.userId); // Store UID for profile page
+            router.push('/profile'); // Redirect to profile page
+          }
+        } else {
+          // This case should ideally not happen if Firebase Auth succeeds and action is correct
           console.error("Login successful but no userId returned from action.");
           toast({ title: "Login Anomaly", description: "Logged in, but user ID was not available. Cannot redirect.", variant: "destructive"});
+        }
+      } else {
+        // Display an error toast if login failed
+        toast({
+          title: 'Login Error',
+          description: formState.message, // Use the error message from the server action
+          variant: 'destructive',
+        });
+
+        // Set form errors if provided by the server action
+        if (formState.errors) {
+          Object.entries(formState.errors).forEach(([field, messages]) => {
+            if (messages && field !== '_form') {
+              form.setError(field as keyof SignInInput, { type: 'server', message: messages.join(', ') });
+            }
+          });
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, router, toast]); // Added router and toast to dependency array as they are used inside.
-
-  const handleClientValidationOnly = (data: SignInInput) => {
-    // Client-side validation handled by RHF. If successful, form action will proceed.
-  };
+  }, [formState, router, toast]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
