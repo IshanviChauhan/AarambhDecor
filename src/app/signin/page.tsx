@@ -42,6 +42,7 @@ export default function SignInPage() {
         description: formState.message,
         variant: formState.success ? 'default' : 'destructive',
       });
+
       if (formState.errors) {
         Object.entries(formState.errors).forEach(([field, messages]) => {
           if (messages && field !== '_form') {
@@ -49,22 +50,24 @@ export default function SignInPage() {
           }
         });
       }
+
       if (formState.success) {
         form.reset();
         if (formState.userId && typeof window !== 'undefined') {
           localStorage.setItem('tempUserId', formState.userId);
+          router.push('/profile');
+        } else if (formState.success && !formState.userId) {
+          // This case should ideally not happen if Firebase Auth succeeds
+          console.error("Login successful but no userId returned from action.");
+          toast({ title: "Login Anomaly", description: "Logged in, but user ID was not available. Cannot redirect.", variant: "destructive"});
         }
-        router.push('/profile'); 
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, toast, router]);
+  }, [formState]); // Only formState is needed as a dependency here
 
-  // This handler is called by react-hook-form after client-side validation.
-  // If validation passes, react-hook-form allows the form to submit to its `action` prop.
   const handleClientValidationOnly = (data: SignInInput) => {
-    // console.log('Client-side validation passed for sign-in:', data);
-    // No need to manually call formAction here. It's handled by the form's `action` prop.
+    // Client-side validation handled by RHF. If successful, form action will proceed.
   };
 
   return (
