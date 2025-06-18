@@ -22,56 +22,55 @@ export interface Product {
   isLatest?: boolean;
   sizeAndDimensions?: string;
   material?: string;
-  reviews?: Review[]; // Reviews can still exist even if submission by users is disabled
+  reviews?: Review[];
 }
 
-// CartItem can still exist if a non-user-specific cart is implemented later,
-// but for now, persistent user carts are removed.
 export interface CartItem extends Product {
   quantity: number;
 }
 
-
 // --- User Profile & Address Types ---
-// Address structure for user profiles
 export interface UserAddress {
+  id?: string; // Optional: for Firestore document ID if stored as separate docs
   street: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
+  fullName?: string; // Often associated with an address
+  phoneNumber?: string; // Often associated with an address
+  isDefault?: boolean; // Optional: if user can set a default address
 }
 
 export interface UserProfile {
-  uid: string; // Firestore document ID (auto-generated in this case)
-  email: string;
+  uid: string;
+  email: string; // Typically non-editable by user directly after creation
   firstName: string;
   lastName: string;
   phoneNumber?: string | null;
-  address: UserAddress;
-  createdAt?: any; // Firestore serverTimestamp
+  // Addresses might be a subcollection in Firestore or an array if simple
+  // For this example, we'll manage addresses via actions that would use a subcollection
+  // address: UserAddress; // This was for the registration form, profile might have multiple addresses
+  createdAt?: any;
 }
 
 
-// --- Order Related Types (Commented out as they depend on users) ---
-/*
+// --- Order Related Types ---
 export interface OrderItem {
   productId: string;
   productName: string;
   quantity: number;
-  price: string;
+  price: string; // Price at the time of order
   imageUrl?: string;
 }
 
 export interface Order {
-  id: string;
-  userId: string;
-  orderDate: string;
+  id: string; // Firestore document ID
+  userId: string; // To link order to a user
+  orderDate: any; // Firestore serverTimestamp or Date
   items: OrderItem[];
   totalAmount: number;
-  shippingAddress: Address; // Depends on Address type
+  shippingAddress: UserAddress; // Snapshot of the address used for this order
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  orderNumber?: string; // Human-readable order number
 }
-*/
-
-    
