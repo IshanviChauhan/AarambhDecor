@@ -18,6 +18,7 @@ import { UserProfileUpdateSchema, AddressSchema, type UserProfileUpdateInput, ty
 import { 
   updateUserProfileAction, 
   addShippingAddressAction, 
+  // deleteShippingAddressAction, // Keep disabled for now
   getUserProfile,
   getShippingAddresses,
   getOrderHistory, // Though not fully implemented, import for consistency
@@ -25,23 +26,25 @@ import {
 } from './actions';
 import type { UserProfile, UserAddress, Order } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+// AlertDialog components are not used in the current active features of this page.
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogTrigger,
+// } from "@/components/ui/alert-dialog"
 
 
 const initialFormState: FormState = { message: null, success: false, errors: undefined };
 
 const getTemporaryUserId = (): string | null => {
   if (typeof window !== 'undefined') {
+    // Ensure localStorage interaction only happens client-side
     return localStorage.getItem('tempUserId');
   }
   return null;
@@ -53,12 +56,25 @@ export default function ProfilePage() {
   
   const [userProfileData, setUserProfileData] = useState<UserProfile | null>(null);
   const [shippingAddresses, setShippingAddresses] = useState<UserAddress[]>([]);
-  const [orderHistory, setOrderHistory] = useState<Order[]>([]); // Placeholder
+  const [orderHistory, setOrderHistory] = useState<Order[]>([]); // Placeholder for orders
   
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
-  const [isLoadingOrders, setIsLoadingOrders] = useState(true); // Placeholder
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true); // Placeholder for orders
 
+  // --- Profile Form ---
+  const [profileFormState, profileFormAction, isProfileUpdatePending] = useActionState(updateUserProfileAction, initialFormState);
+  const profileForm = useForm<UserProfileUpdateInput>({
+    resolver: zodResolver(UserProfileUpdateSchema),
+    defaultValues: { userId: '', firstName: '', lastName: '', phoneNumber: '' },
+  });
+
+  // --- Address Form ---
+  const [addressFormState, addressFormAction, isAddressAddPending] = useActionState(addShippingAddressAction, initialFormState);
+  const addressForm = useForm<AddressInput>({
+    resolver: zodResolver(AddressSchema),
+    defaultValues: { userId: '', fullName: '', street: '', city: '', state: '', postalCode: '', country: '', phoneNumber: '' },
+  });
 
   const fetchProfileData = useCallback(async (userId: string) => {
     setIsLoadingProfile(true);
@@ -66,29 +82,26 @@ export default function ProfilePage() {
       const profile = await getUserProfile(userId);
       setUserProfileData(profile);
       if (profile) {
-        profileForm.reset({
+        profileForm.reset({ // Reset form with fetched data
           userId: profile.uid,
           firstName: profile.firstName || '',
           lastName: profile.lastName || '',
           phoneNumber: profile.phoneNumber || '',
         });
-      } else {
-        // If profile is null (not found), reset form with just userId to avoid stale data
+      } else { // If profile not found, reset form with userId to avoid stale data from previous user
          profileForm.reset({
-          userId: userId,
-          firstName: '',
-          lastName: '',
-          phoneNumber: '',
+          userId: userId, // Keep current userId
+          firstName: '', lastName: '', phoneNumber: '',
         });
       }
     } catch (error) {
       console.error("Error fetching profile data:", error);
       toast({ title: 'Error', description: 'Failed to load profile data.', variant: 'destructive' });
-       profileForm.reset({ userId: userId, firstName: '', lastName: '', phoneNumber: ''});
+      profileForm.reset({ userId: userId, firstName: '', lastName: '', phoneNumber: ''}); // Reset but keep userId
     } finally {
       setIsLoadingProfile(false);
     }
-  }, []); // profileForm is memoized by useForm, so it's stable
+  }, [profileForm, toast]); // profileForm is stable from useForm
 
   const fetchAddresses = useCallback(async (userId: string) => {
     setIsLoadingAddresses(true);
@@ -103,46 +116,40 @@ export default function ProfilePage() {
     }
   }, [toast]);
   
-  // Fetch initial data
+  // Initial effect to get currentUserId from localStorage
   useEffect(() => {
     const tempId = getTemporaryUserId();
     if (tempId) {
       setCurrentUserId(tempId);
       // Data fetching will be triggered by the useEffect below, watching currentUserId
     } else {
+      // No user ID found, so stop loading states
       setIsLoadingProfile(false);
       setIsLoadingAddresses(false);
       setIsLoadingOrders(false);
     }
   }, []);
 
-  // Effects for data fetching when currentUserId is set
+  // Effect for data fetching when currentUserId is available or changes
   useEffect(() => {
     if (currentUserId) {
       fetchProfileData(currentUserId);
       fetchAddresses(currentUserId);
-      // Fetch order history (placeholder)
+      // Fetch order history (placeholder for now)
       // getOrderHistory(currentUserId).then(setOrderHistory).finally(() => setIsLoadingOrders(false));
       setIsLoadingOrders(false); // Simulating no orders for now
 
-      // Initialize forms with currentUserId
+      // Ensure forms have the correct userId if not already set
       if (!profileForm.getValues('userId')) {
-        profileForm.reset({ ...profileForm.getValues(), userId: currentUserId });
+        profileForm.setValue('userId', currentUserId);
       }
       if (!addressForm.getValues('userId')) {
-        addressForm.reset({ ...addressForm.getValues(), userId: currentUserId });
+        addressForm.setValue('userId', currentUserId);
       }
     }
-  }, [currentUserId, fetchProfileData, fetchAddresses]);
+  }, [currentUserId, fetchProfileData, fetchAddresses, profileForm, addressForm]);
 
-
-  // Profile Form
-  const [profileFormState, profileFormAction, isProfileUpdatePending] = useActionState(updateUserProfileAction, initialFormState);
-  const profileForm = useForm<UserProfileUpdateInput>({
-    resolver: zodResolver(UserProfileUpdateSchema),
-    defaultValues: { userId: '', firstName: '', lastName: '', phoneNumber: '' },
-  });
-
+  // Effect for handling profile form submission state
   useEffect(() => {
     if (profileFormState.message) {
       toast({
@@ -151,8 +158,8 @@ export default function ProfilePage() {
         variant: profileFormState.success ? 'default' : 'destructive',
       });
       if (profileFormState.success && profileFormState.data?.userId) {
-        fetchProfileData(profileFormState.data.userId); // Re-fetch profile data on success
-      } else if (profileFormState.errors) {
+        fetchProfileData(profileFormState.data.userId); // Re-fetch profile on success
+      } else if (!profileFormState.success && profileFormState.errors) {
         Object.entries(profileFormState.errors).forEach(([field, messages]) => {
           if (messages && field !== '_form') {
             profileForm.setError(field as keyof UserProfileUpdateInput, { type: 'server', message: messages.join(', ') });
@@ -160,16 +167,9 @@ export default function ProfilePage() {
         });
       }
     }
-  }, [profileFormState, toast, fetchProfileData]);
+  }, [profileFormState, toast, fetchProfileData, profileForm]);
   
-
-  // Address Form
-  const [addressFormState, addressFormAction, isAddressAddPending] = useActionState(addShippingAddressAction, initialFormState);
-  const addressForm = useForm<AddressInput>({
-    resolver: zodResolver(AddressSchema),
-    defaultValues: { userId: '', fullName: '', street: '', city: '', state: '', postalCode: '', country: '', phoneNumber: '' },
-  });
-
+  // Effect for handling address form submission state
   useEffect(() => {
     if (addressFormState.message) {
       toast({
@@ -178,9 +178,14 @@ export default function ProfilePage() {
         variant: addressFormState.success ? 'default' : 'destructive',
       });
       if (addressFormState.success && addressFormState.data?.userId) {
-        addressForm.reset({ userId: addressFormState.data.userId, fullName: '', street: '', city: '', state: '', postalCode: '', country: '', phoneNumber: '' });
+        // Reset address form, keeping userId
+        addressForm.reset({ 
+            userId: addressFormState.data.userId, 
+            fullName: '', street: '', city: '', state: '', 
+            postalCode: '', country: '', phoneNumber: '' 
+        });
         fetchAddresses(addressFormState.data.userId); // Re-fetch addresses on success
-      } else if (addressFormState.errors) {
+      } else if (!addressFormState.success && addressFormState.errors) {
         Object.entries(addressFormState.errors).forEach(([field, messages]) => {
           if (messages && field !== '_form') {
             addressForm.setError(field as keyof AddressInput, { type: 'server', message: messages.join(', ') });
@@ -188,9 +193,10 @@ export default function ProfilePage() {
         });
       }
     }
-  }, [addressFormState, toast, fetchAddresses]);
+  }, [addressFormState, toast, fetchAddresses, addressForm]);
 
-  if (!currentUserId && !isLoadingProfile && !isLoadingAddresses) { // Check all loading states
+  // Display "Please log in" if no userId is found after initial client-side check
+  if (!isLoadingProfile && !isLoadingAddresses && !currentUserId) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -199,12 +205,12 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle className="font-headline text-2xl text-primary flex items-center">
                 <AlertTriangle className="mr-3 h-6 w-6 text-destructive" />
-                Profile Unavailable
+                Profile Access Denied
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center py-10">
               <p className="text-lg text-muted-foreground mb-4">
-                Please log in to view your profile.
+                You need to be logged in to view your profile.
               </p>
               <Button asChild>
                 <Link href="/signin">Go to Login</Link>
@@ -237,7 +243,7 @@ export default function ProfilePage() {
             <Card className="shadow-lg rounded-lg border-border/70">
               <CardHeader>
                 <CardTitle className="font-headline text-2xl text-primary">Profile Details</CardTitle>
-                <CardDescription>Update your personal information. Email (<span className="font-medium text-foreground">{isLoadingProfile ? 'Loading...' : (userProfileData?.email || 'N/A')}</span>) is not editable here.</CardDescription>
+                <CardDescription>Update your personal information. Your email (<span className="font-medium text-foreground">{isLoadingProfile ? 'Loading...' : (userProfileData?.email || 'N/A')}</span>) is used for login and cannot be changed here.</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoadingProfile ? (
@@ -245,7 +251,9 @@ export default function ProfilePage() {
                 ) : userProfileData ? (
                 <Form {...profileForm}>
                   <form action={profileFormAction} className="space-y-6">
+                    {/* Hidden field for userId, crucial for the server action */}
                     <input type="hidden" {...profileForm.register('userId')} value={currentUserId || ''} />
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField control={profileForm.control} name="firstName" render={({ field }) => (
                         <FormItem>
@@ -264,22 +272,22 @@ export default function ProfilePage() {
                     </div>
                     <FormField control={profileForm.control} name="phoneNumber" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl><Input type="tel" placeholder="Your phone number (optional)" {...field} value={field.value || ''} /></FormControl>
+                        <FormLabel>Phone Number (Optional)</FormLabel>
+                        <FormControl><Input type="tel" placeholder="e.g., +1234567890" {...field} value={field.value || ''} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    {profileFormState.errors?._form && (
+                    {profileFormState.errors?._form && !profileFormState.success && (
                         <p className="text-sm font-medium text-destructive">{profileFormState.errors._form.join(', ')}</p>
                     )}
                     <Button type="submit" disabled={isProfileUpdatePending || !currentUserId} className="w-full md:w-auto">
                       {isProfileUpdatePending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                      {isProfileUpdatePending ? 'Saving...' : 'Save Changes'}
+                      {isProfileUpdatePending ? 'Saving Changes...' : 'Save Changes'}
                     </Button>
                   </form>
                 </Form>
                 ) : (
-                  <p className="text-muted-foreground text-center py-4">Could not load profile details. User may not exist or there was an error.</p>
+                  <p className="text-muted-foreground text-center py-4">Could not load profile details. User data may not exist or there was an error fetching it.</p>
                 )}
               </CardContent>
             </Card>
@@ -289,7 +297,7 @@ export default function ProfilePage() {
             <Card className="shadow-lg rounded-lg border-border/70">
               <CardHeader>
                 <CardTitle className="font-headline text-2xl text-primary">Shipping Addresses</CardTitle>
-                <CardDescription>Manage your shipping addresses.</CardDescription>
+                <CardDescription>Manage your saved shipping addresses.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div>
@@ -309,13 +317,13 @@ export default function ProfilePage() {
                                     {address.phoneNumber && <p className="text-sm text-muted-foreground">Phone: {address.phoneNumber}</p>}
                                 </div>
                                 <div className="flex space-x-2">
-                                    <Button variant="outline" size="icon" className="h-8 w-8" disabled>
+                                    <Button variant="outline" size="icon" className="h-8 w-8" disabled title="Edit (Disabled)">
                                         <Edit3 className="h-4 w-4"/>
-                                        <span className="sr-only">Edit Address (disabled)</span>
+                                        <span className="sr-only">Edit Address (Disabled)</span>
                                     </Button>
-                                     <Button variant="destructive" size="icon" className="h-8 w-8" disabled>
+                                     <Button variant="destructive" size="icon" className="h-8 w-8" disabled title="Delete (Disabled)">
                                         <Trash2 className="h-4 w-4"/>
-                                         <span className="sr-only">Delete Address (disabled)</span>
+                                         <span className="sr-only">Delete Address (Disabled)</span>
                                     </Button>
                                 </div>
                             </div>
@@ -331,19 +339,21 @@ export default function ProfilePage() {
                     <h3 className="text-lg font-semibold mb-4 text-foreground">Add New Address</h3>
                      <Form {...addressForm}>
                         <form action={addressFormAction} className="space-y-6">
+                        {/* Hidden field for userId, crucial for the server action */}
                         <input type="hidden" {...addressForm.register('userId')} value={currentUserId || ''} />
+                        
                         <FormField control={addressForm.control} name="fullName" render={({ field }) => (
-                            <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Recipient's full name" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Full Name (Recipient)</FormLabel><FormControl><Input placeholder="Recipient's full name" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={addressForm.control} name="street" render={({ field }) => (
-                            <FormItem><FormLabel>Street Address</FormLabel><FormControl><Input placeholder="123 Main St, Apt 4B" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Street Address</FormLabel><FormControl><Input placeholder="123 Decor Lane, Apt 4B" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField control={addressForm.control} name="city" render={({ field }) => (
                                 <FormItem><FormLabel>City</FormLabel><FormControl><Input placeholder="City" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                             <FormField control={addressForm.control} name="state" render={({ field }) => (
-                                <FormItem><FormLabel>State / Province</FormLabel><FormControl><Input placeholder="State/Province" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>State / Province</FormLabel><FormControl><Input placeholder="State or Province" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -355,14 +365,14 @@ export default function ProfilePage() {
                             )} />
                         </div>
                         <FormField control={addressForm.control} name="phoneNumber" render={({ field }) => (
-                            <FormItem><FormLabel>Phone Number (Optional)</FormLabel><FormControl><Input type="tel" placeholder="Address phone number" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Phone Number (Optional for this address)</FormLabel><FormControl><Input type="tel" placeholder="e.g. +1234567890" {...field} value={field.value || ''} /></FormControl><FormMessage /></FormItem>
                         )} />
-                        {addressFormState.errors?._form && (
+                        {addressFormState.errors?._form && !addressFormState.success && (
                             <p className="text-sm font-medium text-destructive">{addressFormState.errors._form.join(', ')}</p>
                         )}
                         <Button type="submit" disabled={isAddressAddPending || !currentUserId} className="w-full md:w-auto">
                             {isAddressAddPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                            {isAddressAddPending ? 'Adding...' : 'Add Address'}
+                            {isAddressAddPending ? 'Adding Address...' : 'Add Address'}
                         </Button>
                         </form>
                     </Form>
@@ -375,17 +385,19 @@ export default function ProfilePage() {
             <Card className="shadow-lg rounded-lg border-border/70">
               <CardHeader>
                 <CardTitle className="font-headline text-2xl text-primary">Order History</CardTitle>
+                <CardDescription>View your past orders with Aarambh Decor.</CardDescription>
               </CardHeader>
               <CardContent className="text-center py-10">
                  {isLoadingOrders ? (
-                    <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/> <span className="ml-2 text-muted-foreground">Loading orders...</span></div>
+                    <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/> <span className="ml-2 text-muted-foreground">Loading order history...</span></div>
                  ) : orderHistory.length > 0 ? (
-                    <p className="text-muted-foreground">Displaying order history is under development.</p> // Placeholder for actual list
+                    // This would be replaced with actual order list rendering
+                    <p className="text-muted-foreground">Displaying order history is under development. Order data would be shown here.</p> 
                  ) : (
                     <>
                         <ShoppingBag className="h-12 w-12 text-primary mx-auto mb-4 opacity-70" />
-                        <p className="text-lg text-muted-foreground mb-2">No orders yet.</p>
-                        <p className="text-sm text-muted-foreground mb-6">Your past orders will appear here.</p>
+                        <p className="text-lg text-muted-foreground mb-2">You have no past orders.</p>
+                        <p className="text-sm text-muted-foreground mb-6">Once you place an order, it will appear here.</p>
                         <Button asChild>
                             <Link href="/collections"><Home className="mr-2 h-4 w-4"/>Start Shopping</Link>
                         </Button>
@@ -400,4 +412,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

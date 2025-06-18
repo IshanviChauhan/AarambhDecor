@@ -70,12 +70,13 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
 
     const userProfileRef = doc(db, 'userProfile', user.uid);
 
+    // Construct the UserProfile data, including the nested address object
     const newUserProfileData: Omit<UserProfile, 'uid' | 'createdAt'> & { createdAt: any } = {
       email,
       firstName,
       lastName,
-      phoneNumber: phoneNumber || null,
-      address: { 
+      phoneNumber: phoneNumber || null, // Store null if empty or undefined
+      address: { // This is the structured address from registration
         street: addressStreet,
         city: addressCity,
         state: addressState,
@@ -91,6 +92,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
       console.log(`RegisterUserAction: Firestore document set successfully for user: ${user.uid}`);
     } catch (firestoreError) {
       console.error(`RegisterUserAction: Error setting Firestore document for user ${user.uid} after auth creation:`, firestoreError);
+      // Critical: If Firestore fails, roll back Auth user creation to avoid orphaned auth accounts
       try {
         await user.delete();
         console.log(`RegisterUserAction: Successfully deleted Firebase Auth user ${user.uid} after Firestore failure.`);
@@ -102,7 +104,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
         message: `Account authentication created, but failed to save full profile. The authentication record has been rolled back. Please try again. Error: ${errorMessage}`,
         success: false,
         errors: { _form: [`Account authentication part succeeded, but profile setup failed. The operation was rolled back. Error: ${errorMessage}`] },
-        userId: undefined,
+        userId: undefined, // No userId as the auth user was deleted or not fully established
       };
     }
 
@@ -110,7 +112,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     return {
       message: 'Registration successful! Your account has been created.',
       success: true,
-      userId: user.uid,
+      userId: user.uid, // Return the UID for client-side redirection/storage
     };
 
   } catch (error: any) {
@@ -129,6 +131,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
           fieldErrors = { email: [errorMessage] };
           break;
         case 'auth/operation-not-allowed':
+          // This error means Email/Password sign-in is disabled in the Firebase console.
           errorMessage = 'Email/password accounts are not enabled. Please contact support.';
           fieldErrors = { _form: [errorMessage] }; 
           break;

@@ -2,9 +2,10 @@
 'use server';
 
 /**
- * @fileOverview This file is deprecated and no longer used.
+ * @fileOverview This file is DEPRECATED and no longer used.
  * The AI style suggestion functionality has been replaced by an image-based product recommender.
  * See recommend-products-from-image-flow.ts for the new implementation.
+ * This file can be safely deleted.
  */
 
 import {ai} from '@/ai/genkit';
@@ -33,28 +34,26 @@ export type GenerateStyleSuggestionsOutput = z.infer<
 export async function generateStyleSuggestions(
   input: GenerateStyleSuggestionsInput
 ): Promise<GenerateStyleSuggestionsOutput> {
-  // This flow is deprecated.
-  // Consider removing calls to this function or updating them to the new flow.
-  console.warn("generateStyleSuggestionsFlow is deprecated and should not be used.");
-  return { styleSuggestions: "This feature is no longer available. Please use the image-based product recommender." };
+  console.warn("generateStyleSuggestionsFlow is DEPRECATED and should not be used. It will return a static message.");
+  return { styleSuggestions: "This feature is deprecated and no longer available. Please use the image-based product recommender on the homepage." };
 }
 
+// Define a dummy prompt and flow to avoid errors if something still tries to import/call them,
+// but they will effectively do nothing useful.
 const prompt = ai.definePrompt({
-  name: 'generateStyleSuggestionsPrompt',
+  name: 'deprecatedGenerateStyleSuggestionsPrompt',
   input: {schema: GenerateStyleSuggestionsInputSchema},
   output: {schema: GenerateStyleSuggestionsOutputSchema},
-  prompt: `This prompt is deprecated.`,
+  prompt: `This prompt is deprecated and should not be used.`,
 });
 
 const generateStyleSuggestionsFlow = ai.defineFlow(
   {
-    name: 'generateStyleSuggestionsFlow',
+    name: 'deprecatedGenerateStyleSuggestionsFlow',
     inputSchema: GenerateStyleSuggestionsInputSchema,
     outputSchema: GenerateStyleSuggestionsOutputSchema,
   },
   async input => {
-    // const {output} = await prompt(input);
-    // return output!;
-    return { styleSuggestions: "This feature is no longer available." };
+    return { styleSuggestions: "This feature is deprecated. Please use the image-based AI advisor on the homepage." };
   }
 );

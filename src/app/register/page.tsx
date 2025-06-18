@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, AlertTriangle } from 'lucide-react';
-import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'; // Updated import for AlertDescription
 
 import { SignUpSchemaWithAddress, type SignUpWithAddressInput } from '@/lib/schemas';
 import { registerUserAction, type RegisterUserFormState } from './actions';
@@ -54,10 +54,10 @@ export default function RegisterPage() {
           description: "Welcome! You'll be redirected to your profile.",
           variant: 'default',
         });
-        form.reset();
+        form.reset(); // Clear form fields
         if (typeof window !== 'undefined') {
-          localStorage.setItem('tempUserId', formState.userId);
-          router.push('/profile');
+          localStorage.setItem('tempUserId', formState.userId); // Store UID for profile page access
+          router.push('/profile'); // Redirect to profile page
         }
       } else if (!formState.success) {
         toast({
@@ -65,6 +65,7 @@ export default function RegisterPage() {
           description: formState.message,
           variant: 'destructive',
         });
+        // Populate form errors from server action state
         if (formState.errors) {
           Object.entries(formState.errors).forEach(([field, messages]) => {
             if (messages && field !== '_form') {
@@ -75,15 +76,13 @@ export default function RegisterPage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, toast, router]);
+  }, [formState, toast, router]); // form.reset was added, so form is a dependency
 
-  const handleClientValidationAndSubmit = (data: SignUpWithAddressInput) => {
+  // This function is called by form.handleSubmit for client-side validation.
+  // The actual submission to `formAction` is handled by React due to the <form action={formAction}>.
+  const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
     console.log("RegisterPage: Client-side validation passed. Data submitted to server action:", data);
-    // This function is called by form.handleSubmit.
-    // The actual submission to `formAction` is handled by React due to the <form action={formAction}>
-    // No explicit call to formAction(formData) is needed here if using <form action>.
-    // If not using <form action>, you'd manually construct FormData and call formAction.
-    // For this setup, we let the native form submission with the server action take over.
+    // No need to explicitly call formAction here if using <form action={formAction}>
   };
 
   return (
@@ -99,6 +98,7 @@ export default function RegisterPage() {
               height={60}
               priority
               className="object-contain rounded-lg transition-opacity duration-300 group-hover:opacity-80"
+              data-ai-hint="logo"
             />
             <span
               className="ml-3 text-2xl font-headline text-primary opacity-0 w-0 transform -translate-x-4
@@ -116,28 +116,28 @@ export default function RegisterPage() {
               <UserPlus className="mx-auto h-10 w-10 text-primary mb-3" />
               <CardTitle className="text-3xl font-headline text-primary">Create Your Account</CardTitle>
               <CardDescription>
-                Enter your details to register.
+                Join Aarambh Decor to save your preferences and track orders.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
                 <form 
-                  onSubmit={form.handleSubmit(handleClientValidationAndSubmit)} 
-                  action={formAction} // This wires up the server action
+                  onSubmit={form.handleSubmit(handleClientValidationOnly)} 
+                  action={formAction} // Wires up the server action
                   className="space-y-6"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="firstName" render={({ field }) => (
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
-                        <FormControl><Input placeholder="John" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Your first name" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="lastName" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
-                        <FormControl><Input placeholder="Doe" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Your last name" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
@@ -146,7 +146,7 @@ export default function RegisterPage() {
                   <FormField control={form.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
-                      <FormControl><Input type="email" placeholder="john.doe@example.com" {...field} /></FormControl>
+                      <FormControl><Input type="email" placeholder="you@example.com" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                   <FormField control={form.control} name="phoneNumber" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone Number (Optional)</FormLabel>
-                      <FormControl><Input type="tel" placeholder="+1234567890" {...field} /></FormControl>
+                      <FormControl><Input type="tel" placeholder="e.g., +1234567890" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -177,11 +177,11 @@ export default function RegisterPage() {
                     )} />
                   </div>
 
-                  <h3 className="text-lg font-medium text-primary pt-2 border-t">Address</h3>
+                  <h3 className="text-lg font-medium text-primary pt-2 border-t">Primary Address</h3>
                   <FormField control={form.control} name="addressStreet" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Street Address</FormLabel>
-                      <FormControl><Input placeholder="123 Main St" {...field} /></FormControl>
+                      <FormControl><Input placeholder="123 Decor Lane, Apt 4B" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -189,14 +189,14 @@ export default function RegisterPage() {
                     <FormField control={form.control} name="addressCity" render={({ field }) => (
                       <FormItem>
                         <FormLabel>City</FormLabel>
-                        <FormControl><Input placeholder="Anytown" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Your city" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="addressState" render={({ field }) => (
                       <FormItem>
                         <FormLabel>State / Province</FormLabel>
-                        <FormControl><Input placeholder="CA" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Your state or province" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
@@ -205,14 +205,14 @@ export default function RegisterPage() {
                     <FormField control={form.control} name="addressPostalCode" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Postal Code</FormLabel>
-                        <FormControl><Input placeholder="90210" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Your postal code" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="addressCountry" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
-                        <FormControl><Input placeholder="USA" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Your country" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
@@ -222,13 +222,13 @@ export default function RegisterPage() {
                      <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>Registration Error</AlertTitle>
-                        <FormMessage>{formState.errors._form.join(', ')}</FormMessage>
+                        <AlertDescription>{formState.errors._form.join(', ')}</AlertDescription>
                       </Alert>
                   )}
 
                   <Button type="submit" className="w-full" disabled={isActionPending}>
                     {isActionPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-                    {isActionPending ? 'Registering...' : 'Create Account'}
+                    {isActionPending ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </form>
               </Form>

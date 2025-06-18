@@ -31,27 +31,27 @@ export interface CartItem extends Product {
 
 // --- User Profile & Address Types ---
 export interface UserAddress {
-  id: string; // Firestore document ID for the address
+  id: string; // Firestore document ID for the address subcollection item
   street: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
-  fullName?: string;
-  phoneNumber?: string | null; // Allow null for phone number
+  fullName?: string; // Recipient name for this specific address
+  phoneNumber?: string | null;
   isDefault?: boolean;
   createdAt?: any; // Firestore serverTimestamp or Date
 }
 
 export interface UserProfile {
-  uid: string;
+  uid: string; // Firebase Auth UID, also the document ID in 'userProfile' collection
   email: string;
   firstName: string;
   lastName: string;
-  phoneNumber?: string | null; // Allow null for phone number
-  // The 'address' field from registration is a single initial address,
-  // separate from the 'addresses' subcollection for multiple shipping addresses.
-  address?: { // This is the primary address from registration
+  phoneNumber?: string | null;
+  // This 'address' field stores the initial address provided during registration.
+  // Additional shipping addresses are stored in a subcollection.
+  address?: {
     street: string;
     city: string;
     state: string;

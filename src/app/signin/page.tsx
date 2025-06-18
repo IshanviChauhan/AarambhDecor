@@ -36,36 +36,24 @@ export default function SignInPage() {
   });
 
   useEffect(() => {
-    // Check if there's a message from the server action (either success or error)
     if (formState.message) {
-      if (formState.success) {
-        // Display a welcome toast on successful login
+      if (formState.success && formState.userId) {
         toast({
           title: 'Login Successful',
-          description: 'Welcome! You will be redirected shortly.',
+          description: 'Welcome back! You will be redirected shortly.',
           variant: 'default',
         });
-
-        if (formState.userId) {
-          form.reset(); // Reset form fields
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('tempUserId', formState.userId); // Store UID for profile page
-            router.push('/profile'); // Redirect to profile page
-          }
-        } else {
-          // This case should ideally not happen if Firebase Auth succeeds and action is correct
-          console.error("Login successful but no userId returned from action.");
-          toast({ title: "Login Anomaly", description: "Logged in, but user ID was not available. Cannot redirect.", variant: "destructive"});
+        form.reset(); 
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('tempUserId', formState.userId); 
+          router.push('/profile'); 
         }
-      } else {
-        // Display an error toast if login failed
+      } else if (!formState.success) {
         toast({
           title: 'Login Error',
-          description: formState.message, // Use the error message from the server action
+          description: formState.message, 
           variant: 'destructive',
         });
-
-        // Set form errors if provided by the server action
         if (formState.errors) {
           Object.entries(formState.errors).forEach(([field, messages]) => {
             if (messages && field !== '_form') {
@@ -76,7 +64,13 @@ export default function SignInPage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, router, toast]);
+  }, [formState, router, toast]); // form.reset added, so form is a dependency
+
+  // This function is called by form.handleSubmit for client-side validation.
+  // The actual submission to `formAction` is handled by React due to the <form action={formAction}>.
+  const handleClientValidationOnly = (data: SignInInput) => {
+    console.log("SignInPage: Client-side validation passed. Data submitted to server action:", data);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -89,6 +83,7 @@ export default function SignInPage() {
             height={60}
             priority
             className="object-contain rounded-lg transition-opacity duration-300 group-hover:opacity-80"
+            data-ai-hint="logo"
           />
           <span
             className="ml-3 text-2xl font-headline text-primary opacity-0 w-0 transform -translate-x-4
@@ -106,19 +101,20 @@ export default function SignInPage() {
             <LogIn className="mx-auto h-10 w-10 text-primary mb-3" />
             <CardTitle className="text-3xl font-headline text-primary">Login to Your Account</CardTitle>
             <CardDescription>
-              Enter your credentials to login.
+              Enter your credentials to access your account.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form
-                action={formAction}
+                onSubmit={form.handleSubmit(handleClientValidationOnly)}
+                action={formAction} // Wires up the server action
                 className="space-y-6"
               >
                 <FormField control={form.control} name="email" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>
-                    <FormControl><Input type="email" placeholder="john.doe@example.com" {...field} /></FormControl>
+                    <FormControl><Input type="email" placeholder="you@example.com" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />

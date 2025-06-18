@@ -1,37 +1,37 @@
 
 import { z } from 'zod';
 
-// Schema for updating user profile details
+// Schema for updating user profile details (firstName, lastName, phoneNumber)
 export const UserProfileUpdateSchema = z.object({
-  userId: z.string().min(1, "User ID is required."), // Temporary for actions without proper session
+  userId: z.string().min(1, "User ID is required."),
   firstName: z.string().min(1, { message: 'First name cannot be empty.' }).max(50, { message: 'First name is too long.' }),
   lastName: z.string().min(1, { message: 'Last name cannot be empty.' }).max(50, { message: 'Last name is too long.' }),
   phoneNumber: z.string()
     .max(20, { message: 'Phone number must be 20 characters or less.' })
-    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
-    .optional().or(z.literal('')),
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Use E.164 or leave empty (e.g. +1234567890)" })
+    .optional().or(z.literal('')), // Allows empty string or valid phone
 });
 export type UserProfileUpdateInput = z.infer<typeof UserProfileUpdateSchema>;
 
-// Schema for adding/editing a shipping address
+// Schema for adding/editing a shipping address (for the addresses subcollection)
 export const AddressSchema = z.object({
-  userId: z.string().min(1, "User ID is required."), // Temporary for actions without proper session
-  addressId: z.string().optional(), // For updates
-  fullName: z.string().min(1, 'Full name is required.').max(100, 'Full name is too long.'),
+  userId: z.string().min(1, "User ID is required."),
+  addressId: z.string().optional(), // For updates, not used for add
+  fullName: z.string().min(1, 'Full name for shipping is required.').max(100, 'Full name is too long.'),
   street: z.string().min(1, 'Street address is required.').max(200, 'Street address is too long.'),
   city: z.string().min(1, 'City is required.').max(100, 'City name is too long.'),
   state: z.string().min(1, 'State/Province is required.').max(100, 'State/Province name is too long.'),
   postalCode: z.string().min(1, 'Postal code is required.').max(20, 'Postal code is too long.'),
   country: z.string().min(1, 'Country is required.').max(100, 'Country name is too long.'),
-  phoneNumber: z.string().max(20, 'Phone number must be 20 characters or less.')
-    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
+  phoneNumber: z.string()
+    .max(20, 'Phone number must be 20 characters or less.')
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Use E.164 or leave empty." })
     .optional().or(z.literal('')),
-  // isDefault: z.boolean().optional(), // If you want a default address flag
 });
 export type AddressInput = z.infer<typeof AddressSchema>;
 
 
-// --- Product Form Schema (Remains active) ---
+// --- Product Form Schema (Remains active for /add-product page) ---
 const ProductImageSchema = z.object({
   url: z.string().url({ message: "Invalid image URL." }),
   dataAiHint: z.string().max(50, { message: "AI hint too long." }).optional().or(z.literal('')),
@@ -52,17 +52,18 @@ export const ProductFormSchema = z.object({
 export type ProductFormInput = z.infer<typeof ProductFormSchema>;
 
 
-// --- Registration Schema ---
+// --- Registration Schema (for /register page) ---
 export const SignUpSchemaWithAddress = z.object({
   firstName: z.string().min(1, { message: 'First name is required.' }).max(50, { message: 'First name is too long.' }),
   lastName: z.string().min(1, { message: 'Last name is required.' }).max(50, { message: 'Last name is too long.' }),
   email: z.string().email({ message: 'Invalid email address.' }),
   phoneNumber: z.string()
     .max(20, { message: 'Phone number must be 20 characters or less.' })
-    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Use E.164 or leave empty." })
     .optional().or(z.literal('')),
   password: z.string().min(6, { message: 'Password must be at least 6 characters long.' }),
   confirmPassword: z.string(),
+  // Address fields for initial registration
   addressStreet: z.string().min(1, 'Street address is required.').max(200, 'Street address is too long.'),
   addressCity: z.string().min(1, 'City is required.').max(100, 'City name is too long.'),
   addressState: z.string().min(1, 'State/Province is required.').max(100, 'State/Province name is too long.'),
@@ -70,13 +71,13 @@ export const SignUpSchemaWithAddress = z.object({
   addressCountry: z.string().min(1, 'Country is required.').max(100, 'Country name is too long.'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match.",
-  path: ['confirmPassword'],
+  path: ['confirmPassword'], // Error will be associated with the confirmPassword field
 });
 export type SignUpWithAddressInput = z.infer<typeof SignUpSchemaWithAddress>;
 
-// --- SignIn Schema ---
+// --- SignIn Schema (for /signin page) ---
 export const SignInSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
+  password: z.string().min(1, { message: 'Password is required.' }), // Password can't be empty
 });
 export type SignInInput = z.infer<typeof SignInSchema>;

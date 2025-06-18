@@ -1,9 +1,11 @@
 
-// This action file (src/app/signup/actions.ts) is no longer needed
-// as the registration functionality is handled by /register/actions.ts.
+// This action file (src/app/signup/actions.ts) is deprecated.
+// Registration functionality is handled by /register/actions.ts.
 // This file can be safely deleted.
 
-export interface SignUpFormState {
+'use server';
+
+export interface OldSignUpFormState {
   message: string | null;
   errors?: {
     _form?: string[];
@@ -11,11 +13,11 @@ export interface SignUpFormState {
   success: boolean;
 }
 
-export async function signUpWithEmail(prevState: SignUpFormState, formData: FormData): Promise<SignUpFormState> {
-  console.warn("Old signUpWithEmail action called at /signup/actions.ts, but registration is handled by /register/actions.ts.");
+export async function oldSignUpWithEmailAction(prevState: OldSignUpFormState, formData: FormData): Promise<OldSignUpFormState> {
+  console.warn("Deprecated signUpWithEmail action called at /signup/actions.ts. Registration is handled by /register/actions.ts.");
   return {
     message: 'Registration functionality has moved. Please use the /register route.',
     success: false,
-    errors: { _form: ['This sign-up endpoint is deprecated.'] }
+    errors: { _form: ['This sign-up endpoint is deprecated. Please navigate to /register.'] }
   };
 }
