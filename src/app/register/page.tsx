@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useActionState } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -24,7 +24,7 @@ import { registerUserAction, type RegisterUserFormState } from './actions';
 
 export default function RegisterPage() {
   const { toast } = useToast();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
   const initialFormState: RegisterUserFormState = { message: null, success: false, errors: undefined, userId: undefined };
   const [formState, formAction, isActionPending] = useActionState(registerUserAction, initialFormState);
@@ -56,8 +56,8 @@ export default function RegisterPage() {
         });
         form.reset();
         if (typeof window !== 'undefined') {
-          localStorage.setItem('tempUserId', formState.userId); // Store UID
-          router.push('/profile'); // Redirect to profile page
+          localStorage.setItem('tempUserId', formState.userId);
+          router.push('/profile');
         }
       } else if (!formState.success) {
         toast({
@@ -75,12 +75,15 @@ export default function RegisterPage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, toast, router]); // Add router to dependencies
+  }, [formState, toast, router]);
 
-  const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
+  const handleClientValidationAndSubmit = (data: SignUpWithAddressInput) => {
     console.log("RegisterPage: Client-side validation passed. Data submitted to server action:", data);
-    // Client-side validation passed, form will submit to server action
+    // This function is called by form.handleSubmit.
     // The actual submission to `formAction` is handled by React due to the <form action={formAction}>
+    // No explicit call to formAction(formData) is needed here if using <form action>.
+    // If not using <form action>, you'd manually construct FormData and call formAction.
+    // For this setup, we let the native form submission with the server action take over.
   };
 
   return (
@@ -113,14 +116,14 @@ export default function RegisterPage() {
               <UserPlus className="mx-auto h-10 w-10 text-primary mb-3" />
               <CardTitle className="text-3xl font-headline text-primary">Create Your Account</CardTitle>
               <CardDescription>
-                Enter your details to register. This will create an account with Firebase Authentication and store your profile in Firestore.
+                Enter your details to register.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
                 <form 
-                  onSubmit={form.handleSubmit(handleClientValidationOnly)} 
-                  action={formAction}
+                  onSubmit={form.handleSubmit(handleClientValidationAndSubmit)} 
+                  action={formAction} // This wires up the server action
                   className="space-y-6"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -215,7 +218,7 @@ export default function RegisterPage() {
                     )} />
                   </div>
                    
-                  {formState.errors?._form && (
+                  {formState.errors?._form && !formState.success && (
                      <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>Registration Error</AlertTitle>

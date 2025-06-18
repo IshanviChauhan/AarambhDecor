@@ -1,6 +1,4 @@
 
-'use server';
-
 // This action file (src/app/signup/actions.ts) is no longer needed
 // as the registration functionality is handled by /register/actions.ts.
 // This file can be safely deleted.

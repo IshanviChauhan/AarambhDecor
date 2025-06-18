@@ -1,27 +1,25 @@
 // This component is deprecated and has been replaced by ImageBasedProductRecommender.tsx
-// You can safely delete this file: src/components/style-suggester.tsx
+// This file can be safely deleted: src/components/style-suggester.tsx
 
 'use client';
 
 import { useState } from 'react';
-// import { generateStyleSuggestions, type GenerateStyleSuggestionsInput } from '@/ai/flows/generate-style-suggestions'; // Deprecated flow
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wand2, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Wand2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 export function StyleSuggester() {
   const [productDetails, setProductDetails] = useState('');
-  const [suggestions, setSuggestions] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [suggestions, setSuggestions] = useState('');
+  // const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async () => {
     toast({
       title: "Feature Updated",
-      description: "This AI Style Advisor has been upgraded! Please use the new Image-Based Recommender.",
+      description: "This AI Style Advisor has been upgraded! Please use the new Image-Based Recommender found on the homepage.",
       variant: "default",
     });
   };
@@ -34,7 +32,7 @@ export function StyleSuggester() {
           <CardTitle className="font-headline text-2xl">AI Style Advisor (Updated)</CardTitle>
         </div>
         <CardDescription className="pt-2">
-          This feature has been updated. Try our new Image-Based Product Recommender to get suggestions by uploading a photo of your space!
+          This feature has been updated. Try our new <a href="/#ai-decor-advisor" className="underline hover:text-accent">Image-Based Product Recommender</a> on the homepage to get suggestions by uploading a photo of your space!
         </CardDescription>
       </CardHeader>
       <CardContent>
