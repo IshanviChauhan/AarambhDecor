@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useActionState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -23,6 +24,7 @@ import { registerUserAction, type RegisterUserFormState } from './actions';
 
 export default function RegisterPage() {
   const { toast } = useToast();
+  const router = useRouter(); // Initialize useRouter
 
   const initialFormState: RegisterUserFormState = { message: null, success: false, errors: undefined, userId: undefined };
   const [formState, formAction, isActionPending] = useActionState(registerUserAction, initialFormState);
@@ -46,28 +48,34 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (formState.message) {
-      toast({
-        title: formState.success ? 'Registration Successful' : 'Registration Error',
-        description: formState.message,
-        variant: formState.success ? 'default' : 'destructive',
-      });
-      if (formState.errors) {
-        Object.entries(formState.errors).forEach(([field, messages]) => {
-          if (messages && field !== '_form') {
-            form.setError(field as keyof SignUpWithAddressInput, { type: 'server', message: messages.join(', ') });
-          }
+      if (formState.success && formState.userId) {
+        toast({
+          title: 'Registration Successful',
+          description: "Welcome! You'll be redirected to your profile.",
+          variant: 'default',
         });
-      }
-      if (formState.success) {
         form.reset();
-        // Optionally, you could redirect here if needed, e.g., to login page
-        // import { useRouter } from 'next/navigation';
-        // const router = useRouter();
-        // router.push('/signin'); 
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('tempUserId', formState.userId); // Store UID
+          router.push('/profile'); // Redirect to profile page
+        }
+      } else if (!formState.success) {
+        toast({
+          title: 'Registration Error',
+          description: formState.message,
+          variant: 'destructive',
+        });
+        if (formState.errors) {
+          Object.entries(formState.errors).forEach(([field, messages]) => {
+            if (messages && field !== '_form') {
+              form.setError(field as keyof SignUpWithAddressInput, { type: 'server', message: messages.join(', ') });
+            }
+          });
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, toast]);
+  }, [formState, toast, router]); // Add router to dependencies
 
   const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
     // Client-side validation passed, form will submit to server action
