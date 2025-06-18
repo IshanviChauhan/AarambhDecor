@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, Suspense, useCallback } from 'react';
-import type { Product }_from '@/lib/types'; // Removed CartItem as it's disabled
+import type { Product } from '@/lib/types'; // Removed CartItem as it's disabled
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
