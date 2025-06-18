@@ -24,7 +24,7 @@ import { registerUserAction, type RegisterUserFormState } from './actions';
 export default function RegisterPage() {
   const { toast } = useToast();
 
-  const initialFormState: RegisterUserFormState = { message: null, success: false, errors: undefined };
+  const initialFormState: RegisterUserFormState = { message: null, success: false, errors: undefined, userId: undefined };
   const [formState, formAction, isActionPending] = useActionState(registerUserAction, initialFormState);
 
   const form = useForm<SignUpWithAddressInput>({
@@ -47,7 +47,7 @@ export default function RegisterPage() {
   useEffect(() => {
     if (formState.message) {
       toast({
-        title: formState.success ? 'Success' : 'Error',
+        title: formState.success ? 'Registration Successful' : 'Registration Error',
         description: formState.message,
         variant: formState.success ? 'default' : 'destructive',
       });
@@ -60,14 +60,17 @@ export default function RegisterPage() {
       }
       if (formState.success) {
         form.reset();
+        // Optionally, you could redirect here if needed, e.g., to login page
+        // import { useRouter } from 'next/navigation';
+        // const router = useRouter();
+        // router.push('/signin'); 
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState, toast]);
 
   const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
-    // console.log('Client-side validation passed for registration:', data);
-    // No need to manually call formAction here. It's handled by the form's `action` prop.
+    // Client-side validation passed, form will submit to server action
   };
 
   return (
@@ -100,7 +103,7 @@ export default function RegisterPage() {
               <UserPlus className="mx-auto h-10 w-10 text-primary mb-3" />
               <CardTitle className="text-3xl font-headline text-primary">Create Your Account</CardTitle>
               <CardDescription>
-                Enter your details to register. Authentication is currently disabled; this form will store your profile data in Firestore (password is not stored).
+                Enter your details to register. This will create an account with Firebase Authentication and store your profile in Firestore.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -148,7 +151,7 @@ export default function RegisterPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
-                        <FormDescription>Min. 6 characters. Not stored, for validation only.</FormDescription>
+                        <FormDescription>Min. 6 characters.</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )} />

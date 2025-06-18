@@ -84,7 +84,7 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     return {
       message: 'Registration successful! Your account has been created.',
       success: true,
-      userId: user.uid,
+      userId: user.uid, // Return the userId
     };
 
   } catch (error: any) {
