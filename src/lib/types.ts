@@ -31,27 +31,34 @@ export interface CartItem extends Product {
 
 // --- User Profile & Address Types ---
 export interface UserAddress {
-  id?: string; // Optional: for Firestore document ID if stored as separate docs
+  id: string; // Firestore document ID for the address
   street: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
-  fullName?: string; // Often associated with an address
-  phoneNumber?: string; // Often associated with an address
-  isDefault?: boolean; // Optional: if user can set a default address
+  fullName?: string;
+  phoneNumber?: string | null; // Allow null for phone number
+  isDefault?: boolean;
+  createdAt?: any; // Firestore serverTimestamp or Date
 }
 
 export interface UserProfile {
   uid: string;
-  email: string; // Typically non-editable by user directly after creation
+  email: string;
   firstName: string;
   lastName: string;
-  phoneNumber?: string | null;
-  // Addresses might be a subcollection in Firestore or an array if simple
-  // For this example, we'll manage addresses via actions that would use a subcollection
-  // address: UserAddress; // This was for the registration form, profile might have multiple addresses
-  createdAt?: any;
+  phoneNumber?: string | null; // Allow null for phone number
+  // The 'address' field from registration is a single initial address,
+  // separate from the 'addresses' subcollection for multiple shipping addresses.
+  address?: { // This is the primary address from registration
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  createdAt?: any; // Firestore serverTimestamp or Date
 }
 
 
