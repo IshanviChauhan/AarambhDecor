@@ -87,9 +87,9 @@ export default function Header() {
               </Link>
             </Button>
             <Button asChild variant="ghost">
-              <Link href="/signin" aria-label="Sign In">
+              <Link href="/signin" aria-label="Login">
                 <LogIn className="mr-2 h-4 w-4" />
-                Sign In
+                Login
               </Link>
             </Button>
           </nav>
@@ -155,8 +155,8 @@ export default function Header() {
                         </Link>
                     </Button>
                     <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Link href="/signin" aria-label="Sign In">
-                          <LogIn className="mr-3 h-5 w-5 text-primary" /> Sign In
+                        <Link href="/signin" aria-label="Login">
+                          <LogIn className="mr-3 h-5 w-5 text-primary" /> Login
                         </Link>
                     </Button>
                 </div>
@@ -168,5 +168,3 @@ export default function Header() {
     </header>
   );
 }
-
-    

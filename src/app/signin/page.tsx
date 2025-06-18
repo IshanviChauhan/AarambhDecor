@@ -34,8 +34,8 @@ export default function SignInPage() {
         <Card className="w-full max-w-md shadow-xl mt-24 sm:mt-0">
           <CardHeader className="text-center">
             <AlertTriangle className="mx-auto h-12 w-12 text-primary mb-4" />
-            <CardTitle className="text-3xl font-headline text-primary">Sign In Disabled</CardTitle>
-            <CardDescription>User sign-in functionality is currently not available.</CardDescription>
+            <CardTitle className="text-3xl font-headline text-primary">Login Disabled</CardTitle>
+            <CardDescription>User login functionality is currently not available.</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-muted-foreground">

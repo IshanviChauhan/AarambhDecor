@@ -221,7 +221,7 @@ export default function RegisterPage() {
               <p className="text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link href="/signin" className="font-medium text-primary hover:underline">
-                  Sign In (Disabled)
+                  Login (Disabled)
                 </Link>
               </p>
             </CardFooter>

@@ -16,8 +16,8 @@ export interface SignInFormState {
 export async function signInWithEmail(prevState: SignInFormState, formData: FormData): Promise<SignInFormState> {
   console.warn("signInWithEmail action called, but authentication is disabled.");
   return {
-    message: 'Sign-in functionality is currently disabled.',
+    message: 'Login functionality is currently disabled.',
     success: false,
-    errors: { _form: ['Sign-in is disabled.'] }
+    errors: { _form: ['Login is disabled.'] }
   };
 }
