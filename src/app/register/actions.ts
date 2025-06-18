@@ -53,9 +53,9 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
   } = validation.data;
 
   try {
-    // Check if user with this email already exists
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where("email", "==", email));
+    // Check if user with this email already exists in the userProfile collection
+    const userProfileRef = collection(db, 'userProfile');
+    const q = query(userProfileRef, where("email", "==", email));
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
@@ -86,19 +86,19 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
       createdAt: serverTimestamp(),
     };
 
-    const userDocRef = await addDoc(usersRef, newUserProfileData);
-    // console.log("User profile stored in Firestore with ID: ", userDocRef.id);
+    const userDocRef = await addDoc(userProfileRef, newUserProfileData);
+    // console.log("User profile stored in Firestore userProfile collection with ID: ", userDocRef.id);
 
     // Optionally revalidate paths if this data is displayed elsewhere immediately
     // revalidatePath('/some-admin-users-page');
     
     return { 
-      message: 'User registered successfully! Profile data stored (authentication is disabled).', 
+      message: 'User registered successfully! Profile data stored in userProfile collection (authentication is disabled).', 
       success: true 
     };
 
   } catch (error) {
-    console.error('Error storing user profile to Firestore:', error);
+    console.error('Error storing user profile to Firestore userProfile collection:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
     return { 
       message: `Failed to register user: ${errorMessage}`, 
