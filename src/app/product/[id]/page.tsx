@@ -159,11 +159,10 @@ export default function ProductDetailPage() {
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
                       fill 
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
-                      style={{ objectFit: 'contain' }} 
-                      className="w-full h-full rounded-lg"
+                      className="object-contain w-full h-full rounded-lg"
                       data-ai-hint={image.dataAiHint}
-                      priority={index === 0} 
+                      priority={index === 0}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                     />
                   </div>
                 </CarouselItem>

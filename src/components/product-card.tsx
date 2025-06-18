@@ -102,10 +102,10 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
                   <Image
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
-                    layout="fill"
-                    objectFit="cover"
-                    className="w-full h-full rounded-t-lg object-top"
+                    fill
+                    className="object-cover w-full h-full rounded-t-lg object-top"
                     data-ai-hint={image.dataAiHint}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 </div>
               ))}
