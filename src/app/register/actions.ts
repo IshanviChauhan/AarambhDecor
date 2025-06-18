@@ -1,16 +1,19 @@
 
 'use server';
 
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, serverTimestamp, query, where, getDocs, collection } from 'firebase/firestore';
 import { SignUpSchemaWithAddress, type SignUpWithAddressInput } from '@/lib/schemas';
 import type { UserProfile } from '@/lib/types';
-import { revalidatePath } from 'next/cache';
+// revalidatePath is not strictly needed here unless another page immediately displays registered users.
+// import { revalidatePath } from 'next/cache';
 
 export interface RegisterUserFormState {
   message: string | null;
   errors?: Partial<Record<keyof SignUpWithAddressInput | '_form', string[]>>;
   success: boolean;
+  userId?: string; // To pass back the UID if needed
 }
 
 export async function registerUserAction(prevState: RegisterUserFormState, formData: FormData): Promise<RegisterUserFormState> {
@@ -39,12 +42,12 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     };
   }
 
-  const { 
-    firstName, 
-    lastName, 
-    email, 
-    phoneNumber, 
-    // password and confirmPassword are validated but not stored
+  const {
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    password, // Password will be used for Firebase Auth, not stored in Firestore
     addressStreet,
     addressCity,
     addressState,
@@ -53,29 +56,19 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
   } = validation.data;
 
   try {
-    // Check if user with this email already exists in the userProfile collection
-    const userProfileRef = collection(db, 'userProfile');
-    const q = query(userProfileRef, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
+    // 1. Create user with Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    if (!querySnapshot.empty) {
-      return {
-        message: 'An account with this email address already exists. Please try a different email or login.',
-        success: false,
-        errors: { email: ['This email address is already registered.'] }
-      };
-    }
+    // 2. If Firebase Auth user creation is successful, create Firestore profile
+    //    using the UID from Firebase Auth as the document ID.
+    const userProfileRef = doc(db, 'userProfile', user.uid);
 
-    // Note: In a real app with Firebase Auth, you would first call
-    // createUserWithEmailAndPassword(auth, email, password)
-    // and then use the returned user's UID for the Firestore document ID.
-    // Here, we simulate creating the profile data only. Password is NOT stored.
-
-    const newUserProfileData: Omit<UserProfile, 'uid'> & { createdAt: any } = {
+    const newUserProfileData: Omit<UserProfile, 'uid' | 'createdAt'> & { createdAt: any } = {
+      email, // Email is stored for querying/display, but auth is the source of truth
       firstName,
       lastName,
-      email,
-      phoneNumber: phoneNumber || null, // Store as null if empty
+      phoneNumber: phoneNumber || null,
       address: {
         street: addressStreet,
         city: addressCity,
@@ -86,26 +79,51 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
       createdAt: serverTimestamp(),
     };
 
-    const userDocRef = await addDoc(userProfileRef, newUserProfileData);
-    // console.log("User profile stored in Firestore userProfile collection with ID: ", userDocRef.id);
+    await setDoc(userProfileRef, newUserProfileData);
 
-    // Optionally revalidate paths if this data is displayed elsewhere immediately
-    // revalidatePath('/some-admin-users-page');
-    
-    return { 
-      message: 'Registration successful! Your profile data has been stored (authentication is disabled).', 
-      success: true 
+    return {
+      message: 'Registration successful! Your account has been created.',
+      success: true,
+      userId: user.uid,
     };
 
-  } catch (error) {
-    console.error('Error storing user profile to Firestore userProfile collection:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
-    return { 
-      message: `Failed to register user: ${errorMessage}`, 
-      success: false, 
-      errors: { _form: [`Failed to register user due to a server error: ${errorMessage}`] } 
+  } catch (error: any) {
+    console.error('Error during registration:', error);
+    let errorMessage = 'Failed to register user. Please try again.';
+    let fieldErrors: Partial<Record<keyof SignUpWithAddressInput | '_form', string[]>> = { _form: [errorMessage] };
+
+    if (error.code) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'This email address is already registered. Please try logging in or use a different email.';
+          fieldErrors = { email: [errorMessage] };
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'The email address is not valid.';
+          fieldErrors = { email: [errorMessage] };
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+          fieldErrors = { _form: [errorMessage] };
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'The password is too weak. Please choose a stronger password.';
+          fieldErrors = { password: [errorMessage] };
+          break;
+        default:
+          errorMessage = `Registration failed: ${error.message || 'An unknown server error occurred.'}`;
+          fieldErrors = { _form: [errorMessage] };
+          break;
+      }
+    } else if (error instanceof Error) {
+         errorMessage = `Registration failed: ${error.message}`;
+         fieldErrors = { _form: [errorMessage] };
+    }
+
+    return {
+      message: errorMessage,
+      success: false,
+      errors: fieldErrors,
     };
   }
 }
-
-    

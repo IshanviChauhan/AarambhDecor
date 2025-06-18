@@ -2,7 +2,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { doc, updateDoc, collection, addDoc, getDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, getDoc, getDocs, query, where, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import type { UserProfile, UserAddress, Order } from '@/lib/types';
 import { UserProfileUpdateSchema, AddressSchema, type UserProfileUpdateInput, type AddressInput } from '@/lib/schemas';
 import { revalidatePath } from 'next/cache';
@@ -15,12 +15,13 @@ export interface FormState {
 }
 
 const featureDisabledMessage = "This specific profile feature is currently under development or disabled.";
-const authNeededMessage = "User authentication context is required for this action and is not fully implemented.";
+const authNeededMessage = "User ID is required for this action. Please ensure you are logged in.";
+
 
 // --- Profile Update Action ---
 export async function updateUserProfileAction(prevState: FormState, formData: FormData): Promise<FormState> {
   const rawFormData = {
-    userId: formData.get('userId'), // Expecting userId from a hidden field (TEMPORARY/INSECURE)
+    userId: formData.get('userId'),
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
     phoneNumber: formData.get('phoneNumber'),
@@ -35,7 +36,7 @@ export async function updateUserProfileAction(prevState: FormState, formData: Fo
       success: false,
     };
   }
-  
+
   const { userId, ...profileData } = validation.data;
 
   if (!userId) {
@@ -44,16 +45,19 @@ export async function updateUserProfileAction(prevState: FormState, formData: Fo
 
   try {
     const userProfileRef = doc(db, 'userProfile', userId);
-    // Check if profile exists before updating
     const profileSnap = await getDoc(userProfileRef);
     if (!profileSnap.exists()) {
         return { message: "User profile not found. Cannot update.", success: false, errors: { _form: ["User profile not found."] } };
     }
 
-    await updateDoc(userProfileRef, {
-        ...profileData,
-        phoneNumber: profileData.phoneNumber || null, // Ensure empty string becomes null
-    });
+    // Prepare data for update, ensuring optional fields are handled
+    const updateData: Partial<Pick<UserProfile, 'firstName' | 'lastName' | 'phoneNumber'>> = {
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        phoneNumber: profileData.phoneNumber || null, // Store empty string as null
+    };
+
+    await updateDoc(userProfileRef, updateData);
     revalidatePath('/profile');
     return { message: 'Profile updated successfully!', success: true };
   } catch (error) {
@@ -66,7 +70,7 @@ export async function updateUserProfileAction(prevState: FormState, formData: Fo
 // --- Add Shipping Address Action ---
 export async function addShippingAddressAction(prevState: FormState, formData: FormData): Promise<FormState> {
   const rawFormData = {
-    userId: formData.get('userId'), // Expecting userId from a hidden field (TEMPORARY/INSECURE)
+    userId: formData.get('userId'),
     fullName: formData.get('fullName'),
     street: formData.get('street'),
     city: formData.get('city'),
@@ -85,7 +89,7 @@ export async function addShippingAddressAction(prevState: FormState, formData: F
       success: false,
     };
   }
-  
+
   const { userId, ...addressData } = validation.data;
 
   if (!userId) {
@@ -94,12 +98,16 @@ export async function addShippingAddressAction(prevState: FormState, formData: F
 
   try {
     const addressesColRef = collection(db, 'userProfile', userId, 'addresses');
-    await addDoc(addressesColRef, {
-        ...addressData,
-        phoneNumber: addressData.phoneNumber || null,
+    // Ensure addressId is not part of the data being added for a new address
+    const { addressId, ...newAddressData } = addressData;
+
+    const dataToSave: Omit<UserAddress, 'id' | 'createdAt'> & { createdAt: any } = {
+        ...newAddressData,
+        phoneNumber: newAddressData.phoneNumber || null,
         createdAt: serverTimestamp(),
-    });
-    revalidatePath('/profile'); // Revalidate to show new address if listing was implemented
+    };
+    await addDoc(addressesColRef, dataToSave);
+    revalidatePath('/profile');
     return { message: 'Shipping address added successfully!', success: true };
   } catch (error) {
     console.error('Error adding shipping address:', error);
@@ -109,9 +117,9 @@ export async function addShippingAddressAction(prevState: FormState, formData: F
 }
 
 
-// --- Placeholder/Disabled Actions ---
+// --- Placeholder/Disabled/Future Actions ---
 export async function getUserProfile(userId?: string): Promise<UserProfile | null> {
-  console.warn("getUserProfile called. Full implementation depends on auth context.");
+  console.warn("getUserProfile called. User identification should be secure.");
   if (!userId) {
     console.error("getUserProfile: userId is required.");
     return null;
@@ -120,7 +128,9 @@ export async function getUserProfile(userId?: string): Promise<UserProfile | nul
     const userProfileRef = doc(db, 'userProfile', userId);
     const docSnap = await getDoc(userProfileRef);
     if (docSnap.exists()) {
-      return { uid: docSnap.id, ...docSnap.data() } as UserProfile;
+      // Ensure the 'address' field is handled correctly if it exists (it's part of UserProfile type but might not always be on top level)
+      const data = docSnap.data();
+      return { uid: docSnap.id, ...data } as UserProfile;
     }
     return null;
   } catch (error) {
@@ -130,14 +140,15 @@ export async function getUserProfile(userId?: string): Promise<UserProfile | nul
 }
 
 export async function getShippingAddresses(userId?: string): Promise<UserAddress[]> {
-  console.warn("getShippingAddresses called. Full implementation depends on auth context.");
+  console.warn("getShippingAddresses called. User identification should be secure.");
    if (!userId) {
     console.error("getShippingAddresses: userId is required.");
     return [];
   }
   try {
     const addressesColRef = collection(db, 'userProfile', userId, 'addresses');
-    const snapshot = await getDocs(query(addressesColRef, where("userId", "==", userId))); // Should not need where if subcollection
+    // No 'where' clause needed for subcollection direct query
+    const snapshot = await getDocs(query(addressesColRef, orderBy("createdAt", "desc")));
     const addresses: UserAddress[] = [];
     snapshot.forEach(doc => addresses.push({ id: doc.id, ...doc.data() } as UserAddress));
     return addresses;
@@ -147,29 +158,40 @@ export async function getShippingAddresses(userId?: string): Promise<UserAddress
   }
 }
 
-export async function updateShippingAddress(prevState: FormState, formData: FormData): Promise<FormState> {
-  console.warn("updateShippingAddress called, but feature is under development.");
+export async function updateShippingAddressAction(prevState: FormState, formData: FormData): Promise<FormState> {
+  console.warn("updateShippingAddressAction called, but feature is under development.");
+  // Implementation would be similar to add, but use updateDoc and an addressId
   return { message: featureDisabledMessage, success: false, errors: { _form: [featureDisabledMessage] } };
 }
 
-export async function deleteShippingAddress(userId: string, addressId: string): Promise<FormState> {
-  console.warn("deleteShippingAddress called, but feature is under development.");
-  // In a real scenario, this would be:
-  // if (!userId || !addressId) return { message: "User and Address ID required.", success: false };
-  // const addressRef = doc(db, 'userProfile', userId, 'addresses', addressId);
-  // await deleteDoc(addressRef);
-  // return { message: "Address deleted.", success: true };
-  return { message: featureDisabledMessage, success: false };
+export async function deleteShippingAddressAction(userId: string, addressId: string): Promise<FormState> {
+  console.warn("deleteShippingAddressAction called, but feature is under development.");
+  if (!userId || !addressId) return { message: authNeededMessage, success: false };
+  try {
+    // const addressRef = doc(db, 'userProfile', userId, 'addresses', addressId);
+    // await deleteDoc(addressRef);
+    // revalidatePath('/profile');
+    // return { message: "Address deleted.", success: true };
+    return { message: featureDisabledMessage, success: false, errors: { _form: [featureDisabledMessage] } };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Server error when deleting address.';
+    return { message: `Failed to delete address: ${errorMessage}`, success: false, errors: { _form: [errorMessage] } };
+  }
 }
 
 export async function getOrderHistory(userId?: string): Promise<Order[]> {
-  console.warn("getOrderHistory called. Full implementation depends on auth context.");
+  console.warn("getOrderHistory called. User identification should be secure.");
    if (!userId) {
     console.error("getOrderHistory: userId is required.");
     return [];
   }
-  // Example: const ordersColRef = collection(db, 'orders');
-  // const q = query(ordersColRef, where("userId", "==", userId), orderBy("orderDate", "desc"));
-  // ... fetch and map orders
-  return [];
+  try {
+    // const ordersColRef = collection(db, 'orders');
+    // const q = query(ordersColRef, where("userId", "==", userId), orderBy("orderDate", "desc"));
+    // ... fetch and map orders
+    return []; // Placeholder
+  } catch (error) {
+     console.error("Error fetching order history in action:", error);
+    return [];
+  }
 }
