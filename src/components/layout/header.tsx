@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, PlusSquare, UserPlus } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, PlusSquare, UserPlus, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -86,6 +86,12 @@ export default function Header() {
                 Register
               </Link>
             </Button>
+            <Button asChild variant="ghost">
+              <Link href="/signin" aria-label="Sign In">
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </Link>
+            </Button>
           </nav>
 
           {/* Cart Icon - No count displayed as user-specific cart is removed */}
@@ -146,6 +152,11 @@ export default function Header() {
                     <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
                         <Link href="/register" aria-label="Register">
                           <UserPlus className="mr-3 h-5 w-5 text-primary" /> Register
+                        </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/signin" aria-label="Sign In">
+                          <LogIn className="mr-3 h-5 w-5 text-primary" /> Sign In
                         </Link>
                     </Button>
                 </div>
