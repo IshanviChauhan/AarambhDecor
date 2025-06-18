@@ -4,6 +4,7 @@
 import { useEffect, useActionState, useState } from 'react'; // Added useState
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link'; // Added missing import
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -67,17 +68,6 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileFormState]);
   
-  const handleProfileClientValidationOnly = (data: UserProfileUpdateInput) => {
-    if (!currentUserId) {
-      toast({ title: "Error", description: "User ID not found. Cannot update profile.", variant: "destructive" });
-      // Prevent form submission by throwing an error or returning false if RHF supports it
-      // For now, the action itself will also check for userId.
-      return;
-    }
-    // If we need to set userId into form data before RHF submits it to the action, it's tricky.
-    // The server action should ideally get userId from a secure session, not the form.
-    // For now, we ensure the hidden field has the value, and RHF will include it.
-  };
 
   const [addressFormState, addressFormAction, isAddressAddPending] = useActionState(addShippingAddressAction, initialFormState);
   const addressForm = useForm<AddressInput>({
@@ -107,12 +97,6 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressFormState]);
 
-  const handleAddressClientValidationOnly = (data: AddressInput) => {
-     if (!currentUserId) {
-      toast({ title: "Error", description: "User ID not found. Cannot add address.", variant: "destructive" });
-      return;
-    }
-  };
 
   // Update defaultValues when currentUserId is available
   useEffect(() => {
@@ -169,7 +153,6 @@ export default function ProfilePage() {
               <CardContent>
                 <Form {...profileForm}>
                   <form 
-                    onSubmit={profileForm.handleSubmit(handleProfileClientValidationOnly)} 
                     action={profileFormAction}
                     className="space-y-6"
                   >
@@ -226,7 +209,6 @@ export default function ProfilePage() {
                     <h3 className="text-lg font-semibold mb-4 text-foreground">Add New Address</h3>
                      <Form {...addressForm}>
                         <form 
-                          onSubmit={addressForm.handleSubmit(handleAddressClientValidationOnly)} 
                           action={addressFormAction}
                           className="space-y-6"
                         >
