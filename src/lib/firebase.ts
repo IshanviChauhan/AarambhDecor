@@ -14,15 +14,29 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+// Client-side logging for Firebase config
 if (typeof window !== 'undefined') {
-  console.log("Firebase config being used by client-side SDK:", firebaseConfig);
+  console.log("--- Firebase Client-Side Configuration ---");
+  console.log("API Key:", firebaseConfig.apiKey ? "Loaded" : "MISSING or undefined");
+  console.log("Auth Domain:", firebaseConfig.authDomain ? "Loaded" : "MISSING or undefined");
+  console.log("Project ID:", firebaseConfig.projectId ? "Loaded" : "MISSING or undefined");
+  console.log("Storage Bucket:", firebaseConfig.storageBucket ? "Loaded" : "MISSING or undefined");
+  console.log("Messaging Sender ID:", firebaseConfig.messagingSenderId ? "Loaded" : "MISSING or undefined");
+  console.log("App ID:", firebaseConfig.appId ? "Loaded" : "MISSING or undefined");
+  console.log("Measurement ID:", firebaseConfig.measurementId ? `Loaded (${firebaseConfig.measurementId}) (Optional)` : "Not defined (Optional)");
+  console.log("-----------------------------------------");
+
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.error("CRITICAL: Firebase API Key or Project ID is missing. Check your .env file and ensure it's loaded correctly for the client (NEXT_PUBLIC_ prefix).");
+    console.error("CRITICAL: Firebase API Key or Project ID is missing. Ensure NEXT_PUBLIC_ prefixes are used in your .env.local file and it's correctly loaded.");
   }
-  if (firebaseConfig.storageBucket && !firebaseConfig.storageBucket.endsWith('.appspot.com')) {
-    console.warn(`POTENTIAL CONFIG ISSUE: Your NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET value is "${firebaseConfig.storageBucket}". It typically should end with ".appspot.com" (e.g., "${firebaseConfig.projectId || 'your-project-id'}.appspot.com"). Please verify this in your .env file and Firebase project settings.`);
+  // Updated warning for storage bucket
+  if (firebaseConfig.storageBucket && firebaseConfig.projectId && firebaseConfig.storageBucket !== `${firebaseConfig.projectId}.appspot.com`) {
+     console.warn(`POTENTIAL CONFIG ISSUE: Your NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET value is "${firebaseConfig.storageBucket}". It's typically recommended to be "${firebaseConfig.projectId}.appspot.com". Please verify this in your .env file and Firebase project settings if you encounter storage issues.`);
+  } else if (firebaseConfig.storageBucket && !firebaseConfig.projectId) {
+     console.warn(`POTENTIAL CONFIG ISSUE: Your NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ("${firebaseConfig.storageBucket}") is defined, but NEXT_PUBLIC_FIREBASE_PROJECT_ID is missing. The typical storage bucket name format is "<project-id>.appspot.com".`);
   }
 }
+
 
 let app: FirebaseApp;
 
@@ -53,7 +67,7 @@ const auth = getAuth(app!); // Add non-null assertion if app could be undefined 
 if (typeof window !== 'undefined' && app!) { // ensure app is initialized
   setPersistence(auth, browserLocalPersistence)
     .then(() => {
-      console.log("Firebase auth persistence explicitly set to 'local'.");
+      // console.log("Firebase auth persistence explicitly set to 'local'."); // Can be noisy, uncomment if needed
     })
     .catch((error) => {
       console.error("Error setting Firebase auth persistence:", error);
@@ -64,3 +78,4 @@ const db = getFirestore(app!); // Add non-null assertion
 const storage = getStorage(app!); // Initialize Firebase Storage
 
 export { app, auth, db, storage };
+
