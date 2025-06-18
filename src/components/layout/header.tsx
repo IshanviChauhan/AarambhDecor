@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu, PlusSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -188,6 +188,12 @@ export default function Header() {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                  <Link href="/(admin)/add-product" className="cursor-pointer">
+                    <PlusSquare className="mr-2 h-4 w-4" />
+                    <span>Add Product</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -267,6 +273,11 @@ export default function Header() {
                       <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
                         <Link href="/profile" aria-label="Profile">
                           <UserCircle className="mr-3 h-5 w-5 text-primary" /> Profile
+                        </Link>
+                      </Button>
+                      <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/(admin)/add-product" aria-label="Add Product">
+                          <PlusSquare className="mr-3 h-5 w-5 text-primary" /> Add Product
                         </Link>
                       </Button>
                       <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 text-destructive focus:text-destructive hover:text-destructive" onClick={handleSignOut}>

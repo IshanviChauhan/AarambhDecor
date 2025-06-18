@@ -2,6 +2,7 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -60,5 +61,6 @@ if (typeof window !== 'undefined' && app!) { // ensure app is initialized
 }
 
 const db = getFirestore(app!); // Add non-null assertion
+const storage = getStorage(app!); // Initialize Firebase Storage
 
-export { app, auth, db };
+export { app, auth, db, storage };

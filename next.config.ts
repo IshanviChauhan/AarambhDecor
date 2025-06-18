@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         hostname: 'instagram.fdel11-3.fna.fbcdn.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
