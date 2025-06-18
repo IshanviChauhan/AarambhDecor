@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useActionState } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,20 +51,20 @@ export default function SignInPage() {
         });
       }
 
-      if (formState.success) {
+      if (formState.success && formState.userId) {
         form.reset();
-        if (formState.userId && typeof window !== 'undefined') {
-          localStorage.setItem('tempUserId', formState.userId);
-          router.push('/profile');
-        } else if (formState.success && !formState.userId) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('tempUserId', formState.userId); // Store UID for profile page
+          router.push('/profile'); // Redirect to profile page
+        }
+      } else if (formState.success && !formState.userId) {
           // This case should ideally not happen if Firebase Auth succeeds
           console.error("Login successful but no userId returned from action.");
           toast({ title: "Login Anomaly", description: "Logged in, but user ID was not available. Cannot redirect.", variant: "destructive"});
-        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState]); // Only formState is needed as a dependency here
+  }, [formState, router, toast]); // Added router and toast to dependency array as they are used inside.
 
   const handleClientValidationOnly = (data: SignInInput) => {
     // Client-side validation handled by RHF. If successful, form action will proceed.
@@ -91,7 +91,7 @@ export default function SignInPage() {
           </span>
         </Link>
       </div>
-      
+
       <main className="flex-grow flex flex-col items-center justify-center p-2">
         <Card className="w-full max-w-md shadow-xl mt-12 sm:mt-0">
           <CardHeader className="text-center">
@@ -103,8 +103,7 @@ export default function SignInPage() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form 
-                onSubmit={form.handleSubmit(handleClientValidationOnly)} 
+              <form
                 action={formAction}
                 className="space-y-6"
               >
@@ -115,7 +114,7 @@ export default function SignInPage() {
                     <FormMessage />
                   </FormItem>
                 )} />
-                
+
                 <FormField control={form.control} name="password" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
@@ -123,7 +122,7 @@ export default function SignInPage() {
                     <FormMessage />
                   </FormItem>
                 )} />
-                
+
                 {formState.errors?._form && !formState.success && (
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />

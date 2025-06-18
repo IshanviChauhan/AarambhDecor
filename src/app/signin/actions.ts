@@ -9,7 +9,7 @@ export interface SignInUserFormState {
   message: string | null;
   errors?: Partial<Record<keyof SignInInput | '_form', string[]>>;
   success: boolean;
-  userId?: string; 
+  userId?: string;
 }
 
 export async function signInUserAction(prevState: SignInUserFormState, formData: FormData): Promise<SignInUserFormState> {
@@ -33,12 +33,11 @@ export async function signInUserAction(prevState: SignInUserFormState, formData:
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     // If successful, Firebase Auth handles the session internally.
-    // The onAuthStateChanged listener (if active in AuthContext) would pick this up.
-    
-    return { 
-      message: 'Login successful! Redirecting...', 
+
+    return {
+      message: 'Login successful! You will be redirected shortly.',
       success: true,
-      userId: userCredential.user.uid
+      userId: userCredential.user.uid, // Ensure userId is part of the successful state
     };
 
   } catch (error: any) {
@@ -46,12 +45,10 @@ export async function signInUserAction(prevState: SignInUserFormState, formData:
     let errorMessage = 'Login failed. Please try again.';
     let fieldErrors: Partial<Record<keyof SignInInput | '_form', string[]>> = { _form: [errorMessage] };
 
-    // Handle specific Firebase Auth errors
-    // Common error codes: https://firebase.google.com/docs/auth/admin/errors
     switch (error.code) {
       case 'auth/invalid-credential':
-      case 'auth/user-not-found': // Often included in invalid-credential
-      case 'auth/wrong-password': // Often included in invalid-credential
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
         errorMessage = 'Invalid email or password. Please check your credentials and try again.';
         fieldErrors = { _form: [errorMessage] };
         break;
@@ -64,16 +61,15 @@ export async function signInUserAction(prevState: SignInUserFormState, formData:
         fieldErrors = { _form: [errorMessage] };
         break;
       default:
-        // For other errors, use a generic message
         errorMessage = `Login failed: ${error.message || 'An unknown server error occurred.'}`;
         fieldErrors = { _form: [errorMessage] };
         break;
     }
-    
-    return { 
-      message: errorMessage, 
-      success: false, 
-      errors: fieldErrors
+
+    return {
+      message: errorMessage,
+      success: false,
+      errors: fieldErrors,
     };
   }
 }
