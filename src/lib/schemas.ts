@@ -14,12 +14,6 @@ export const SignUpSchema = z.object({
   path: ['confirmPassword'],
 });
 export type SignUpInput = z.infer<typeof SignUpSchema>;
-
-export const SignInSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
-});
-export type SignInInput = z.infer<typeof SignInSchema>;
 */
 
 // --- User Profile & Address Schemas (Commented out as they depend on auth) ---
@@ -92,4 +86,9 @@ export const SignUpSchemaWithAddress = z.object({
 });
 export type SignUpWithAddressInput = z.infer<typeof SignUpSchemaWithAddress>;
 
-    
+// --- SignIn Schema ---
+export const SignInSchema = z.object({
+  email: z.string().email({ message: 'Invalid email address.' }),
+  password: z.string().min(1, { message: 'Password is required.' }), // Basic check, actual strength/comparison is not done here
+});
+export type SignInInput = z.infer<typeof SignInSchema>;
