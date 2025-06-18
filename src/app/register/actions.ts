@@ -17,7 +17,14 @@ export interface RegisterUserFormState {
 }
 
 export async function registerUserAction(prevState: RegisterUserFormState, formData: FormData): Promise<RegisterUserFormState> {
-  console.log("RegisterUserAction: Received form data.");
+  console.log("RegisterUserAction: Action invoked.");
+  
+  const formDataEntries: Record<string, any> = {};
+  for (const [key, value] of formData.entries()) {
+    formDataEntries[key] = value;
+  }
+  console.log("RegisterUserAction: FormData entries received:", formDataEntries);
+
   const rawFormData = {
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
@@ -146,4 +153,3 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     };
   }
 }
-

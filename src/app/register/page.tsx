@@ -78,7 +78,9 @@ export default function RegisterPage() {
   }, [formState, toast, router]); // Add router to dependencies
 
   const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
+    console.log("RegisterPage: Client-side validation passed. Data submitted to server action:", data);
     // Client-side validation passed, form will submit to server action
+    // The actual submission to `formAction` is handled by React due to the <form action={formAction}>
   };
 
   return (
