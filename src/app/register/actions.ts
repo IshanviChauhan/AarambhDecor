@@ -1,3 +1,4 @@
+
 'use server';
 
 import { auth, db } from '@/lib/firebase';
@@ -14,7 +15,7 @@ export interface RegisterUserFormState {
 }
 
 export async function registerUserAction(prevState: RegisterUserFormState, formData: FormData): Promise<RegisterUserFormState> {
-  console.log("RegisterUserAction: TOP OF ACTION INVOKED. PrevState keys:", Object.keys(prevState || {})); // MODIFIED LOG
+  console.log("RegisterUserAction: TOP OF ACTION INVOKED. PrevState keys:", Object.keys(prevState || {}));
   
   const formDataEntries: Record<string, any> = {};
   for (const [key, value] of formData.entries()) {
@@ -69,12 +70,13 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
 
     const userProfileRef = doc(db, 'userProfile', user.uid);
 
+    // Construct the newUserProfileData with the nested address object
     const newUserProfileData: Omit<UserProfile, 'uid' | 'createdAt'> & { createdAt: any } = {
       email,
       firstName,
       lastName,
       phoneNumber: phoneNumber || null,
-      address: {
+      address: { // Nested address object
         street: addressStreet,
         city: addressCity,
         state: addressState,
@@ -85,16 +87,24 @@ export async function registerUserAction(prevState: RegisterUserFormState, formD
     };
 
     try {
-      console.log(`RegisterUserAction: Attempting to set Firestore document for user: ${user.uid}`);
+      console.log(`RegisterUserAction: Attempting to set Firestore document for user: ${user.uid} with data:`, newUserProfileData);
       await setDoc(userProfileRef, newUserProfileData);
       console.log(`RegisterUserAction: Firestore document set successfully for user: ${user.uid}`);
     } catch (firestoreError) {
       console.error(`RegisterUserAction: Error setting Firestore document for user ${user.uid} after auth creation:`, firestoreError);
+      // Attempt to delete the auth user if Firestore profile creation fails to avoid orphaned auth accounts
+      // This is a best-effort and might also fail, but it's good practice.
+      try {
+        await user.delete();
+        console.log(`RegisterUserAction: Successfully deleted Firebase Auth user ${user.uid} after Firestore failure.`);
+      } catch (deleteError) {
+        console.error(`RegisterUserAction: CRITICAL - Failed to delete Firebase Auth user ${user.uid} after Firestore failure. Manual cleanup may be needed. Delete error:`, deleteError);
+      }
       return {
-        message: `Account authentication created, but failed to save full profile. Please contact support. Auth UID: ${user.uid}`,
+        message: `Account authentication created, but failed to save full profile. The authentication record has been rolled back. Please try again. Error: ${firestoreError instanceof Error ? firestoreError.message : 'Unknown Firestore error'}`,
         success: false,
-        errors: { _form: [`Account authentication part succeeded, but profile setup failed. Error: ${firestoreError instanceof Error ? firestoreError.message : 'Unknown Firestore error'}`] },
-        userId: user.uid,
+        errors: { _form: [`Account authentication part succeeded, but profile setup failed. The operation was rolled back. Error: ${firestoreError instanceof Error ? firestoreError.message : 'Unknown Firestore error'}`] },
+        userId: undefined, // No valid user if profile save failed and auth was rolled back
       };
     }
 

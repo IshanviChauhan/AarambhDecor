@@ -1,5 +1,7 @@
 
-'use client';
+// This page component (src/app/signup/page.tsx) is no longer needed
+// as the registration functionality is handled by /register.
+// This file can be safely deleted.
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,15 +36,15 @@ export default function SignUpPage() {
         <Card className="w-full max-w-md shadow-xl mt-24 sm:mt-0">
            <CardHeader className="text-center">
             <AlertTriangle className="mx-auto h-12 w-12 text-primary mb-4" />
-            <CardTitle className="text-3xl font-headline text-primary">Sign Up Disabled</CardTitle>
-            <CardDescription>User sign-up functionality is currently not available.</CardDescription>
+            <CardTitle className="text-3xl font-headline text-primary">Registration Route Changed</CardTitle>
+            <CardDescription>User sign-up is now handled at the <Link href="/register" className="underline hover:text-accent">/register</Link> page.</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
              <p className="text-muted-foreground">
-              You can continue to browse our collections.
+              Please use the new registration page.
             </p>
              <Button asChild className="mt-6">
-                <Link href="/">Go to Homepage</Link>
+                <Link href="/register">Go to Registration</Link>
             </Button>
           </CardContent>
         </Card>
