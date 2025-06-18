@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, PlusSquare, UserPlus, LogIn } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, UserPlus, LogIn } from 'lucide-react'; // Removed PlusSquare
 import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -73,13 +73,6 @@ export default function Header() {
                 AI Advisor
               </Link>
             </Button>
-            {/* Admin Add Product Link - accessible without login now */}
-             <Button asChild variant="ghost">
-              <Link href="/(admin)/add-product" aria-label="Add Product">
-                <PlusSquare className="mr-2 h-4 w-4" />
-                Add Product
-              </Link>
-            </Button>
              <Button asChild variant="ghost">
               <Link href="/register" aria-label="Register">
                 <UserPlus className="mr-2 h-4 w-4" />
@@ -144,11 +137,6 @@ export default function Header() {
 
                 <Separator className="my-4" />
                 <div className="flex flex-col space-y-1">
-                   <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Link href="/(admin)/add-product" aria-label="Add Product">
-                          <PlusSquare className="mr-3 h-5 w-5 text-primary" /> Add Product
-                        </Link>
-                    </Button>
                     <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
                         <Link href="/register" aria-label="Register">
                           <UserPlus className="mr-3 h-5 w-5 text-primary" /> Register
