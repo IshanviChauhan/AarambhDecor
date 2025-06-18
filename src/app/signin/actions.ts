@@ -1,21 +1,21 @@
 
 'use server';
 
-import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { auth } from '@/lib/firebase'; // Import Firebase auth instance
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { SignInSchema, type SignInInput } from '@/lib/schemas';
 
 export interface SignInUserFormState {
   message: string | null;
   errors?: Partial<Record<keyof SignInInput | '_form', string[]>>;
   success: boolean;
-  userId?: string; // Optionally return user ID or some indicator
+  userId?: string; 
 }
 
 export async function signInUserAction(prevState: SignInUserFormState, formData: FormData): Promise<SignInUserFormState> {
   const rawFormData = {
     email: formData.get('email'),
-    password: formData.get('password'), // Collected but not checked against a stored hash
+    password: formData.get('password'),
   };
 
   const validation = SignInSchema.safeParse(rawFormData);
@@ -28,47 +28,52 @@ export async function signInUserAction(prevState: SignInUserFormState, formData:
     };
   }
 
-  const { email } = validation.data;
+  const { email, password } = validation.data;
 
   try {
-    const userProfileRef = collection(db, 'userProfile');
-    const q = query(userProfileRef, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      return {
-        message: 'No account found with this email address. Please check your email or register.',
-        success: false,
-        errors: { email: ['No account found with this email.'] }
-      };
-    }
-
-    // Password checking is skipped in this simulated environment.
-    // If email exists, consider login successful.
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    // If successful, Firebase Auth handles the session internally.
+    // The onAuthStateChanged listener (if active in AuthContext) would pick this up.
     
-    // In a real scenario, you'd compare the provided password with a stored hash.
-    // const userDoc = querySnapshot.docs[0];
-    // const userData = userDoc.data();
-    // const passwordMatches = await comparePassword(password, userData.passwordHash); // Fictional function
-    // if (!passwordMatches) {
-    //   return { message: "Invalid password.", success: false, errors: { password: ["Incorrect password."]}};
-    // }
-
-    const userId = querySnapshot.docs[0].id; // Get the Firestore document ID
-
     return { 
-      message: 'Login successful! Redirecting... (Password check was simulated)', 
+      message: 'Login successful! Redirecting...', 
       success: true,
-      userId: userId
+      userId: userCredential.user.uid
     };
 
-  } catch (error) {
-    console.error('Error during simulated login:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+  } catch (error: any) {
+    console.error('Firebase Authentication Error:', error);
+    let errorMessage = 'Login failed. Please try again.';
+    let fieldErrors: Partial<Record<keyof SignInInput | '_form', string[]>> = { _form: [errorMessage] };
+
+    // Handle specific Firebase Auth errors
+    // Common error codes: https://firebase.google.com/docs/auth/admin/errors
+    switch (error.code) {
+      case 'auth/invalid-credential':
+      case 'auth/user-not-found': // Often included in invalid-credential
+      case 'auth/wrong-password': // Often included in invalid-credential
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        fieldErrors = { _form: [errorMessage] };
+        break;
+      case 'auth/invalid-email':
+        errorMessage = 'The email address is not valid.';
+        fieldErrors = { email: [errorMessage] };
+        break;
+      case 'auth/too-many-requests':
+        errorMessage = 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.';
+        fieldErrors = { _form: [errorMessage] };
+        break;
+      default:
+        // For other errors, use a generic message
+        errorMessage = `Login failed: ${error.message || 'An unknown server error occurred.'}`;
+        fieldErrors = { _form: [errorMessage] };
+        break;
+    }
+    
     return { 
-      message: `Login failed: ${errorMessage}`, 
+      message: errorMessage, 
       success: false, 
-      errors: { _form: [`Login failed due to a server error: ${errorMessage}`] } 
+      errors: fieldErrors
     };
   }
 }

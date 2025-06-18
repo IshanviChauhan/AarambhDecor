@@ -7,10 +7,10 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useActionState } from 'react';
-import { useRouter } from 'next/navigation'; // Added for redirection
+import { useRouter } from 'next/navigation'; 
 
-import Header from '@/components/layout/header'; // Assuming Header is used for layout
-import Footer from '@/components/layout/footer'; // Assuming Footer is used for layout
+import Header from '@/components/layout/header'; 
+import Footer from '@/components/layout/footer'; 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -53,8 +53,10 @@ export default function SignInPage() {
       }
       if (formState.success) {
         form.reset();
-        // Redirect to profile page on successful "simulated" login
-        router.push('/profile');
+        // Redirect to profile page on successful login
+        // The actual display of user-specific info on /profile page
+        // depends on AuthContext being fully implemented.
+        router.push('/profile'); 
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,7 +72,7 @@ export default function SignInPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* <Header /> */} {/* Temporarily remove Header/Footer if they cause issues during dev for signin/signup pages */}
+      {/* <Header /> */} 
       <div className="absolute top-8 left-8 z-10 hidden md:flex">
         <Link href="/" className="flex items-center group" aria-label="Aarambh Decor Home">
           <Image
@@ -97,17 +99,11 @@ export default function SignInPage() {
             <LogIn className="mx-auto h-10 w-10 text-primary mb-3" />
             <CardTitle className="text-3xl font-headline text-primary">Login to Your Account</CardTitle>
             <CardDescription>
-              Enter your credentials to login. (Password check is simulated).
+              Enter your credentials to login.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Alert variant="default" className="mb-6 bg-primary/10 border-primary/30 text-primary">
-                <AlertTriangle className="h-4 w-4 !text-primary" />
-                <AlertTitle className="font-semibold">Simulated Login</AlertTitle>
-                <AlertDescription>
-                This is a simulated login. Password checking is not implemented. Login will be successful if the email exists in the database.
-                </AlertDescription>
-            </Alert>
+            {/* Removed the "Simulated Login" alert */}
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField control={form.control} name="email" render={({ field }) => (
@@ -126,7 +122,7 @@ export default function SignInPage() {
                   </FormItem>
                 )} />
                 
-                {formState.errors?._form && (
+                {formState.errors?._form && !formState.success && ( // Only show form-level errors if not successful
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Login Error</AlertTitle>
@@ -151,7 +147,7 @@ export default function SignInPage() {
           </CardFooter>
         </Card>
       </main>
-      {/* <Footer /> */} {/* Temporarily remove Header/Footer if they cause issues */}
+      {/* <Footer /> */} 
     </div>
   );
 }
