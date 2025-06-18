@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, UserPlus, LogIn } from 'lucide-react'; // Removed PlusSquare
+import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, UserPlus, LogIn, UserCircle2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -15,11 +15,36 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from '@/components/ui/separator';
+import { auth } from '@/lib/firebase'; // Import Firebase auth instance
+import { signOut } from 'firebase/auth';
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Indicates component has mounted on the client
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      const checkLoginStatus = () => {
+        const userId = localStorage.getItem('tempUserId');
+        setIsLoggedIn(!!userId);
+      };
+
+      checkLoginStatus(); // Initial check
+
+      // Listen for storage changes to reflect login/logout from other tabs/windows
+      window.addEventListener('storage', checkLoginStatus);
+      return () => {
+        window.removeEventListener('storage', checkLoginStatus);
+      };
+    }
+  }, [isClient]);
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
@@ -30,6 +55,20 @@ export default function Header() {
       }
     }
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out from Firebase
+    } catch (error) {
+      console.error("Error signing out from Firebase:", error);
+      // Optionally, inform the user about the error, but proceed with local cleanup.
+    }
+    localStorage.removeItem('tempUserId'); // Clear local user indicator
+    setIsLoggedIn(false); // Update UI state
+    setIsMobileMenuOpen(false); // Close mobile menu if open
+    router.push('/'); // Redirect to homepage
+    // Consider a toast message for successful logout if desired
   };
 
   return (
@@ -73,21 +112,50 @@ export default function Header() {
                 AI Advisor
               </Link>
             </Button>
-             <Button asChild variant="ghost">
-              <Link href="/register" aria-label="Register">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Register
-              </Link>
-            </Button>
-            <Button asChild variant="ghost">
-              <Link href="/signin" aria-label="Login">
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </Link>
-            </Button>
+            {isClient && isLoggedIn ? (
+              <>
+                <Button asChild variant="ghost">
+                  <Link href="/profile" aria-label="My Profile">
+                    <UserCircle2 className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                </Button>
+                <Button variant="ghost" onClick={handleLogout} aria-label="Logout">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </>
+            ) : isClient ? (
+              <>
+                <Button asChild variant="ghost">
+                  <Link href="/register" aria-label="Register">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Register
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost">
+                  <Link href="/signin" aria-label="Login">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              // Placeholder for SSR or before client check completes
+              // You might want to render nothing or a minimal set of links here
+              // to avoid layout shifts if isLoggedIn status changes rapidly.
+              // For simplicity, we'll render login/register as default pre-client.
+              <>
+                <Button asChild variant="ghost" disabled>
+                  <span className="opacity-50"><UserPlus className="mr-2 h-4 w-4" />Register</span>
+                </Button>
+                <Button asChild variant="ghost" disabled>
+                  <span className="opacity-50"><LogIn className="mr-2 h-4 w-4" />Login</span>
+                </Button>
+              </>
+            )}
           </nav>
 
-          {/* Cart Icon - No count displayed as user-specific cart is removed */}
           <Button asChild variant="ghost" className="relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
@@ -137,16 +205,41 @@ export default function Header() {
 
                 <Separator className="my-4" />
                 <div className="flex flex-col space-y-1">
-                    <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Link href="/register" aria-label="Register">
-                          <UserPlus className="mr-3 h-5 w-5 text-primary" /> Register
-                        </Link>
-                    </Button>
-                    <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Link href="/signin" aria-label="Login">
-                          <LogIn className="mr-3 h-5 w-5 text-primary" /> Login
-                        </Link>
-                    </Button>
+                    {isClient && isLoggedIn ? (
+                      <>
+                        <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link href="/profile" aria-label="My Profile">
+                            <UserCircle2 className="mr-3 h-5 w-5 text-primary" /> My Profile
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={handleLogout}>
+                          <LogOut className="mr-3 h-5 w-5 text-primary" /> Logout
+                        </Button>
+                      </>
+                    ) : isClient ? (
+                      <>
+                        <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                            <Link href="/register" aria-label="Register">
+                              <UserPlus className="mr-3 h-5 w-5 text-primary" /> Register
+                            </Link>
+                        </Button>
+                        <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                            <Link href="/signin" aria-label="Login">
+                              <LogIn className="mr-3 h-5 w-5 text-primary" /> Login
+                            </Link>
+                        </Button>
+                      </>
+                    ) : (
+                        // Fallback for mobile pre-client check (can be empty or disabled links)
+                        <>
+                         <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 opacity-50" disabled>
+                            <UserPlus className="mr-3 h-5 w-5 text-primary" /> Register
+                        </Button>
+                         <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 opacity-50" disabled>
+                            <LogIn className="mr-3 h-5 w-5 text-primary" /> Login
+                        </Button>
+                        </>
+                    )}
                 </div>
               </SheetContent>
             </Sheet>
