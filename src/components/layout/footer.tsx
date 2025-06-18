@@ -1,4 +1,6 @@
 
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Instagram, Heart } from 'lucide-react';
@@ -123,9 +125,9 @@ export default function Footer() {
                 alt="Aarambh Decor Logo"
                 width={200} 
                 height={200} 
-                layout="responsive"
                 className="object-contain rounded-lg transition-opacity hover:opacity-80"
                 data-ai-hint="logo"
+                style={{ maxWidth: '100%', height: 'auto' }}
                 />
             </Link>
           </div>
@@ -142,4 +144,3 @@ export default function Footer() {
     </footer>
   );
 }
-
