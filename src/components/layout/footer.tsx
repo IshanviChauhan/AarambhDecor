@@ -119,15 +119,18 @@ export default function Footer() {
 
           {/* Column 4: Footer Logo */}
           <div className="col-span-2 md:col-span-1 flex justify-center items-start">
-            <Link href="/" aria-label="Aarambh Decor Home" className="block w-full max-w-[120px] sm:max-w-[150px] md:max-w-full">
-                <Image
-                src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
-                alt="Aarambh Decor Logo"
-                width={150} 
-                height={150} 
-                className="object-contain rounded-lg transition-opacity hover:opacity-80"
-                data-ai-hint="logo"
-                />
+             <Link href="/" aria-label="Aarambh Decor Home" className="block w-full max-w-[120px] sm:max-w-[150px] md:max-w-full">
+                <div className="relative w-full" style={{ paddingTop: '100%' }}> {/* Aspect ratio container */}
+                  <Image
+                    src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
+                    alt="Aarambh Decor Logo"
+                    fill
+                    style={{ objectFit: 'contain' }}
+                    className="rounded-lg transition-opacity hover:opacity-80"
+                    data-ai-hint="logo"
+                    sizes="(max-width: 768px) 120px, 150px"
+                  />
+                </div>
             </Link>
           </div>
         </div>

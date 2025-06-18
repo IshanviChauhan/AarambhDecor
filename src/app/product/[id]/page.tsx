@@ -131,7 +131,7 @@ export default function ProductDetailPage() {
   
   const safeImageUrls = product.imageUrls && product.imageUrls.length > 0 
     ? product.imageUrls 
-    : [{ url: 'https://placehold.co/800x600.png?text=No+Image', dataAiHint: 'placeholder image' }];
+    : [{ url: 'https://placehold.co/800x600.png', dataAiHint: 'placeholder image' }];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -159,7 +159,8 @@ export default function ProductDetailPage() {
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
                       fill 
-                      className="object-contain w-full h-full rounded-lg"
+                      style={{ objectFit: 'contain' }}
+                      className="w-full h-full rounded-lg"
                       data-ai-hint={image.dataAiHint}
                       priority={index === 0}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
@@ -180,14 +181,14 @@ export default function ProductDetailPage() {
                   "transition-opacity duration-200 ease-in-out",
                   "flex items-center justify-center",
                   "border-none p-0",
-                  "transition-transform-none", 
-                  "hover:translate-y-[-50%] active:translate-y-[-50%]"
+                  "transform-none hover:transform-none active:transform-none",
+                  "translate-y-[-50%]" 
                 )}
               />
               <CarouselNext
                 variant="ghost"
                 className={cn(
-                  "absolute right-2 top-1/2  z-10",
+                  "absolute right-2 top-1/2 z-10",
                   "h-10 w-10 rounded-full",
                   "bg-background/70 text-foreground/70",
                   "hover:bg-background/90 hover:text-primary",
@@ -196,8 +197,8 @@ export default function ProductDetailPage() {
                   "transition-opacity duration-200 ease-in-out",
                   "flex items-center justify-center",
                   "border-none p-0",
-                  "transition-transform-none",
-                  "hover:translate-y-[-50%] active:translate-y-[-50%]"
+                  "transform-none hover:transform-none active:transform-none",
+                  "translate-y-[-50%]"
                 )}
               />
           </Carousel>

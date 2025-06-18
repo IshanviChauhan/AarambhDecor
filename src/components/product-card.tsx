@@ -86,7 +86,7 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <div
-            className="relative w-full aspect-square rounded-t-lg"
+            className="relative w-full aspect-square rounded-t-lg overflow-hidden" // Added overflow-hidden
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -103,9 +103,10 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     fill
-                    className="object-cover w-full h-full rounded-t-lg object-top"
+                    style={{ objectFit: 'cover', objectPosition: 'top' }} // Changed from className
                     data-ai-hint={image.dataAiHint}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    priority={index === 0} // Prioritize the first image
                   />
                 </div>
               ))}
