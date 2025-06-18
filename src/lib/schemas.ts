@@ -1,6 +1,8 @@
 
 import { z } from 'zod';
 
+// --- Authentication Schemas (Commented out as auth is removed) ---
+/*
 export const SignUpSchema = z.object({
   firstName: z.string().min(1, { message: 'First name is required.' }).max(50, { message: 'First name is too long.' }),
   lastName: z.string().min(1, { message: 'Last name is required.' }).max(50, { message: 'Last name is too long.' }),
@@ -11,28 +13,28 @@ export const SignUpSchema = z.object({
   message: "Passwords don't match.",
   path: ['confirmPassword'],
 });
-
 export type SignUpInput = z.infer<typeof SignUpSchema>;
 
 export const SignInSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
-
 export type SignInInput = z.infer<typeof SignInSchema>;
+*/
 
+// --- User Profile & Address Schemas (Commented out as they depend on auth) ---
+/*
 export const UserProfileSchema = z.object({
   firstName: z.string().min(1, { message: 'First name cannot be empty.' }).max(50, { message: 'First name is too long.' }).optional().or(z.literal('')),
   lastName: z.string().min(1, { message: 'Last name cannot be empty.' }).max(50, { message: 'Last name is too long.' }).optional().or(z.literal('')),
   phoneNumber: z.string().max(20, { message: 'Phone number must be 20 characters or less.' })
-    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" }) // Allows empty or E.164 format
+    .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
     .optional().or(z.literal('')),
 });
-
 export type UserProfileInput = z.infer<typeof UserProfileSchema>;
 
 export const AddressSchema = z.object({
-  id: z.string().optional(), // For identifying address to update/delete
+  id: z.string().optional(),
   fullName: z.string().min(1, 'Full name is required.').max(100, 'Full name is too long.'),
   addressLine1: z.string().min(1, 'Address line 1 is required.').max(200, 'Address line 1 is too long.'),
   addressLine2: z.string().max(200, 'Address line 2 is too long.').optional().or(z.literal('')),
@@ -44,9 +46,10 @@ export const AddressSchema = z.object({
     .regex(/^$|^(\+?[1-9]\d{1,14})$/, { message: "Invalid phone number format. Should be empty or like +1234567890" })
     .optional().or(z.literal('')),
 });
-
 export type AddressInput = z.infer<typeof AddressSchema>;
+*/
 
+// --- Product Form Schema (Remains active) ---
 const ProductImageSchema = z.object({
   url: z.string().url({ message: "Invalid image URL." }),
   dataAiHint: z.string().max(50, { message: "AI hint too long." }).optional().or(z.literal('')),

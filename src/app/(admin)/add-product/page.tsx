@@ -6,8 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ProductFormSchema, type ProductFormInput } from '@/lib/schemas';
 import { addProduct, type AddProductFormState } from './actions';
-import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
+// Removed useAuth and router for auth check
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -20,27 +19,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, AlertTriangle, UploadCloud, PlusCircle, Trash2, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
-import { storage } from '@/lib/firebase'; // Firebase storage instance
+import { storage } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid'; // For unique file names
+import { v4 as uuidv4 } from 'uuid';
 
 interface ImagePreview {
   file: File;
   previewUrl: string;
   aiHint: string;
-  storagePath?: string; // To store the path in Firebase Storage for potential deletion on error
+  storagePath?: string;
   uploadProgress?: number;
-  downloadUrl?: string; // After successful upload
+  downloadUrl?: string;
 }
 
 export default function AddProductPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
+  // Removed user, authLoading, router for auth check
   const { toast } = useToast();
 
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(false); // Default to false as no auth check needed before render
 
   const initialFormState: AddProductFormState = { message: null, success: false, errors: undefined };
   const [formState, formAction, isActionPending] = useActionState(addProduct, initialFormState);
@@ -60,16 +58,7 @@ export default function AddProductPage() {
     },
   });
 
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        toast({ title: "Access Denied", description: "Please log in to add products.", variant: "destructive" });
-        router.replace('/signin?redirect=/admin/add-product');
-      } else {
-        setIsPageLoading(false);
-      }
-    }
-  }, [user, authLoading, router, toast]);
+  // Removed useEffect for auth check
 
   useEffect(() => {
     if (formState.message) {
@@ -102,7 +91,7 @@ export default function AddProductPage() {
         aiHint: '',
         uploadProgress: 0,
       }));
-      setImagePreviews(prev => [...prev, ...newImagePreviews].slice(0, 5)); // Limit to 5 images for example
+      setImagePreviews(prev => [...prev, ...newImagePreviews].slice(0, 5));
     }
   };
 
@@ -115,7 +104,6 @@ export default function AddProductPage() {
   const handleRemoveImage = (indexToRemove: number) => {
     const imageToRemove = imagePreviews[indexToRemove];
     if (imageToRemove.storagePath) {
-      // If image was already uploaded, try to delete it from storage
       const imageRef = ref(storage, imageToRemove.storagePath);
       deleteObject(imageRef).catch(error => console.error("Error deleting image from storage:", error));
     }
@@ -181,7 +169,6 @@ export default function AddProductPage() {
     } catch (error) {
       console.error("Error uploading images or submitting form:", error);
       toast({ title: "Submission Error", description: "Could not upload all images or save product details.", variant: "destructive" });
-      // Optionally, try to delete already uploaded images if the overall process fails
       imagePreviews.forEach(img => {
         if (img.storagePath) {
           const imageRef = ref(storage, img.storagePath);
@@ -193,34 +180,8 @@ export default function AddProductPage() {
     }
   };
 
-
-  if (authLoading || isPageLoading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-8 flex justify-center items-center">
-          <Loader2 className="h-12 w-12 text-primary animate-spin" />
-          <p className="ml-4 text-lg text-muted-foreground">Loading page...</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-  
-  if (!user) { // Fallback for strict checking, though useEffect should redirect
-     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-8 text-center">
-          <AlertTriangle className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h1 className="text-3xl font-headline text-primary mb-2">Access Denied</h1>
-          <p className="text-muted-foreground mb-6">You must be logged in to add products.</p>
-          <Button asChild size="lg"><a href="/signin">Log In</a></Button>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  // Removed loading state based on authLoading or isPageLoading if it was tied to auth check
+  // if (authLoading || isPageLoading) { ... } 
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -324,7 +285,6 @@ export default function AddProductPage() {
                     <FormMessage />
                   </FormItem>
                 )}/>
-
 
                 <FormField control={form.control} name="sizeAndDimensions" render={({ field }) => (
                   <FormItem>

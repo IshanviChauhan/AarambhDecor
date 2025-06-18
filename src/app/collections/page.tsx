@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, Suspense, useCallback } from 'react';
-import type { Product, CartItem } from '@/lib/types';
+import type { Product }_from '@/lib/types'; // Removed CartItem as it's disabled
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
@@ -20,7 +20,6 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { parsePrice } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import { getProducts } from '@/app/products/actions';
@@ -30,8 +29,7 @@ const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = 10000;
 
 function CollectionsPageContent() {
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Removed wishlist and cartItems state
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -49,7 +47,7 @@ function CollectionsPageContent() {
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const { user } = useAuth();
+  // Removed useAuth
 
   useEffect(() => {
     setIsClient(true);
@@ -57,7 +55,7 @@ function CollectionsPageContent() {
       console.log("CollectionsPage: Fetching initial products...");
       setIsLoadingProducts(true);
       try {
-        const productsFromSource = await getProducts(); // This will try Firestore then fallback to MOCK_PRODUCTS
+        const productsFromSource = await getProducts();
         console.log(`CollectionsPage: Fetched ${productsFromSource.length} products.`);
         setAllProducts(productsFromSource);
          if (productsFromSource.length === 0) {
@@ -67,7 +65,7 @@ function CollectionsPageContent() {
       } catch (error) {
         console.error("CollectionsPage: Failed to fetch products:", error);
         toast({ title: "Error", description: "Could not load products.", variant: "destructive" });
-        setAllProducts([]); // Ensure it's an empty array on error
+        setAllProducts([]);
       } finally {
         setIsLoadingProducts(false);
         console.log("CollectionsPage: Finished fetching initial products.");
@@ -75,7 +73,7 @@ function CollectionsPageContent() {
     }
     fetchInitialProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only on mount
+  }, []);
 
   const categories = useMemo(() => {
     if (isLoadingProducts || allProducts.length === 0) return ['All'];
@@ -92,14 +90,12 @@ function CollectionsPageContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (isLoadingProducts) return; 
+    if (isLoadingProducts) return;
 
     if (allProducts.length > 0) {
         const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && !isNaN(p));
         const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
         const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
-        
-        console.log(`CollectionsPage: Calculated minPrice: ${minP}, maxPrice: ${maxP} from ${allProducts.length} products.`);
         
         setMinProductPrice(minP);
         setMaxProductPrice(maxP);
@@ -118,10 +114,8 @@ function CollectionsPageContent() {
         
         if (initialMin > initialMax) initialMin = initialMax;
         
-        console.log(`CollectionsPage: Setting initial priceRange: [${initialMin}, ${initialMax}]`);
         setPriceRange([initialMin, initialMax]);
     } else {
-         console.log("CollectionsPage: No products available to calculate price range. Using defaults.");
          setMinProductPrice(MIN_PRICE_DEFAULT);
          setMaxProductPrice(MAX_PRICE_DEFAULT);
          setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
@@ -144,8 +138,7 @@ function CollectionsPageContent() {
         if (selectedCategory !== null) { 
             setSelectedCategory(null); 
         }
-        // Only attempt to update URL if categories are loaded and the category is truly invalid
-        if (!isLoadingProducts && categories.length > 1) { // categories.length > 1 means actual categories are loaded beyond 'All'
+        if (!isLoadingProducts && categories.length > 1) {
             const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
             currentParams.delete('category');
             router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
@@ -159,47 +152,7 @@ function CollectionsPageContent() {
   }, [searchParams, categories, isLoadingProducts, selectedCategory, router, pathname, isClient]);
 
 
-  useEffect(() => {
-    if (!isClient) return;
-    if (user) {
-      const storedWishlist = localStorage.getItem(`aarambhWishlist_${user.uid}`);
-      if (storedWishlist) {
-         try {
-          setWishlist(new Set(JSON.parse(storedWishlist)));
-        } catch (e) {
-          console.error("Failed to parse wishlist from localStorage", e);
-          setWishlist(new Set());
-        }
-      } else {
-        setWishlist(new Set());
-      }
-      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
-      if (storedCart) {
-         try {
-          setCartItems(JSON.parse(storedCart));
-        } catch (e) {
-          console.error("Failed to parse cart from localStorage", e);
-          setCartItems([]);
-        }
-      } else {
-        setCartItems([]);
-      }
-    } else {
-      setWishlist(new Set());
-      setCartItems([]);
-    }
-  }, [isClient, user]);
-
-  useEffect(() => {
-    if (!isClient || !user) return; // Only save if user is logged in
-    localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
-  }, [wishlist, isClient, user]);
-
-  useEffect(() => {
-    if (!isClient || !user) return; // Only save if user is logged in
-    localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
-    window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-  }, [cartItems, isClient, user]);
+  // Removed useEffects for wishlist and cart local storage
 
   useEffect(() => {
     if (isLoadingProducts) {
@@ -229,54 +182,20 @@ function CollectionsPageContent() {
   }, [selectedCategory, allProducts, priceRange, searchTerm, isLoadingProducts]);
 
   const handleToggleWishlist = (productId: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to manage your wishlist.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
-    setWishlist((prevWishlist) => {
-      const newWishlist = new Set(prevWishlist);
-      if (newWishlist.has(productId)) {
-        newWishlist.delete(productId);
-      } else {
-        newWishlist.add(productId);
-      }
-      return newWishlist;
-    });
+    // Wishlist functionality is disabled
+    console.log("Wishlist functionality disabled for product:", productId);
+    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
   };
 
   const handleAddToCart = (product: Product) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to add items to your cart.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
-    setCartItems((prevCartItems) => {
-      const existingItem = prevCartItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevCartItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevCartItems, { ...product, quantity: 1 }];
-    });
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    // Cart functionality is disabled
+     console.log("Add to cart clicked for product:", product.name);
+    toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
   };
 
   const isProductInCart = (productId: string) => {
-    if (!isClient || !user) return false;
-    return cartItems.some(item => item.id === productId);
+    // Cart functionality is disabled
+    return false;
   };
 
   const handleCategoryFilter = (categoryValue: string) => {
@@ -397,10 +316,10 @@ function CollectionsPageContent() {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    isWishlisted={isClient && user ? wishlist.has(product.id) : false}
-                    onToggleWishlist={handleToggleWishlist}
-                    onAddToCart={handleAddToCart}
-                    isProductInCart={isProductInCart(product.id)}
+                    isWishlisted={false} // Wishlist disabled
+                    onToggleWishlist={handleToggleWishlist} // Will show disabled message
+                    onAddToCart={handleAddToCart} // Will show disabled message
+                    isProductInCart={false} // Cart disabled
                   />
                 ))}
               </div>
@@ -424,7 +343,6 @@ function CollectionsPageContent() {
     </div>
   );
 }
-
 
 export default function CollectionsPage() {
   return (

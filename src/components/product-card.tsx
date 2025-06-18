@@ -10,20 +10,23 @@ import { Button } from '@/components/ui/button';
 import { WishlistIcon } from './wishlist-icon';
 import { ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+
 
 interface ProductCardProps {
   product: Product;
-  isWishlisted: boolean;
-  onToggleWishlist: (productId: string) => void;
-  onAddToCart: (product: Product) => void;
-  isProductInCart?: boolean; // Kept for potential future use, but not directly used by new icon
+  isWishlisted: boolean; // Will effectively be false and non-interactive
+  onToggleWishlist: (productId: string) => void; // Will show disabled message
+  onAddToCart: (product: Product) => void; // Will show disabled message
+  isProductInCart?: boolean; // Will be false
   className?: string;
 }
 
-export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, isProductInCart, className: propClassName }: ProductCardProps) {
+export function ProductCard({ product, className: propClassName }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { toast } = useToast();
 
   const imagesToDisplay = product.imageUrls && product.imageUrls.length > 0
     ? product.imageUrls
@@ -33,13 +36,12 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
     if (isHovering && imagesToDisplay.length > 1) {
       intervalRef.current = setInterval(() => {
         setCurrentImageIndex(prevIndex => (prevIndex + 1) % imagesToDisplay.length);
-      }, 1000); // Change image every 1 second
+      }, 1000);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     }
-
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -61,6 +63,14 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         clearInterval(intervalRef.current);
       }
     }
+  };
+
+  const handleDisabledWishlist = () => {
+    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
+  };
+
+  const handleDisabledCart = () => {
+     toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
   };
 
   return (
@@ -104,9 +114,10 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         </Link>
         <div className="absolute top-2 right-2 z-10">
           <WishlistIcon
-            isWishlisted={isWishlisted}
-            onClick={() => onToggleWishlist(product.id)}
+            isWishlisted={false} // Always false
+            onClick={handleDisabledWishlist} // Show disabled message
             className="bg-background/70 hover:bg-background"
+            disabled // Visually disable
           />
         </div>
       </CardHeader>
@@ -125,9 +136,9 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8" // Smaller icon button for a cleaner look
-              onClick={() => onAddToCart(product)}
-              aria-label="Add to cart"
+              className="h-8 w-8"
+              onClick={handleDisabledCart} // Show disabled message
+              aria-label="Add to cart (disabled)"
             >
               <ShoppingCart className="h-4 w-4" />
             </Button>
@@ -135,9 +146,7 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCa
         )}
       </CardContent>
       <CardFooter className="px-3 pb-3 pt-0">
-        {/* Add to Cart button removed from here */}
       </CardFooter>
     </Card>
   );
 }
-

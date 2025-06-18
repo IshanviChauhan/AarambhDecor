@@ -1,62 +1,13 @@
 
 'use client';
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { SignInSchema, type SignInInput } from '@/lib/schemas';
-import { signInWithEmail, type SignInFormState } from './actions';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, LogIn } from 'lucide-react';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" /> }
-      Log In
-    </Button>
-  );
-}
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle } from 'lucide-react';
 
 export default function SignInPage() {
-  const { toast } = useToast();
-
-  const initialFormState: SignInFormState = { message: null, success: false };
-  const [formState, formAction] = useActionState(signInWithEmail, initialFormState);
-
-  const form = useForm<SignInInput>({
-    resolver: zodResolver(SignInSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-  
-  useEffect(() => {
-    if (formState.errors) {
-      if (formState.errors.email) form.setError('email', { type: 'server', message: formState.errors.email.join(', ') });
-      if (formState.errors.password) form.setError('password', { type: 'server', message: formState.errors.password.join(', ') });
-      // Generic _form errors are handled by toast only
-    }
-
-    if (formState.message) {
-      toast({
-        title: formState.success ? 'Success' : 'Error',
-        description: formState.message,
-        variant: formState.success ? 'default' : 'destructive',
-      });
-    }
-  }, [formState, toast, form]);
-
   return (
     <div className="min-h-screen bg-background relative">
       <div className="absolute top-8 left-8 z-10">
@@ -64,9 +15,9 @@ export default function SignInPage() {
           <Image
             src="https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-19/505746725_17843352006510460_4000077421691590872_n.jpg?_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGrole3olHTzDhyipLFazMcqxTH3BTY1mp1iUgGHh4vS9EKAKzwAqkfF7dIo9auedjAk-OgM_5e06tRXQpcQ518&_nc_ohc=PWAubMoouIAQ7kNvwGXkA7l&_nc_gid=FmC7UlvNMxPMW8Vr6tpdOA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfPdwAvgOVVQOsnHh8uHrqXaxpnddaWxkGxDWyAHrd0Uzw&oe=685472D7&_nc_sid=7a9f4b"
             alt="Aarambh Decor Logo"
-            width={60} 
-            height={60} 
-            priority 
+            width={60}
+            height={60}
+            priority
             className="object-contain rounded-lg transition-opacity duration-300 group-hover:opacity-80"
           />
            <span
@@ -80,52 +31,20 @@ export default function SignInPage() {
       </div>
       
       <div className="flex flex-col items-center justify-center min-h-screen p-2">
-        <Card className="w-full max-w-md shadow-xl mt-24 sm:mt-0"> {/* Added margin top for small screens if logo takes space */}
+        <Card className="w-full max-w-md shadow-xl mt-24 sm:mt-0">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-headline text-primary">Welcome Back</CardTitle>
-            <CardDescription>Log in to continue to your Aarambh Decor.</CardDescription>
+            <AlertTriangle className="mx-auto h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-3xl font-headline text-primary">Sign In Disabled</CardTitle>
+            <CardDescription>User sign-in functionality is currently not available.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form action={formAction} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="name@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <SubmitButton />
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex flex-col items-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
-              <Button variant="link" asChild className="p-0 h-auto font-semibold text-primary">
-                <Link href="/signup">Sign Up</Link>
-              </Button>
+          <CardContent className="text-center">
+            <p className="text-muted-foreground">
+              You can continue to browse our collections.
             </p>
-          </CardFooter>
+             <Button asChild className="mt-6">
+                <Link href="/">Go to Homepage</Link>
+            </Button>
+          </CardContent>
         </Card>
       </div>
     </div>

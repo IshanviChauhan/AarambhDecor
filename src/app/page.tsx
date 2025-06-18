@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Product, CartItem } from '@/lib/types';
+import type { Product } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, ShoppingBag, Search as SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/auth-context';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
@@ -23,14 +22,11 @@ import { cn } from '@/lib/utils';
 const FEATURED_PRODUCTS_COUNT = 6;
 
 export default function HomePage() {
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -61,113 +57,25 @@ export default function HomePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!isClient) return;
-    if (user) {
-      const storedWishlist = localStorage.getItem(`aarambhWishlist_${user.uid}`);
-      if (storedWishlist) {
-        try {
-          setWishlist(new Set(JSON.parse(storedWishlist)));
-        } catch (e) {
-          console.error("Failed to parse wishlist from localStorage", e);
-          setWishlist(new Set()); 
-        }
-      } else {
-        setWishlist(new Set());
-      }
-      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
-      if (storedCart) {
-        try {
-          setCartItems(JSON.parse(storedCart));
-        } catch (e) {
-          console.error("Failed to parse cart from localStorage", e);
-          setCartItems([]);
-        }
-      } else {
-        setCartItems([]);
-      }
-    } else {
-      setWishlist(new Set());
-      setCartItems([]);
-    }
-  }, [isClient, user]);
+  // Removed useEffects for wishlist and cart as auth is removed
 
-  useEffect(() => {
-    if (!isClient || !user) return; // Only save if user is logged in
-    localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
-  }, [wishlist, isClient, user]);
-
-  useEffect(() => {
-    if (!isClient || !user) return; // Only save if user is logged in
-    localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
-    window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-  }, [cartItems, isClient, user]);
-
-  useEffect(() => {
-    if (isClient) {
-      const welcomeMessage = searchParams.get('welcome_message');
-      if (welcomeMessage) {
-        toast({
-          title: "Login Successful",
-          description: decodeURIComponent(welcomeMessage),
-        });
-        const newPath = window.location.pathname; // Or router.asPath
-        const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
-        currentParams.delete('welcome_message');
-        router.replace(`${newPath}?${currentParams.toString()}`, { scroll: false });
-      }
-    }
-  }, [isClient, searchParams, router, toast]);
+  // Removed welcome_message toast logic as it was tied to user login
 
   const handleToggleWishlist = (productId: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to manage your wishlist.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
-    setWishlist((prevWishlist) => {
-      const newWishlist = new Set(prevWishlist);
-      if (newWishlist.has(productId)) {
-        newWishlist.delete(productId);
-      } else {
-        newWishlist.add(productId);
-      }
-      return newWishlist;
-    });
+    // Wishlist functionality is disabled
+    console.log("Wishlist functionality disabled for product:", productId);
+    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
   };
 
   const handleAddToCart = (product: Product) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to add items to your cart.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
-    setCartItems((prevCartItems) => {
-      const existingItem = prevCartItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevCartItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevCartItems, { ...product, quantity: 1 }];
-    });
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    // Cart functionality is disabled for persistent user carts
+    console.log("Add to cart clicked for product:", product.name);
+    toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
   };
 
   const isProductInCart = (productId: string) => {
-    if (!isClient || !user) return false;
-    return cartItems.some(item => item.id === productId);
+    // Cart functionality is disabled
+    return false;
   };
 
   const handleHomepageSearch = (searchTerm: string) => {
@@ -265,7 +173,7 @@ export default function HomePage() {
               <Carousel
                 opts={{
                   align: "start",
-                  loop: featuredProducts.length > 3, 
+                  loop: featuredProducts.length > 3,
                 }}
                 className="w-full max-w-5xl mx-auto animate-fade-in-up animation-delay-400 group"
               >
@@ -275,10 +183,10 @@ export default function HomePage() {
                       <div className="p-1 h-full flex">
                         <ProductCard
                           product={product}
-                          isWishlisted={isClient && user ? wishlist.has(product.id) : false}
-                          onToggleWishlist={handleToggleWishlist}
-                          onAddToCart={handleAddToCart}
-                          isProductInCart={isProductInCart(product.id)}
+                          isWishlisted={false} // Wishlist disabled
+                          onToggleWishlist={handleToggleWishlist} // Will show disabled message
+                          onAddToCart={handleAddToCart} // Will show disabled message
+                          isProductInCart={false} // Cart disabled
                           className="w-full flex flex-col"
                         />
                       </div>

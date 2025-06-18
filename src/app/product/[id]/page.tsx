@@ -3,7 +3,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import type { Product, CartItem, Review, ProductImage } from '@/lib/types';
+import type { Product, Review, ProductImage }_from '@/lib/types'; // Removed CartItem
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Image from 'next/image';
@@ -16,10 +16,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/auth-context';
+// Removed Input, Textarea, Label for review form
 import {
   Carousel,
   CarouselContent,
@@ -47,19 +44,15 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const router = useRouter();
-  const { user } = useAuth();
+  // Removed useAuth and user
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Removed wishlist and cartItems state
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
-  const [newReviewName, setNewReviewName] = useState('');
-  const [newReviewRating, setNewReviewRating] = useState(0);
-  const [newReviewComment, setNewReviewComment] = useState('');
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  // Removed review form state
 
   useEffect(() => {
     setIsClient(true);
@@ -81,136 +74,27 @@ export default function ProductDetailPage() {
     }
   }, [productId, toast]);
 
-  useEffect(() => {
-    if (!isClient) return;
-    if (user) {
-      const storedWishlist = localStorage.getItem(`aarambhWishlist_${user.uid}`);
-      if (storedWishlist) {
-        try {
-          setWishlist(new Set(JSON.parse(storedWishlist)));
-        } catch (e) { 
-          console.error("Failed to parse wishlist", e); 
-          setWishlist(new Set());
-        }
-      } else {
-        setWishlist(new Set());
-      }
-      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
-      if (storedCart) {
-         try {
-          setCartItems(JSON.parse(storedCart));
-        } catch (e) { 
-          console.error("Failed to parse cart", e); 
-          setCartItems([]);
-        }
-      } else {
-        setCartItems([]);
-      }
-    } else {
-      setWishlist(new Set());
-      setCartItems([]);
-    }
-  }, [isClient, user]);
-
-  useEffect(() => {
-    if (!isClient || !user) return; // Only save if user is logged in
-    localStorage.setItem(`aarambhWishlist_${user.uid}`, JSON.stringify(Array.from(wishlist)));
-  }, [wishlist, isClient, user]);
-
-  useEffect(() => {
-    if (!isClient || !user) return; // Only save if user is logged in
-    localStorage.setItem(`aarambhCart_${user.uid}`, JSON.stringify(cartItems));
-    window.dispatchEvent(new CustomEvent('aarambhCartUpdated'));
-  }, [cartItems, isClient, user]);
+  // Removed useEffects for wishlist and cart localStorage
 
   const handleToggleWishlist = (id: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to manage your wishlist.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
-    setWishlist(prev => {
-      const newWishlist = new Set(prev);
-      if (newWishlist.has(id)) newWishlist.delete(id);
-      else newWishlist.add(id);
-      return newWishlist;
-    });
+    // Wishlist functionality is disabled
+     console.log("Wishlist functionality disabled for product:", id);
+    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
   };
 
   const handleAddToCart = (p: Product) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to add items to your cart.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
-    setCartItems(prev => {
-      const existing = prev.find(item => item.id === p.id);
-      if (existing) {
-        return prev.map(item => item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item);
-      }
-      return [...prev, { ...p, quantity: 1 }];
-    });
-    toast({ title: "Added to Cart", description: `${p.name} has been added.` });
+    // Cart functionality is disabled
+    console.log("Add to cart clicked for product:", p.name);
+    toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
   };
 
-  const handleReviewSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to submit a review.",
-        variant: "destructive",
-      });
-      router.push('/signin');
-      return;
-    }
+  // Removed handleReviewSubmit as review submission is disabled
 
-    if (!newReviewName.trim() || newReviewRating === 0 || !newReviewComment.trim()) {
-      toast({
-        title: "Incomplete Review",
-        description: "Please fill in all fields and select a rating.",
-        variant: "destructive",
-      });
-      return;
-    }
+  // const isProductInCart = product ? cartItems.some(item => item.id === product.id) : false; // Cart disabled
+  // const isProductWishlisted = product ? wishlist.has(product.id) : false; // Wishlist disabled
+  const isProductInCart = false;
+  const isProductWishlisted = false;
 
-    setIsSubmittingReview(true);
-    const newReview: Review = {
-      reviewer: newReviewName,
-      rating: newReviewRating,
-      comment: newReviewComment,
-      date: new Date().toISOString().split('T')[0], 
-    };
-
-    setTimeout(() => {
-      setProduct(prevProduct => {
-        if (!prevProduct) return null;
-        const updatedReviews = [...(prevProduct.reviews || []), newReview];
-        return { ...prevProduct, reviews: updatedReviews };
-      });
-
-      setNewReviewName('');
-      setNewReviewRating(0);
-      setNewReviewComment('');
-      setIsSubmittingReview(false);
-
-      toast({
-        title: "Review Submitted (Locally)",
-        description: "Thank you for your feedback! (Note: This review is temporary for this session. Firestore integration pending.)",
-      });
-    }, 500);
-  };
-
-  const isProductInCart = product && user ? cartItems.some(item => item.id === product.id) : false;
-  const isProductWishlisted = product && user ? wishlist.has(product.id) : false;
 
   if (isLoading || !isClient) {
     return (
@@ -339,12 +223,12 @@ export default function ProductDetailPage() {
                 disabled={!product}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                {isProductInCart ? 'Add Another' : 'Add to Cart'}
+                Add to Cart (Feature Disabled)
               </Button>
               <WishlistIcon
-                isWishlisted={isProductWishlisted}
-                onClick={() => handleToggleWishlist(product.id)}
-                className="w-full sm:w-auto h-12 px-4 border border-input hover:bg-red-100 dark:hover:bg-red-900/30 text-lg"
+                isWishlisted={isProductWishlisted} // Will be false
+                onClick={() => handleToggleWishlist(product.id)} // Will show disabled message
+                className="w-full sm:w-auto h-12 px-4 border border-input text-lg"
                 disabled={!product}
               />
             </div>
@@ -410,92 +294,21 @@ export default function ProductDetailPage() {
             <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
               <Info className="h-8 w-8 text-primary mx-auto mb-3" />
               <p className="text-muted-foreground">No reviews yet for this product.</p>
-              <p className="text-sm text-muted-foreground/80">Be the first to share your thoughts!</p>
             </Card>
           )}
         </section>
 
         <section id="add-review" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-400">
-          {user ? (
             <Card className="shadow-lg rounded-lg border-border/70 p-6">
               <CardHeader className="p-0 mb-4">
                 <CardTitle className="font-headline text-2xl text-primary">Write a Review</CardTitle>
-                <CardDescription>Share your experience with this product.</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <form onSubmit={handleReviewSubmit} className="space-y-6">
-                  <div>
-                    <Label htmlFor="reviewerName" className="block text-sm font-medium text-foreground mb-1">Your Name</Label>
-                    <Input
-                      id="reviewerName"
-                      type="text"
-                      value={newReviewName}
-                      onChange={(e) => setNewReviewName(e.target.value)}
-                      placeholder="e.g., Priya S."
-                      required
-                      className="focus:ring-accent focus:border-accent"
-                    />
-                  </div>
-                  <div>
-                    <Label className="block text-sm font-medium text-foreground mb-2">Your Rating</Label>
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Button
-                          key={star}
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setNewReviewRating(star)}
-                          className={`h-8 w-8 p-0 ${
-                            star <= newReviewRating ? 'text-accent' : 'text-muted-foreground'
-                          } hover:text-accent`}
-                          aria-label={`Rate ${star} out of 5 stars`}
-                        >
-                          <Star className={`h-6 w-6 ${star <= newReviewRating ? 'fill-accent' : ''}`} />
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="reviewComment" className="block text-sm font-medium text-foreground mb-1">Your Review</Label>
-                    <Textarea
-                      id="reviewComment"
-                      value={newReviewComment}
-                      onChange={(e) => setNewReviewComment(e.target.value)}
-                      placeholder="What did you like or dislike? How did you use this product?"
-                      rows={4}
-                      required
-                      className="focus:ring-accent focus:border-accent"
-                    />
-                  </div>
-                  <Button type="submit" disabled={isSubmittingReview} className="w-full sm:w-auto">
-                    {isSubmittingReview ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Submit Review
-                      </>
-                    )}
-                  </Button>
-                </form>
+                <p className="text-muted-foreground">
+                  Review submission is currently disabled.
+                </p>
               </CardContent>
             </Card>
-          ) : (
-             <Card className="shadow-lg rounded-lg border-border/70 p-6 text-center">
-                <CardHeader className="p-0 mb-4">
-                    <CardTitle className="font-headline text-2xl text-primary">Write a Review</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <p className="text-muted-foreground">
-                        Please <Link href="/signin" className="text-primary hover:underline font-semibold">log in</Link> to leave a review for this product.
-                    </p>
-                </CardContent>
-            </Card>
-          )}
         </section>
       </main>
       <Footer />

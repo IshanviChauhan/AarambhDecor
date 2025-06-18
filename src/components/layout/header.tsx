@@ -4,22 +4,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, LogIn, UserCircle, LogOut, Menu, PlusSquare } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, PlusSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { CartItem } from '@/lib/types';
-import { useAuth } from '@/contexts/auth-context';
-import { auth } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
 import { useRouter, usePathname } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -30,94 +17,19 @@ import {
 import { Separator } from '@/components/ui/separator';
 
 export default function Header() {
-  const [cartItemCount, setCartItemCount] = useState(0);
-  const [isClient, setIsClient] = useState(false);
-  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    const calculateTotalItems = () => {
-      if (!user) { // If no user, cart count is 0
-        setCartItemCount(0);
-        return;
-      }
-      const storedCart = localStorage.getItem(`aarambhCart_${user.uid}`);
-      if (storedCart) {
-        try {
-          const items: CartItem[] = JSON.parse(storedCart);
-          const total = items.reduce((sum, item) => sum + item.quantity, 0);
-          setCartItemCount(total);
-        } catch (e) {
-          console.error("Failed to parse cart from localStorage", e);
-          setCartItemCount(0);
-        }
-      } else {
-        setCartItemCount(0);
-      }
-    };
-
-    calculateTotalItems(); // Initial calculation
-
-    const handleCartUpdateEvent = () => {
-      calculateTotalItems();
-    };
-
-    // Listen for storage changes (e.g., from other tabs)
-    const handleStorageChange = (event: StorageEvent) => {
-        if (user && event.key === `aarambhCart_${user.uid}`) {
-            calculateTotalItems();
-        } else if (event.key && event.key.startsWith('aarambhCart_') && !user) {
-            // If user logged out on another tab, this tab's user would be null
-            calculateTotalItems();
-        }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('aarambhCartUpdated', handleCartUpdateEvent as EventListener);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('aarambhCartUpdated', handleCartUpdateEvent as EventListener);
-    };
-  }, [isClient, user]); // Re-run if user state changes
-
-  const handleSignOut = async () => {
-    try {
-      if (user) { 
-        localStorage.removeItem(`aarambhCart_${user.uid}`);
-        localStorage.removeItem(`aarambhWishlist_${user.uid}`);
-      }
-      await signOut(auth);
-      // setUser(null) will be handled by onAuthStateChanged in AuthProvider
-      setCartItemCount(0); // Explicitly set cart count to 0 on UI
-      window.dispatchEvent(new CustomEvent('aarambhCartUpdated')); // Notify other components
-      router.push('/');
-      toast({ title: "Signed Out", description: "You have been successfully signed out." });
-    } catch (error) {
-      console.error("Error signing out: ", error);
-      toast({ title: "Sign Out Error", description: "Failed to sign out. Please try again.", variant: "destructive" });
-    }
-    setIsMobileMenuOpen(false);
-  };
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
-      e.preventDefault(); 
+      e.preventDefault();
       const section = document.getElementById('ai-decor-advisor');
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-    setIsMobileMenuOpen(false); 
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -161,67 +73,19 @@ export default function Header() {
                 AI Advisor
               </Link>
             </Button>
+            {/* Admin Add Product Link - accessible without login now */}
+             <Button asChild variant="ghost">
+              <Link href="/(admin)/add-product" aria-label="Add Product">
+                <PlusSquare className="mr-2 h-4 w-4" />
+                Add Product
+              </Link>
+            </Button>
           </nav>
 
-          {!authLoading && user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="User menu">
-                  <UserCircle className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">My Account</p>
-                    {user.email && (
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    )}
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="cursor-pointer">
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                  <Link href="/(admin)/add-product" className="cursor-pointer">
-                    <PlusSquare className="mr-2 h-4 w-4" />
-                    <span>Add Product</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : !authLoading && !user ? (
-              <div className="hidden md:flex items-center">
-                <Button asChild variant="default" className="text-primary-foreground bg-primary hover:bg-primary/90">
-                  <Link href="/signin" aria-label="Log In">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Log In
-                  </Link>
-                </Button>
-              </div>
-          ) : (
-             <div className="w-10 h-10 md:w-auto md:min-w-[88px]"></div> 
-          )}
-
+          {/* Cart Icon - No count displayed as user-specific cart is removed */}
           <Button asChild variant="ghost" className="relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
-              {isClient && user && cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-primary-foreground transform translate-x-1/2 -translate-y-1/2 bg-primary rounded-full min-w-[1.25rem] h-5">
-                  {cartItemCount}
-                </span>
-              )}
             </Link>
           </Button>
 
@@ -265,37 +129,19 @@ export default function Header() {
                     </Link>
                   </Button>
                 </nav>
-                
+
                 <Separator className="my-4" />
                 <div className="flex flex-col space-y-1">
-                  {!authLoading && user ? (
-                    <>
-                      <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Link href="/profile" aria-label="Profile">
-                          <UserCircle className="mr-3 h-5 w-5 text-primary" /> Profile
-                        </Link>
-                      </Button>
-                      <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                   <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
                         <Link href="/(admin)/add-product" aria-label="Add Product">
                           <PlusSquare className="mr-3 h-5 w-5 text-primary" /> Add Product
                         </Link>
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 text-destructive focus:text-destructive hover:text-destructive" onClick={handleSignOut}>
-                        <LogOut className="mr-3 h-5 w-5" /> Log Out
-                      </Button>
-                    </>
-                  ) : !authLoading && !user ? (
-                    <Button asChild variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Link href="/signin" aria-label="Log In">
-                        <LogIn className="mr-3 h-5 w-5 text-primary" /> Log In
-                      </Link>
                     </Button>
-                  ) : null }
                 </div>
               </SheetContent>
             </Sheet>
           </div>
-        </div> 
+        </div>
       </div>
     </header>
   );
