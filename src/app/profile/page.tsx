@@ -72,13 +72,23 @@ export default function ProfilePage() {
           lastName: profile.lastName || '',
           phoneNumber: profile.phoneNumber || '',
         });
+      } else {
+        // If profile is null (not found), reset form with just userId to avoid stale data
+         profileForm.reset({
+          userId: userId,
+          firstName: '',
+          lastName: '',
+          phoneNumber: '',
+        });
       }
     } catch (error) {
+      console.error("Error fetching profile data:", error);
       toast({ title: 'Error', description: 'Failed to load profile data.', variant: 'destructive' });
+       profileForm.reset({ userId: userId, firstName: '', lastName: '', phoneNumber: ''});
     } finally {
       setIsLoadingProfile(false);
     }
-  }, []);
+  }, []); // profileForm is memoized by useForm, so it's stable
 
   const fetchAddresses = useCallback(async (userId: string) => {
     setIsLoadingAddresses(true);
@@ -86,28 +96,44 @@ export default function ProfilePage() {
       const addresses = await getShippingAddresses(userId);
       setShippingAddresses(addresses);
     } catch (error) {
+      console.error("Error fetching addresses:", error);
       toast({ title: 'Error', description: 'Failed to load shipping addresses.', variant: 'destructive' });
     } finally {
       setIsLoadingAddresses(false);
     }
-  }, []);
+  }, [toast]);
   
   // Fetch initial data
   useEffect(() => {
     const tempId = getTemporaryUserId();
     if (tempId) {
       setCurrentUserId(tempId);
-      fetchProfileData(tempId);
-      fetchAddresses(tempId);
-      // Fetch order history (placeholder)
-      // getOrderHistory(tempId).then(setOrderHistory).finally(() => setIsLoadingOrders(false));
-      setIsLoadingOrders(false); // Simulating no orders for now
+      // Data fetching will be triggered by the useEffect below, watching currentUserId
     } else {
       setIsLoadingProfile(false);
       setIsLoadingAddresses(false);
       setIsLoadingOrders(false);
     }
-  }, [fetchProfileData, fetchAddresses]);
+  }, []);
+
+  // Effects for data fetching when currentUserId is set
+  useEffect(() => {
+    if (currentUserId) {
+      fetchProfileData(currentUserId);
+      fetchAddresses(currentUserId);
+      // Fetch order history (placeholder)
+      // getOrderHistory(currentUserId).then(setOrderHistory).finally(() => setIsLoadingOrders(false));
+      setIsLoadingOrders(false); // Simulating no orders for now
+
+      // Initialize forms with currentUserId
+      if (!profileForm.getValues('userId')) {
+        profileForm.reset({ ...profileForm.getValues(), userId: currentUserId });
+      }
+      if (!addressForm.getValues('userId')) {
+        addressForm.reset({ ...addressForm.getValues(), userId: currentUserId });
+      }
+    }
+  }, [currentUserId, fetchProfileData, fetchAddresses]);
 
 
   // Profile Form
@@ -164,19 +190,7 @@ export default function ProfilePage() {
     }
   }, [addressFormState, toast, fetchAddresses]);
 
-
-  // Update defaultValues for forms when currentUserId is available
-  useEffect(() => {
-    if (currentUserId) {
-      if (!profileForm.getValues('userId')) { // Only set if not already set (e.g. by fetchProfileData)
-        profileForm.reset({ ...profileForm.getValues(), userId: currentUserId });
-      }
-      addressForm.reset({ ...addressForm.getValues(), userId: currentUserId });
-    }
-  }, [currentUserId, profileForm, addressForm]);
-
-
-  if (!currentUserId && !isLoadingProfile) {
+  if (!currentUserId && !isLoadingProfile && !isLoadingAddresses) { // Check all loading states
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -223,12 +237,12 @@ export default function ProfilePage() {
             <Card className="shadow-lg rounded-lg border-border/70">
               <CardHeader>
                 <CardTitle className="font-headline text-2xl text-primary">Profile Details</CardTitle>
-                <CardDescription>Update your personal information. Email (<span className="font-medium text-foreground">{userProfileData?.email || '...'}</span>) is not editable here.</CardDescription>
+                <CardDescription>Update your personal information. Email (<span className="font-medium text-foreground">{isLoadingProfile ? 'Loading...' : (userProfileData?.email || 'N/A')}</span>) is not editable here.</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoadingProfile ? (
-                  <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
-                ) : (
+                  <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/> <span className="ml-2 text-muted-foreground">Loading profile...</span></div>
+                ) : userProfileData ? (
                 <Form {...profileForm}>
                   <form action={profileFormAction} className="space-y-6">
                     <input type="hidden" {...profileForm.register('userId')} value={currentUserId || ''} />
@@ -258,12 +272,14 @@ export default function ProfilePage() {
                     {profileFormState.errors?._form && (
                         <p className="text-sm font-medium text-destructive">{profileFormState.errors._form.join(', ')}</p>
                     )}
-                    <Button type="submit" disabled={isProfileUpdatePending} className="w-full md:w-auto">
+                    <Button type="submit" disabled={isProfileUpdatePending || !currentUserId} className="w-full md:w-auto">
                       {isProfileUpdatePending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                       {isProfileUpdatePending ? 'Saving...' : 'Save Changes'}
                     </Button>
                   </form>
                 </Form>
+                ) : (
+                  <p className="text-muted-foreground text-center py-4">Could not load profile details. User may not exist or there was an error.</p>
                 )}
               </CardContent>
             </Card>
@@ -279,7 +295,7 @@ export default function ProfilePage() {
                 <div>
                     <h3 className="text-lg font-semibold mb-4 text-foreground">Your Addresses</h3>
                     {isLoadingAddresses ? (
-                         <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
+                         <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/> <span className="ml-2 text-muted-foreground">Loading addresses...</span></div>
                     ) : shippingAddresses.length > 0 ? (
                       <div className="space-y-4">
                         {shippingAddresses.map((address) => (
@@ -344,7 +360,7 @@ export default function ProfilePage() {
                         {addressFormState.errors?._form && (
                             <p className="text-sm font-medium text-destructive">{addressFormState.errors._form.join(', ')}</p>
                         )}
-                        <Button type="submit" disabled={isAddressAddPending} className="w-full md:w-auto">
+                        <Button type="submit" disabled={isAddressAddPending || !currentUserId} className="w-full md:w-auto">
                             {isAddressAddPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
                             {isAddressAddPending ? 'Adding...' : 'Add Address'}
                         </Button>
@@ -362,7 +378,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="text-center py-10">
                  {isLoadingOrders ? (
-                    <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
+                    <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary"/> <span className="ml-2 text-muted-foreground">Loading orders...</span></div>
                  ) : orderHistory.length > 0 ? (
                     <p className="text-muted-foreground">Displaying order history is under development.</p> // Placeholder for actual list
                  ) : (
@@ -384,3 +400,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+
