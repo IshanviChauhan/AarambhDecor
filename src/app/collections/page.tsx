@@ -36,7 +36,7 @@ import {
 
 
 const MIN_PRICE_DEFAULT = 0;
-const MAX_PRICE_DEFAULT = 10000;
+const MAX_PRICE_DEFAULT = 10000; // Max default for products like "DM for Price"
 const PRODUCTS_PER_PAGE = 10;
 const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
 
@@ -108,13 +108,26 @@ function CollectionsPageContent() {
   }, [searchParams]);
 
   const { minProductPrice: derivedMinPrice, maxProductPrice: derivedMaxPrice } = useMemo(() => {
-    if (allProducts.length === 0 || isLoadingProducts) {
+    if (isLoadingProducts || allProducts.length === 0) {
         return { minProductPrice: MIN_PRICE_DEFAULT, maxProductPrice: MAX_PRICE_DEFAULT };
     }
-    const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && !isNaN(p));
-    const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
-    const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
-    return { minProductPrice: minP, maxProductPrice: maxP };
+    // Get all prices that are numbers (includes 0 for "DM for Price" items after parsing)
+    const allParsedNumericPrices = allProducts.map(p => parsePrice(p.price)).filter(p => !isNaN(p));
+
+    if (allParsedNumericPrices.length === 0) { // No products with parsable prices at all
+        return { minProductPrice: MIN_PRICE_DEFAULT, maxProductPrice: MAX_PRICE_DEFAULT };
+    }
+
+    const minP = Math.min(...allParsedNumericPrices); // This will correctly be 0 if "DM for Price" items exist
+    const maxP = Math.max(...allParsedNumericPrices); // This will be 0 if all items are "DM for Price" or actual 0 price
+
+    return { 
+        minProductPrice: minP, 
+        // If maxP is 0 (e.g., all items are "DM for Price" or actual 0 price), 
+        // and minP is also 0, set slider max to MAX_PRICE_DEFAULT to make it usable.
+        // Otherwise, use the actual maxP, ensuring it's not less than minP.
+        maxProductPrice: (maxP === 0 && minP === 0) ? MAX_PRICE_DEFAULT : Math.max(minP, maxP)
+    };
   }, [allProducts, isLoadingProducts]);
 
   const [priceRange, setPriceRange] = useState<[number, number]>(() => {
@@ -125,7 +138,7 @@ function CollectionsPageContent() {
     
     return [
         initialMinFromUrl ?? MIN_PRICE_DEFAULT, 
-        initialMaxFromUrl ?? MAX_PRICE_DEFAULT
+        initialMaxFromUrl ?? MAX_PRICE_DEFAULT 
     ];
   });
 
@@ -140,12 +153,11 @@ function CollectionsPageContent() {
 
     newMin = isNaN(newMin) ? derivedMinPrice : newMin;
     newMax = isNaN(newMax) ? derivedMaxPrice : newMax;
-
-    newMin = Math.max(derivedMinPrice, Math.min(derivedMaxPrice, newMin));
-    newMax = Math.max(derivedMinPrice, Math.min(derivedMaxPrice, newMax));
-
-    if (newMin > newMax) newMin = newMax;
     
+    newMin = Math.max(derivedMinPrice, Math.min(newMax, newMin)); // Clamp min against derivedMin and newMax
+    newMax = Math.max(newMin, Math.min(derivedMaxPrice, newMax)); // Clamp max against newMin and derivedMax
+
+
     if (priceRange[0] !== newMin || priceRange[1] !== newMax) {
         setPriceRange([newMin, newMax]);
     }
@@ -193,6 +205,7 @@ function CollectionsPageContent() {
 
     productsToFilter = productsToFilter.filter(p => {
       const price = parsePrice(p.price);
+      // This filter ensures "DM for Price" (parsed as 0) are included if priceRange[0] is 0.
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
@@ -377,11 +390,11 @@ function CollectionsPageContent() {
                     onValueChange={handlePriceChange} 
                     min={derivedMinPrice}
                     max={derivedMaxPrice}
-                    step={50}
+                    step={derivedMaxPrice > 500 ? 50: 10} // Smaller step for smaller ranges
                     minStepsBetweenThumbs={1}
                     className="my-4"
                     aria-label="Price range slider"
-                    disabled={isLoadingProducts || allProducts.length === 0}
+                    disabled={isLoadingProducts || allProducts.length === 0 || derivedMinPrice === derivedMaxPrice}
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Rs. {priceRange[0].toLocaleString()}</span>
@@ -486,3 +499,4 @@ export default function CollectionsPage() {
     </Suspense>
   )
 }
+
