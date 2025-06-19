@@ -63,26 +63,14 @@ export default function ProductDetailPage() {
           const fetchedProduct = await getProductById(productId);
           setProduct(fetchedProduct);
 
-          if (fetchedProduct) {
+          if (fetchedProduct && fetchedProduct.category) {
             const allProducts = await getProducts();
-            const potentialSuggestions = allProducts.filter(p => p.id !== fetchedProduct.id);
-            
-            let finalSuggestions: Product[] = [];
-
-            if (fetchedProduct.category) {
-              const categorySuggestions = potentialSuggestions.filter(p => p.category === fetchedProduct.category);
-              finalSuggestions = categorySuggestions.slice(0, MAX_SUGGESTIONS);
-            }
-
-            if (finalSuggestions.length < MAX_SUGGESTIONS) {
-              const otherSuggestions = potentialSuggestions.filter(p => !finalSuggestions.some(s => s.id === p.id));
-              const shuffledOthers = otherSuggestions.sort(() => 0.5 - Math.random());
-              finalSuggestions = [
-                ...finalSuggestions,
-                ...shuffledOthers.slice(0, MAX_SUGGESTIONS - finalSuggestions.length)
-              ];
-            }
-            setSuggestedProducts(finalSuggestions);
+            const categorySuggestions = allProducts.filter(
+              p => p.id !== fetchedProduct.id && p.category === fetchedProduct.category
+            );
+            setSuggestedProducts(categorySuggestions.slice(0, MAX_SUGGESTIONS));
+          } else {
+            setSuggestedProducts([]); // No category or no product, so no suggestions
           }
 
         } catch (error) {
@@ -310,7 +298,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Removed photo gallery section (id="photo-gallery") as per user request */}
 
         <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
@@ -363,7 +350,7 @@ export default function ProductDetailPage() {
              <Carousel
                 opts={{
                   align: "start",
-                  loop: suggestedProducts.length > 3, // Adjust if a different number of items are visible
+                  loop: suggestedProducts.length > 3, 
                 }}
                 className="w-full max-w-5xl mx-auto group"
               >
@@ -377,7 +364,7 @@ export default function ProductDetailPage() {
                           onToggleWishlist={handleToggleWishlist} 
                           onAddToCart={handleAddToCart} 
                           isProductInCart={false}
-                          className="w-full flex flex-col" // Ensure product card fills item
+                          className="w-full flex flex-col" 
                         />
                       </div>
                     </CarouselItem>
