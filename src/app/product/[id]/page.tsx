@@ -185,7 +185,6 @@ export default function ProductDetailPage() {
                       alt={`${product.name} - Image ${index + 1}`}
                       fill 
                       style={{ objectFit: 'contain' }}
-                      className="w-full h-full rounded-lg"
                       data-ai-hint={image.dataAiHint}
                       priority={index === 0}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
@@ -311,6 +310,8 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
+        {/* Removed photo gallery section (id="photo-gallery") as per user request */}
+
         <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
             <MessageCircle className="h-7 w-7 text-primary" />
@@ -355,23 +356,62 @@ export default function ProductDetailPage() {
         </section>
         
         {suggestedProducts.length > 0 && (
-          <section id="suggested-products" className="mt-12 md:mt-20 animate-fade-in-up animation-delay-200">
+          <section id="suggested-products" className="mt-12 md:mt-20 py-8 animate-fade-in-up animation-delay-200">
             <h2 className="text-2xl lg:text-3xl font-headline text-foreground text-center mb-8 md:mb-10">
               You may also like
             </h2>
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8">
-              {suggestedProducts.map((suggestedProduct) => (
-                <ProductCard
-                  key={suggestedProduct.id}
-                  product={suggestedProduct}
-                  isWishlisted={false} 
-                  onToggleWishlist={handleToggleWishlist} 
-                  onAddToCart={handleAddToCart} 
-                  isProductInCart={false}
-                  className="w-[calc(50%-theme(spacing.2))] sm:w-[calc(33.333%-theme(spacing.4))] md:w-[calc(25%-theme(spacing.6))] lg:max-w-[280px]"
+             <Carousel
+                opts={{
+                  align: "start",
+                  loop: suggestedProducts.length > 3, // Adjust if a different number of items are visible
+                }}
+                className="w-full max-w-5xl mx-auto group"
+              >
+                <CarouselContent className="-ml-4">
+                  {suggestedProducts.map((suggestedProduct) => (
+                    <CarouselItem key={suggestedProduct.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3">
+                      <div className="p-1 h-full flex">
+                        <ProductCard
+                          product={suggestedProduct}
+                          isWishlisted={false} 
+                          onToggleWishlist={handleToggleWishlist} 
+                          onAddToCart={handleAddToCart} 
+                          isProductInCart={false}
+                          className="w-full flex flex-col" // Ensure product card fills item
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                 <CarouselPrevious
+                    variant="ghost"
+                    className={cn(
+                      "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
+                      "h-10 w-10 rounded-full",
+                      "bg-background/70 text-foreground/70",
+                      "hover:bg-background/90 hover:text-primary",
+                      "shadow-md",
+                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                      "transition-opacity duration-200 ease-in-out",
+                      "md:left-[-20px]",
+                      "disabled:opacity-30 disabled:cursor-not-allowed"
+                    )}
                 />
-              ))}
-            </div>
+                <CarouselNext
+                    variant="ghost"
+                    className={cn(
+                      "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
+                      "h-10 w-10 rounded-full",
+                      "bg-background/70 text-foreground/70",
+                      "hover:bg-background/90 hover:text-primary",
+                      "shadow-md",
+                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                      "transition-opacity duration-200 ease-in-out",
+                      "md:right-[-20px]",
+                      "disabled:opacity-30 disabled:cursor-not-allowed"
+                    )}
+                />
+              </Carousel>
           </section>
         )}
       </main>
@@ -379,4 +419,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
