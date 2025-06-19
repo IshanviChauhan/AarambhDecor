@@ -20,20 +20,17 @@ export async function addProduct(prevState: AddProductFormState, formData: FormD
     careInstructions: formData.get('careInstructions'),
     price: formData.get('price'),
     category: formData.get('category'),
-    isLatest: formData.get('isLatest') === 'true', // Convert string "true" to boolean
+    featured: formData.get('featured') === 'true', // Changed from isLatest
     sizeAndDimensions: formData.get('sizeAndDimensions'),
     material: formData.get('material'),
-    // Image URLs are more complex as they are an array of objects
     imageUrls: [] as { url: string; dataAiHint: string }[],
   };
 
-  // Extract and parse imageUrls from FormData
-  // Assuming they are submitted as imageUrls[0].url, imageUrls[0].dataAiHint, etc.
   let i = 0;
   while (formData.has(`imageUrls[${i}].url`)) {
     const url = formData.get(`imageUrls[${i}].url`) as string;
     const dataAiHint = formData.get(`imageUrls[${i}].dataAiHint`) as string;
-    if (url) { // Ensure URL is present
+    if (url) { 
         rawFormData.imageUrls.push({ url, dataAiHint: dataAiHint || '' });
     }
     i++;
@@ -50,7 +47,7 @@ export async function addProduct(prevState: AddProductFormState, formData: FormD
     };
   }
 
-  const { name, description, careInstructions, price, category, isLatest, sizeAndDimensions, material, imageUrls } = validation.data;
+  const { name, description, careInstructions, price, category, featured, sizeAndDimensions, material, imageUrls } = validation.data;
 
   try {
     const newProductData: Omit<Product, 'id' | 'reviews'> & { createdAt?: any } = {
@@ -60,18 +57,17 @@ export async function addProduct(prevState: AddProductFormState, formData: FormD
       imageUrls,
       price,
       category,
-      isLatest: isLatest || false,
+      featured: featured || false, // Changed from isLatest
       sizeAndDimensions: sizeAndDimensions || '',
       material: material || '',
-      // reviews: [], // Initialize with empty reviews array if not making it optional in type
-      createdAt: serverTimestamp(), // Optional: add a timestamp
+      createdAt: serverTimestamp(), 
     };
 
     const productsColRef = collection(db, 'products');
     await addDoc(productsColRef, newProductData);
 
-    revalidatePath('/collections'); // Revalidate collections page
-    revalidatePath('/'); // Revalidate homepage (if it shows latest products)
+    revalidatePath('/collections'); 
+    revalidatePath('/'); 
     
     return { message: 'Product added successfully!', success: true };
   } catch (error) {
@@ -80,3 +76,4 @@ export async function addProduct(prevState: AddProductFormState, formData: FormD
     return { message: `Failed to add product: ${errorMessage}`, success: false, errors: { _form: [`Failed to add product: ${errorMessage}`] } };
   }
 }
+

@@ -21,7 +21,7 @@
     ],
     "price": "Rs. 1850",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": true,
     "sizeAndDimensions": "Set of 3: 16 inches, 12 inches, & 8 inches",
     "material": "Metal/Canvas (Assumed)",
     "reviews": []
@@ -43,7 +43,7 @@
     ],
     "price": "Rs. 1299",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": true,
     "sizeAndDimensions": "Set of 3: 9 inches each",
     "material": "Metal",
     "reviews": []
@@ -65,7 +65,7 @@
     ],
     "price": "Rs. 1299",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": true,
     "sizeAndDimensions": "32 inches x 0.5 inches x 8 inches",
     "material": "Metal",
     "reviews": []
@@ -91,7 +91,7 @@
     ],
     "price": "Rs. 1450",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": true,
     "sizeAndDimensions": "Set of 3: 12 inches, 10 inches, and 8 inches",
     "material": "Metal",
     "reviews": []
@@ -117,7 +117,7 @@
     ],
     "price": "Rs. 2250",
     "category": "Mirrors",
-    "isLatest": true,
+    "featured": true,
     "sizeAndDimensions": "12 x 0.5 x 24 inches",
     "material": "Glass with frame",
     "reviews": []
@@ -143,7 +143,7 @@
     ],
     "price": "Rs. 1350",
     "category": "Wall Accents",
-    "isLatest": true,
+    "featured": true,
     "sizeAndDimensions": "Set of 3: 6x6x2 inch (1), 5x5x2 inch (2)",
     "material": "Metal (Assumed)",
     "reviews": []
@@ -165,7 +165,7 @@
     ],
     "price": "Rs. 2050",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "8 x 24 inches (each)",
     "material": "Metal",
     "reviews": []
@@ -187,7 +187,7 @@
     ],
     "price": "Rs. 1250",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "26 x 1 x 16 inches",
     "material": "Metal",
     "reviews": []
@@ -209,7 +209,7 @@
     ],
     "price": "Rs. 1400",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "Set of 3: 10 x 1 x 10 inches (each)",
     "material": "Metal",
     "reviews": []
@@ -231,7 +231,7 @@
     ],
     "price": "Rs. 2650",
     "category": "Mirrors",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "30 x 1 x 30 inches",
     "material": "Glass with frame",
     "reviews": []
@@ -253,7 +253,7 @@
     ],
     "price": "Rs. 2450",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "30 x 0.65 x 30 inches",
     "material": "MDF",
     "reviews": []
@@ -275,7 +275,7 @@
     ],
     "price": "Rs. 2350",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "16 x 0.75 x 36 inches",
     "material": "MDF",
     "reviews": []
@@ -301,7 +301,7 @@
     ],
     "price": "Rs. 2900",
     "category": "Mirrors",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "16 x 0.60 x 24 inches",
     "material": "MDF",
     "reviews": []
@@ -327,7 +327,7 @@
     ],
     "price": "Rs. 2750",
     "category": "Wall Art",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "20 x 20 x 2 inches",
     "material": "Mango Wood",
     "reviews": []
@@ -353,7 +353,7 @@
     ],
     "price": "Rs. 3250",
     "category": "Mirrors",
-    "isLatest": true,
+    "featured": false,
     "sizeAndDimensions": "26.5 x 0.60 x 27.5 inches",
     "material": "Glass with metal frame",
     "reviews": []

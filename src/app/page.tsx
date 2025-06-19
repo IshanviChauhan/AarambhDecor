@@ -4,7 +4,7 @@ import HomePageClient from './home-page-client'; // The refactored client part
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Loader2 } from 'lucide-react';
-import { getProducts, getLatestProducts } from '@/app/products/actions';
+import { getProducts, getFeaturedProducts } from '@/app/products/actions'; // Changed from getLatestProducts
 import type { Product } from '@/lib/types';
 
 const FEATURED_PRODUCTS_COUNT = 6;
@@ -19,7 +19,7 @@ export default async function Page() {
   try {
     // Using Promise.all to fetch data concurrently
     const [featuredResult, allResult] = await Promise.allSettled([
-      getLatestProducts(FEATURED_PRODUCTS_COUNT),
+      getFeaturedProducts(FEATURED_PRODUCTS_COUNT), // Changed from getLatestProducts
       getProducts()
     ]);
 
@@ -37,7 +37,7 @@ export default async function Page() {
       errorFetchingInitialData = true;
     }
 
-  } catch (error) { // Catch any unexpected error from Promise.all itself, though allSettled handles individual rejections
+  } catch (error) { 
     console.error("Unexpected error fetching products for homepage (server):", error);
     errorFetchingInitialData = true;
   }
@@ -61,3 +61,4 @@ export default async function Page() {
     </Suspense>
   );
 }
+

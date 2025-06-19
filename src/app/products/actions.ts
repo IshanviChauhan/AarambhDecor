@@ -31,7 +31,7 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
       imageUrls: product.imageUrls.map(img => ({ url: img.url, dataAiHint: img.dataAiHint } as ProductImage)),
       price: product.price,
       category: product.category,
-      isLatest: product.isLatest || false,
+      featured: product.featured || false, // Changed from isLatest
       sizeAndDimensions: product.sizeAndDimensions,
       material: product.material,
       reviews: product.reviews ? product.reviews.map(r => ({ ...r } as Review)) : [],
@@ -83,7 +83,7 @@ export async function getProducts(): Promise<Product[]> {
         imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
         price: data.price || 'Rs. 0',
         category: data.category || 'Uncategorized',
-        isLatest: data.isLatest || false,
+        featured: data.featured || false, // Changed from isLatest
         sizeAndDimensions: data.sizeAndDimensions || 'N/A',
         material: data.material || 'N/A',
         reviews: data.reviews || [],
@@ -114,7 +114,7 @@ export async function getProductById(id: string): Promise<Product | null> {
         imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
         price: data.price || 'Rs. 0',
         category: data.category || 'Uncategorized',
-        isLatest: data.isLatest || false,
+        featured: data.featured || false, // Changed from isLatest
         sizeAndDimensions: data.sizeAndDimensions || 'N/A',
         material: data.material || 'N/A',
         reviews: data.reviews || [],
@@ -140,7 +140,7 @@ export async function getProductById(id: string): Promise<Product | null> {
                 imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
                 price: data.price || 'Rs. 0',
                 category: data.category || 'Uncategorized',
-                isLatest: data.isLatest || false,
+                featured: data.featured || false, // Changed from isLatest
                 sizeAndDimensions: data.sizeAndDimensions || 'N/A',
                 material: data.material || 'N/A',
                 reviews: data.reviews || [],
@@ -163,41 +163,41 @@ export async function getProductById(id: string): Promise<Product | null> {
   }
 }
 
-export async function getLatestProducts(count: number): Promise<Product[]> {
+export async function getFeaturedProducts(count: number): Promise<Product[]> { // Renamed from getLatestProducts
   try {
-    console.log(`getLatestProducts: Attempting to fetch ${count} latest products from Firestore...`);
+    console.log(`getFeaturedProducts: Attempting to fetch ${count} featured products from Firestore...`);
     const productsColRef = collection(db, 'products');
-    let latestProductsQuery = query(productsColRef, where('isLatest', '==', true), limit(count));
-    let productsSnap = await getDocs(latestProductsQuery);
+    let featuredProductsQuery = query(productsColRef, where('featured', '==', true), limit(count)); // Changed from isLatest
+    let productsSnap = await getDocs(featuredProductsQuery);
 
     let productsToReturn: Product[] = [];
 
     if (productsSnap.empty) {
-      console.log("getLatestProducts: 'isLatest' query returned no results. Checking if entire collection is empty for seeding...");
+      console.log("getFeaturedProducts: 'featured' query returned no results. Checking if entire collection is empty for seeding...");
       const allProductsCheckQuery = query(productsColRef, limit(1));
       const anyProductSnap = await getDocs(allProductsCheckQuery);
 
       if (anyProductSnap.empty) {
-        console.log('getLatestProducts: Products collection is entirely empty. Attempting to seed database with mock data...');
+        console.log('getFeaturedProducts: Products collection is entirely empty. Attempting to seed database with mock data...');
         const seedResult = await seedProductsToFirestore();
         if (seedResult.success && seedResult.count && seedResult.count > 0) {
-          console.log(`getLatestProducts: Seeding successful: ${seedResult.message}. Re-fetching latest products.`);
-          productsSnap = await getDocs(latestProductsQuery);
+          console.log(`getFeaturedProducts: Seeding successful: ${seedResult.message}. Re-fetching featured products.`);
+          productsSnap = await getDocs(featuredProductsQuery);
           if (productsSnap.empty) {
-              console.warn("getLatestProducts: 'isLatest' query still empty after successful seed.");
+              console.warn("getFeaturedProducts: 'featured' query still empty after successful seed.");
           }
         } else {
-          console.error(`getLatestProducts: Seeding failed or yielded no products: ${seedResult.message}.`);
+          console.error(`getFeaturedProducts: Seeding failed or yielded no products: ${seedResult.message}.`);
         }
       }
       
-      if (productsSnap.empty) { // If still empty after potential seed, or if collection wasn't empty but no 'isLatest'
-         console.log("getLatestProducts: No 'isLatest' products found. Falling back to a general query for any products.");
+      if (productsSnap.empty) { 
+         console.log("getFeaturedProducts: No 'featured' products found. Falling back to a general query for any products.");
          const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); 
          productsSnap = await getDocs(fallbackQuery);
          if (productsSnap.empty) {
-           console.log("getLatestProducts: Fallback query also returned no results. The collection might be truly empty or seeding failed. Falling back to MOCK_PRODUCTS.");
-           return MOCK_PRODUCTS.slice(0, count); // Fallback to mock data
+           console.log("getFeaturedProducts: Fallback query also returned no results. The collection might be truly empty or seeding failed. Falling back to MOCK_PRODUCTS.");
+           return MOCK_PRODUCTS.slice(0, count); 
          }
       }
     }
@@ -212,7 +212,7 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
         imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
         price: data.price || 'Rs. 0',
         category: data.category || 'Uncategorized',
-        isLatest: data.isLatest || false,
+        featured: data.featured || false, // Changed from isLatest
         sizeAndDimensions: data.sizeAndDimensions || 'N/A',
         material: data.material || 'N/A',
         reviews: data.reviews || [],
@@ -220,15 +220,16 @@ export async function getLatestProducts(count: number): Promise<Product[]> {
     });
 
     if (productsToReturn.length === 0 && MOCK_PRODUCTS.length > 0) {
-        console.warn("getLatestProducts: All Firestore fetches resulted in no products. Falling back to MOCK_PRODUCTS for latest products.");
-        return MOCK_PRODUCTS.filter(p => p.isLatest).slice(0, count);
+        console.warn("getFeaturedProducts: All Firestore fetches resulted in no products. Falling back to MOCK_PRODUCTS for featured products.");
+        return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count); // Changed from isLatest
     }
     
-    console.log(`getLatestProducts: Fetched ${productsToReturn.length} products.`);
+    console.log(`getFeaturedProducts: Fetched ${productsToReturn.length} products.`);
     return productsToReturn;
 
   } catch (error) {
-    console.error("getLatestProducts: Error fetching latest products:", error, "Falling back to MOCK_PRODUCTS.");
-    return MOCK_PRODUCTS.filter(p => p.isLatest).slice(0, count); // Fallback to mock data on error
+    console.error("getFeaturedProducts: Error fetching featured products:", error, "Falling back to MOCK_PRODUCTS.");
+    return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count); // Changed from isLatest
   }
 }
+

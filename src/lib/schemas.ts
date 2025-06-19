@@ -43,7 +43,7 @@ export const ProductFormSchema = z.object({
   careInstructions: z.string().max(1000, "Care instructions too long.").optional().or(z.literal('')),
   price: z.string().min(1, "Price is required.").regex(/^\s*Rs\.\s*\d+(\.\d{1,2})?\s*$/, { message: "Price must be in format 'Rs. 123.45'" }),
   category: z.string().min(1, "Category is required.").max(50, "Category name too long."),
-  isLatest: z.boolean().optional(),
+  featured: z.boolean().optional(), // Changed from isLatest
   sizeAndDimensions: z.string().max(100, "Size/dimensions info too long.").optional().or(z.literal('')),
   material: z.string().max(100, "Material info too long.").optional().or(z.literal('')),
   imageUrls: z.array(ProductImageSchema).min(1, "At least one image is required."),
@@ -81,3 +81,4 @@ export const SignInSchema = z.object({
   password: z.string().min(1, { message: 'Password is required.' }), // Password can't be empty
 });
 export type SignInInput = z.infer<typeof SignInSchema>;
+

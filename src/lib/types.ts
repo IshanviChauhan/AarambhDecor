@@ -19,7 +19,7 @@ export interface Product {
   imageUrls: ProductImage[];
   price?: string;
   category?: string;
-  isLatest?: boolean;
+  featured?: boolean; // Changed from isLatest
   sizeAndDimensions?: string;
   material?: string;
   reviews?: Review[];
@@ -81,3 +81,4 @@ export interface Order {
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   orderNumber?: string; // Human-readable order number
 }
+

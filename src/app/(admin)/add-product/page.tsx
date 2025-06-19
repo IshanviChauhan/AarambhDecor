@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useActionState, startTransition as ReactStartTransition } from 'react'; // Import ReactStartTransition
+import { useState, useEffect, useActionState, startTransition as ReactStartTransition } from 'react'; 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ProductFormSchema, type ProductFormInput } from '@/lib/schemas';
@@ -48,7 +48,7 @@ export default function AddProductPage() {
       careInstructions: '',
       price: 'Rs. ',
       category: '',
-      isLatest: false,
+      featured: false, // Changed from isLatest
       sizeAndDimensions: '',
       material: '',
       imageUrls: [],
@@ -115,7 +115,7 @@ export default function AddProductPage() {
     setIsUploading(true);
     const uploadedImageDetails: { url: string; dataAiHint: string }[] = [];
     const uploadPromises = imagePreviews.map((imgPreview, index) => {
-      if (imgPreview.downloadUrl) { // Already uploaded or a placeholder URL
+      if (imgPreview.downloadUrl) { 
           return Promise.resolve({ url: imgPreview.downloadUrl, dataAiHint: imgPreview.aiHint });
       }
       const uniqueFileName = `${uuidv4()}-${imgPreview.file.name}`;
@@ -170,7 +170,7 @@ export default function AddProductPage() {
       console.error("Error uploading images or submitting form:", error);
       toast({ title: "Submission Error", description: "Could not upload all images or save product details.", variant: "destructive" });
       imagePreviews.forEach(img => {
-        if (img.storagePath && !img.downloadUrl) { // Only attempt to delete if upload failed and path exists
+        if (img.storagePath && !img.downloadUrl) { 
           const imageRef = ref(storage, img.storagePath);
           deleteObject(imageRef).catch(err => console.error("Cleanup: Error deleting image from storage:", err));
         }
@@ -307,12 +307,12 @@ export default function AddProductPage() {
                   </FormItem>
                 )} />
 
-                <FormField control={form.control} name="isLatest" render={({ field }) => (
+                <FormField control={form.control} name="featured" render={({ field }) => ( // Changed name from isLatest
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
                     <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Mark as Latest Product</FormLabel>
-                      <FormDescription>Featured on the homepage if marked.</FormDescription>
+                      <FormLabel>Mark as Featured Product</FormLabel> 
+                      <FormDescription>Featured products appear on the homepage.</FormDescription> 
                     </div>
                   </FormItem>
                 )} />
@@ -334,3 +334,4 @@ export default function AddProductPage() {
     </div>
   );
 }
+
