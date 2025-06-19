@@ -11,6 +11,16 @@ import { Loader2, Heart, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { getProducts } from '@/app/products/actions';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
 
@@ -20,6 +30,11 @@ export default function WishlistPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const [currentWishlistIds, setCurrentWishlistIds] = useState<string[]>([]);
+  const [confirmDialogState, setConfirmDialogState] = useState<{
+    isOpen: boolean;
+    productId: string | null;
+    productName: string | null;
+  }>({ isOpen: false, productId: null, productName: null });
 
   const { toast } = useToast();
 
@@ -62,13 +77,12 @@ export default function WishlistPage() {
     loadWishlist();
   }, [loadWishlist]);
 
-  // Listen for storage changes to update wishlist in real-time if changed in another tab
   useEffect(() => {
     if (!isClient) return;
 
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === WISHLIST_STORAGE_KEY) {
-        loadWishlist(); // Reload wishlist if the storage key changed
+        loadWishlist();
       }
     };
 
@@ -84,38 +98,49 @@ export default function WishlistPage() {
 
     const product = allProducts.find(p => p.id === productId);
     const productName = product?.name || "Product";
-    let newWishlistIds: string[];
 
     if (currentWishlistIds.includes(productId)) {
-      newWishlistIds = currentWishlistIds.filter(id => id !== productId);
-      toast({
-        title: "Removed from Wishlist",
-        description: `${productName} has been removed from your wishlist.`,
-        variant: "default"
-      });
+      // Item is currently wishlisted, open confirmation dialog to remove
+      setConfirmDialogState({ isOpen: true, productId, productName });
     } else {
-      newWishlistIds = [...currentWishlistIds, productId];
+      // Item is not wishlisted, add it directly
+      const newWishlistIds = [...currentWishlistIds, productId];
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlistIds));
+      setCurrentWishlistIds(newWishlistIds);
+      if (allProducts.length > 0) {
+          setWishlistedProducts(allProducts.filter(p => newWishlistIds.includes(p.id)));
+      }
       toast({
         title: "Added to Wishlist",
         description: `${productName} has been added to your wishlist.`,
         variant: "default"
       });
+      window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
     }
+  };
+
+  const handleConfirmRemove = () => {
+    if (!confirmDialogState.productId || !confirmDialogState.productName) return;
+
+    const { productId, productName } = confirmDialogState;
+    const newWishlistIds = currentWishlistIds.filter(id => id !== productId);
 
     localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlistIds));
-    setCurrentWishlistIds(newWishlistIds); // Update current IDs
-    
-    // Update displayed products
+    setCurrentWishlistIds(newWishlistIds);
     if (allProducts.length > 0) {
         setWishlistedProducts(allProducts.filter(p => newWishlistIds.includes(p.id)));
-    } else {
-        // This case implies allProducts might not have loaded yet, edge case
-        loadWishlist(); // Re-evaluate displayed products
     }
-     // Force header update for wishlist icon fill (if header doesn't auto-update)
-     // This is a common pattern. If your header listens to 'storage' event, this might not be needed.
-     // Forcing a storage event to ensure header updates:
-     window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    toast({
+      title: "Removed from Wishlist",
+      description: `${productName} has been removed from your wishlist.`,
+      variant: "default"
+    });
+    window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
+  };
+
+  const handleCancelRemove = () => {
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
   };
 
 
@@ -162,7 +187,7 @@ export default function WishlistPage() {
                 product={product}
                 isWishlisted={currentWishlistIds.includes(product.id)}
                 onToggleWishlist={handleToggleWishlist}
-                className="w-full" // Ensure cards take full width of their grid cell
+                className="w-full"
               />
             ))}
           </div>
@@ -180,6 +205,20 @@ export default function WishlistPage() {
         )}
       </main>
       <Footer />
+      <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Removal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{confirmDialogState.productName || 'this item'}" from your wishlist?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelRemove}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemove} className="bg-destructive hover:bg-destructive/90">Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

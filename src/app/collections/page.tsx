@@ -23,6 +23,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
 import { getProducts } from '@/app/products/actions';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 const MIN_PRICE_DEFAULT = 0;
@@ -42,6 +52,11 @@ function CollectionsPageContent() {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [currentPage, setCurrentPage] = useState(1);
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
+  const [confirmDialogState, setConfirmDialogState] = useState<{
+    isOpen: boolean;
+    productId: string | null;
+    productName: string | null;
+  }>({ isOpen: false, productId: null, productName: null });
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -227,20 +242,40 @@ function CollectionsPageContent() {
     const product = allProducts.find(p => p.id === productId);
     const productName = product?.name || "Product";
 
-    setWishlistItems(prev => {
-      const newWishlist = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+    if (wishlistItems.includes(productId)) {
+      setConfirmDialogState({ isOpen: true, productId, productName });
+    } else {
+      const newWishlist = [...wishlistItems, productId];
       localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+      setWishlistItems(newWishlist);
       toast({
-        title: prev.includes(productId) ? "Removed from Wishlist" : "Added to Wishlist",
-        description: `${productName} has been ${prev.includes(productId) ? 'removed from' : 'added to'} your wishlist.`,
+        title: "Added to Wishlist",
+        description: `${productName} has been added to your wishlist.`,
         variant: "default"
       });
-      return newWishlist;
-    });
+      window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    }
   };
 
-  // Add to Cart functionality removed
-  // const handleAddToCart = (product: Product) => { ... };
+  const handleConfirmRemove = () => {
+    if (!confirmDialogState.productId || !confirmDialogState.productName) return;
+    const { productId: idToRemove, productName } = confirmDialogState;
+
+    const newWishlist = wishlistItems.filter(itemId => itemId !== idToRemove);
+    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+    setWishlistItems(newWishlist);
+    toast({
+      title: "Removed from Wishlist",
+      description: `${productName} has been removed from your wishlist.`,
+      variant: "default"
+    });
+    window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
+  };
+
+  const handleCancelRemove = () => {
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
+  };
   
   const updateUrlParamsAndResetPage = (newParams: URLSearchParams) => {
     newParams.delete('page'); 
@@ -426,6 +461,20 @@ function CollectionsPageContent() {
         </div>
       </main>
       <Footer />
+      <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Removal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{confirmDialogState.productName || 'this item'}" from your wishlist?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelRemove}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemove} className="bg-destructive hover:bg-destructive/90">Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

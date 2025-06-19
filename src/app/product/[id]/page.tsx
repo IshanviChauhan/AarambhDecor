@@ -9,7 +9,7 @@ import Footer from '@/components/layout/footer';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from '@/components/wishlist-icon';
-import { MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send, Plus, Minus, Package } from 'lucide-react'; // ShoppingCart removed
+import { MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send, Plus, Minus, Package, Star } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -20,13 +20,22 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 import { getProductById, getProducts } from '@/app/products/actions';
 import { ProductCard } from '@/components/product-card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
@@ -50,6 +59,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // To find product names for suggested items
   const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -57,6 +67,12 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [emblaApi, setEmblaApi] = useState<CarouselApi>();
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
+  const [confirmDialogState, setConfirmDialogState] = useState<{
+    isOpen: boolean;
+    productId: string | null;
+    productName: string | null;
+  }>({ isOpen: false, productId: null, productName: null });
+
 
   useEffect(() => {
     setIsClient(true);
@@ -74,9 +90,11 @@ export default function ProductDetailPage() {
           const fetchedProduct = await getProductById(productId);
           setProduct(fetchedProduct);
 
+          const fetchedAllProducts = await getProducts();
+          setAllProducts(fetchedAllProducts); // Store all products
+
           if (fetchedProduct && fetchedProduct.category) {
-            const allProducts = await getProducts();
-            const categorySuggestions = allProducts.filter(
+            const categorySuggestions = fetchedAllProducts.filter(
               p => p.id !== fetchedProduct.id && p.category === fetchedProduct.category
             ).slice(0, MAX_SUGGESTIONS);
             setSuggestedProducts(categorySuggestions);
@@ -89,6 +107,7 @@ export default function ProductDetailPage() {
           toast({ title: "Error", description: "Could not load product details or suggestions.", variant: "destructive" });
           setProduct(null);
           setSuggestedProducts([]);
+          setAllProducts([]);
         } finally {
           setIsLoading(false);
         }
@@ -97,25 +116,53 @@ export default function ProductDetailPage() {
     }
   }, [productId, toast]);
 
-  const handleToggleWishlist = (id: string) => {
+  const handleToggleWishlist = (idToToggle: string) => {
     if (!isClient) return;
-    const currentProduct = product?.id === id ? product : suggestedProducts.find(p => p.id === id);
-    const productName = currentProduct?.name || "Product";
 
-    setWishlistItems(prev => {
-      const newWishlist = prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id];
+    let nameOfProductToToggle = "Product";
+    if (product?.id === idToToggle) {
+      nameOfProductToToggle = product.name;
+    } else {
+      const suggestedProd = allProducts.find(p => p.id === idToToggle);
+      if (suggestedProd) {
+        nameOfProductToToggle = suggestedProd.name;
+      }
+    }
+    
+    if (wishlistItems.includes(idToToggle)) {
+      setConfirmDialogState({ isOpen: true, productId: idToToggle, productName: nameOfProductToToggle });
+    } else {
+      const newWishlist = [...wishlistItems, idToToggle];
       localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+      setWishlistItems(newWishlist);
       toast({
-        title: prev.includes(id) ? "Removed from Wishlist" : "Added to Wishlist",
-        description: `${productName} has been ${prev.includes(id) ? 'removed from' : 'added to'} your wishlist.`,
+        title: "Added to Wishlist",
+        description: `${nameOfProductToToggle} has been added to your wishlist.`,
         variant: "default"
       });
-      return newWishlist;
-    });
+      window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    }
   };
 
-  // Add to cart functionality is removed
-  // const handleAddToCart = (p: Product) => { ... };
+  const handleConfirmRemove = () => {
+    if (!confirmDialogState.productId || !confirmDialogState.productName) return;
+    const { productId: idToRemove, productName } = confirmDialogState;
+
+    const newWishlist = wishlistItems.filter(itemId => itemId !== idToRemove);
+    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+    setWishlistItems(newWishlist);
+    toast({
+      title: "Removed from Wishlist",
+      description: `${productName} has been removed from your wishlist.`,
+      variant: "default"
+    });
+    window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
+  };
+
+  const handleCancelRemove = () => {
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
+  };
 
   const handleIncreaseQuantity = () => {
     setQuantity(prev => prev + 1);
@@ -210,7 +257,6 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {/* CarouselPrevious and CarouselNext are removed */}
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
@@ -242,7 +288,6 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              {/* Add to Cart Button removed */}
               <WishlistIcon
                 isWishlisted={isProductWishlisted}
                 onClick={() => handleToggleWishlist(product.id)}
@@ -356,43 +401,26 @@ export default function ProductDetailPage() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                {suggestedProducts.length > 1 && (
-                  <>
-                    <CarouselPrevious
-                        variant="ghost"
-                        className={cn(
-                          "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
-                          "h-10 w-10 rounded-full",
-                          "bg-background/70 text-foreground/70",
-                          "hover:bg-background/90 hover:text-primary",
-                          "shadow-md",
-                          "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                          "transition-opacity duration-200 ease-in-out",
-                          "md:left-[-20px]",
-                          "disabled:opacity-30 disabled:cursor-not-allowed"
-                        )}
-                    />
-                    <CarouselNext
-                        variant="ghost"
-                        className={cn(
-                          "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
-                          "h-10 w-10 rounded-full",
-                          "bg-background/70 text-foreground/70",
-                          "hover:bg-background/90 hover:text-primary",
-                          "shadow-md",
-                          "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                          "transition-opacity duration-200 ease-in-out",
-                          "md:right-[-20px]",
-                          "disabled:opacity-30 disabled:cursor-not-allowed"
-                        )}
-                    />
-                  </>
-                )}
+                {/* CarouselPrevious and CarouselNext are conditionally rendered if suggestedProducts.length > 1 in carousel component */}
               </Carousel>
           </section>
         )}
       </main>
       <Footer />
+      <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Removal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{confirmDialogState.productName || 'this item'}" from your wishlist?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelRemove}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemove} className="bg-destructive hover:bg-destructive/90">Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

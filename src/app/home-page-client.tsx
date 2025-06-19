@@ -17,6 +17,16 @@ import { SearchBar } from '@/components/search-bar';
 import WelcomeLoader from '@/components/welcome-loader';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface HomePageClientProps {
   initialFeaturedProducts: Product[];
@@ -31,6 +41,11 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
   const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>(initialAllProducts);
   const [productsUnavailable, setProductsUnavailable] = useState(errorFetchingInitialData);
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
+  const [confirmDialogState, setConfirmDialogState] = useState<{
+    isOpen: boolean;
+    productId: string | null;
+    productName: string | null;
+  }>({ isOpen: false, productId: null, productName: null });
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -62,20 +77,40 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
     const product = featuredProducts.find(p => p.id === productId) || allProductsForSearch.find(p => p.id === productId);
     const productName = product?.name || "Product";
 
-    setWishlistItems(prev => {
-      const newWishlist = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+    if (wishlistItems.includes(productId)) {
+      setConfirmDialogState({ isOpen: true, productId, productName });
+    } else {
+      const newWishlist = [...wishlistItems, productId];
       localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+      setWishlistItems(newWishlist);
       toast({
-        title: prev.includes(productId) ? "Removed from Wishlist" : "Added to Wishlist",
-        description: `${productName} has been ${prev.includes(productId) ? 'removed from' : 'added to'} your wishlist.`,
+        title: "Added to Wishlist",
+        description: `${productName} has been added to your wishlist.`,
         variant: "default"
       });
-      return newWishlist;
+      window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    }
+  };
+  
+  const handleConfirmRemove = () => {
+    if (!confirmDialogState.productId || !confirmDialogState.productName) return;
+    const { productId: idToRemove, productName } = confirmDialogState;
+
+    const newWishlist = wishlistItems.filter(itemId => itemId !== idToRemove);
+    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+    setWishlistItems(newWishlist);
+    toast({
+      title: "Removed from Wishlist",
+      description: `${productName} has been removed from your wishlist.`,
+      variant: "default"
     });
+    window.dispatchEvent(new StorageEvent('storage', { key: WISHLIST_STORAGE_KEY }));
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
   };
 
-  // Add to Cart functionality removed
-  // const handleAddToCart = (product: Product) => { ... };
+  const handleCancelRemove = () => {
+    setConfirmDialogState({ isOpen: false, productId: null, productName: null });
+  };
 
   const handleHomepageSearch = (searchTerm: string) => {
     const trimmedSearchTerm = searchTerm.trim();
@@ -252,6 +287,20 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
         </main>
         <Footer />
       </div>
+      <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Removal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{confirmDialogState.productName || 'this item'}" from your wishlist?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelRemove}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemove} className="bg-destructive hover:bg-destructive/90">Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
