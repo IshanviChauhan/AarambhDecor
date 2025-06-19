@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, AlertTriangle } from 'lucide-react';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'; // Updated import for AlertDescription
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 import { SignUpSchemaWithAddress, type SignUpWithAddressInput } from '@/lib/schemas';
 import { registerUserAction, type RegisterUserFormState } from './actions';
@@ -57,6 +57,7 @@ export default function RegisterPage() {
         form.reset(); // Clear form fields
         if (typeof window !== 'undefined') {
           localStorage.setItem('tempUserId', formState.userId); // Store UID for profile page access
+          localStorage.setItem('isAuthenticated', 'true'); // Set auth cookie for middleware
           router.push('/profile'); // Redirect to profile page
         }
       } else if (!formState.success) {
@@ -76,13 +77,10 @@ export default function RegisterPage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, toast, router]); // form.reset was added, so form is a dependency
+  }, [formState, toast, router]);
 
-  // This function is called by form.handleSubmit for client-side validation.
-  // The actual submission to `formAction` is handled by React due to the <form action={formAction}>.
   const handleClientValidationOnly = (data: SignUpWithAddressInput) => {
-    console.log("RegisterPage: Client-side validation passed. Data submitted to server action:", data);
-    // No need to explicitly call formAction here if using <form action={formAction}>
+    console.log("RegisterPage (Firebase): Client-side validation passed. Data submitted to server action:", data);
   };
 
   return (
@@ -123,7 +121,7 @@ export default function RegisterPage() {
               <Form {...form}>
                 <form 
                   onSubmit={form.handleSubmit(handleClientValidationOnly)} 
-                  action={formAction} // Wires up the server action
+                  action={formAction} 
                   className="space-y-6"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

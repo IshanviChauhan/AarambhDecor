@@ -2,12 +2,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import NextAuthProvider from '@/contexts/NextAuthProvider'; // Renamed for clarity
+// NextAuthProvider is removed as NextAuth is being reverted
 
 export const metadata: Metadata = {
   title: 'Aarambh Decor',
   description: 'Discover inspiration with Aarambh Decor. Curated home decor items and AI-powered style suggestions.',
-  icons: {
+  icons: { // Explicitly define favicon.ico
     icon: '/favicon.ico',
   },
 };
@@ -26,10 +26,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col" suppressHydrationWarning={true}>
-        <NextAuthProvider>
-          {children}
-          <Toaster />
-        </NextAuthProvider>
+        {/* NextAuthProvider wrapper is removed */}
+        {children}
+        <Toaster />
       </body>
     </html>
   );

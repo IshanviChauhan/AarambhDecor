@@ -50,15 +50,20 @@ export async function signInUserAction(prevState: SignInUserFormState, formData:
     let fieldErrors: Partial<Record<keyof SignInInput | '_form', string[]>> = { _form: [errorMessage] };
 
     // Handle specific Firebase Auth error codes
-    // error.code is Firebase specific, error.type would be NextAuth specific
+    // error.code is Firebase specific
     if (error.code) {
         switch (error.code) {
-        case 'auth/invalid-credential':
-        case 'auth/user-not-found': // Older SDKs might differentiate
-        case 'auth/wrong-password': // Older SDKs might differentiate
+        case 'auth/invalid-credential': // Covers user-not-found, wrong-password in modern SDKs
             errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-            // For security, we don't reveal if it's the email or password that's wrong.
-            fieldErrors = { _form: [errorMessage] };
+            fieldErrors = { _form: [errorMessage] }; // General error for security
+            break;
+        case 'auth/user-not-found': // explicit if backend sends it
+             errorMessage = 'No user found with this email address.';
+             fieldErrors = { email: [errorMessage] };
+            break;
+        case 'auth/wrong-password': // explicit if backend sends it
+             errorMessage = 'Incorrect password. Please try again.';
+             fieldErrors = { password: [errorMessage] };
             break;
         case 'auth/invalid-email':
             errorMessage = 'The email address format is not valid.';

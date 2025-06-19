@@ -15,18 +15,28 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from '@/components/ui/separator';
-import { useSession, signOut } from 'next-auth/react'; // Import NextAuth hooks
 import { useToast } from '@/hooks/use-toast';
+// useSession and signOut from next-auth/react are removed
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession(); // Get session data and status
   const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const isLoadingSession = status === "loading";
-  const isLoggedIn = status === "authenticated" && !!session;
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State for Firebase-based login
+  const [isLoadingSession, setIsLoadingSession] = useState(true); // To mimic loading state
+
+  useEffect(() => {
+    // Check for tempUserId from localStorage to simulate session loading
+    // This is a simplified way to handle UI for Firebase auth without a context/global state manager
+    const tempUserId = localStorage.getItem('tempUserId');
+    if (tempUserId) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+    setIsLoadingSession(false); // Done checking
+  }, [pathname]); // Re-check on path change if needed
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
@@ -39,10 +49,13 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false }); // Sign out from NextAuth
-    setIsMobileMenuOpen(false); 
-    router.push('/'); 
+  const handleLogout = () => {
+    // Firebase logout would typically be handled via auth.signOut()
+    // For now, we'll just clear the localStorage item and update state
+    localStorage.removeItem('tempUserId');
+    setIsLoggedIn(false);
+    setIsMobileMenuOpen(false);
+    router.push('/');
     toast({
       title: "Logged Out",
       description: "You have been successfully logged out.",
@@ -100,7 +113,7 @@ export default function Header() {
             ) : (
               <>
                 <NavLink href="/register" label="Register" icon={UserPlus} />
-                <NavLink href="/auth/signin" label="Login" icon={LogIn} />
+                <NavLink href="/signin" label="Login" icon={LogIn} />
               </>
             )}
           </nav>
@@ -151,7 +164,7 @@ export default function Header() {
                     ) : (
                       <>
                         <NavLink href="/register" label="Register" icon={UserPlus} />
-                        <NavLink href="/auth/signin" label="Login" icon={LogIn} />
+                        <NavLink href="/signin" label="Login" icon={LogIn} />
                       </>
                     )}
                 </div>
