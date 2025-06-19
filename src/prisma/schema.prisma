@@ -1,0 +1,24 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  // Explicitly list binary targets. 'native' attempts to use system SSL.
+  // 'debian-openssl-3.0.x' for environments with OpenSSL 3.x.
+  // 'debian-openssl-1.1.x' was the original default that was failing.
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql" // Or your chosen database provider
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String? // Made phone optional to align with NextAuth user object
+}

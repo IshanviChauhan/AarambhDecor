@@ -87,6 +87,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <Header />
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <div className="absolute top-8 left-8 z-10 hidden md:flex">
           <Link href="/" className="flex items-center group" aria-label="Aarambh Decor Home">
