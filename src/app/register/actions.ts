@@ -16,6 +16,15 @@ export interface RegisterUserFormState {
 
 export async function registerUserAction(prevState: RegisterUserFormState, formData: FormData): Promise<RegisterUserFormState> {
   console.log("RegisterUserAction: TOP OF ACTION INVOKED. PrevState keys:", Object.keys(prevState || {}));
+
+  if (!auth || !db) {
+    console.error("RegisterUserAction: Firebase auth or db service is not available. Initialization might have failed.");
+    return {
+      message: 'Registration service is currently unavailable. Please try again later.',
+      success: false,
+      errors: { _form: ['Firebase services are not initialized. Contact support if this persists.'] },
+    };
+  }
   
   const formDataEntries: Record<string, any> = {};
   for (const [key, value] of formData.entries()) {
