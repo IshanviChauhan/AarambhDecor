@@ -22,7 +22,7 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
       "transition-all duration-300 ease-in-out hover:shadow-xl group",
       className
     )}>
-      <div className="p-3 flex items-center space-x-2 border-b border-border/50">
+      {/* <div className="p-3 flex items-center space-x-2 border-b border-border/50">
         <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label={`View profile of ${reel.username} on Instagram`}>
           <Avatar className="h-8 w-8">
             <AvatarImage src={reel.profileImageUrl} alt={reel.username} data-ai-hint="logo"/>
@@ -32,7 +32,7 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
         <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label={`View profile of ${reel.username} on Instagram`}>
           <span className="text-sm font-semibold text-foreground hover:underline">{reel.username}</span>
         </Link>
-      </div>
+      </div> */}
 
       <div className="relative aspect-[4/5] w-full bg-muted/30 overflow-hidden">
         <iframe
@@ -48,11 +48,9 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
         <div className="flex items-center space-x-3 text-muted-foreground">
           <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 hover:text-primary">
             <Heart size={20} />
-            {reel.likes && <span className="text-xs">{reel.likes}</span>}
           </Link>
           <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 hover:text-primary">
             <MessageCircle size={20} />
-            {reel.comments && <span className="text-xs">{reel.comments}</span>}
           </Link>
           <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
             <Send size={20} />

@@ -45,11 +45,6 @@ export function InstagramReelsSection() {
               Explore More on Instagram
             </h2>
           </div>
-          <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
-            <Link href="https://www.instagram.com/_aarambh_decor/" target="_blank" rel="noopener noreferrer">
-              Follow @_aarambh_decor
-            </Link>
-          </Button>
         </div>
 
         <Carousel

@@ -35,7 +35,5 @@ export interface InstagramReel {
   caption?: string;
   username: string;
   profileImageUrl: string;
-  likes?: string;
-  comments?: string;
 }
 
