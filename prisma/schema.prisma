@@ -1,17 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  // Attempt to use OpenSSL 3.x if libssl1.1 is not available
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
 datasource db {
   provider = "postgresql" // Or your chosen database: "mysql", "sqlite", "sqlserver", "mongodb"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String   // This will store the hashed password
-  firstName String
-  lastName  String
-  phone     String?  // Made phone optional as it often is
+  password  String
+  firstName String? // Optional fields as per NextAuth setup
+  lastName  String? // Optional fields as per NextAuth setup
+  phone     String? // Optional fields as per NextAuth setup
 }
