@@ -289,7 +289,7 @@ export default function ProductDetailPage() {
                   src={safeImageUrls[0].url}
                   alt={`${product.name} - Main gallery view`}
                   fill
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: 'contain' }} 
                   className="rounded-md"
                   data-ai-hint={safeImageUrls[0].dataAiHint}
                   sizes="(max-width: 767px) 100vw, 66vw"
@@ -305,7 +305,7 @@ export default function ProductDetailPage() {
                       src={image.url}
                       alt={`${product.name} - Gallery thumbnail ${index + 1}`}
                       fill
-                      style={{ objectFit: 'cover' }}
+                      style={{ objectFit: 'contain' }} 
                       className="rounded-md"
                       data-ai-hint={image.dataAiHint}
                       sizes="(max-width: 767px) 50vw, 17vw"
@@ -313,7 +313,7 @@ export default function ProductDetailPage() {
                   </div>
                 ))}
                 {/* Placeholder divs to maintain 2x2 structure for the small images grid */}
-                {Array.from({ length: 4 - safeImageUrls.slice(1, 5).length }).map((_, i) => (
+                {Array.from({ length: Math.max(0, 4 - safeImageUrls.slice(1, 5).length) }).map((_, i) => (
                   <div key={`gallery-placeholder-${i}`} className="aspect-square bg-muted/30 rounded-md"></div>
                 ))}
               </div>
@@ -321,7 +321,7 @@ export default function ProductDetailPage() {
           ) : (
              <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
                 <Info className="h-8 w-8 text-primary mx-auto mb-3" />
-                <p className="text-muted-foreground">Detailed gallery views are not available as only one image is provided for this product.</p>
+                <p className="text-muted-foreground">Detailed gallery views are not applicable as only one image is provided for this product.</p>
             </Card>
           )}
         </section>
