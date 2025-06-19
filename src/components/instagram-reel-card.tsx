@@ -17,8 +17,8 @@ interface InstagramReelCardProps {
 export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
   return (
     <Card className={cn(
-      "overflow-hidden rounded-lg shadow-lg w-[280px] sm:w-[300px] flex-shrink-0 snap-start bg-card border-border/70",
-      "transition-all duration-300 ease-in-out hover:shadow-xl group", // Added group for hover effect on image
+      "overflow-hidden rounded-lg shadow-lg w-[220px] sm:w-[250px] flex-shrink-0 snap-start bg-card border-border/70",
+      "transition-all duration-300 ease-in-out hover:shadow-xl group",
       className
     )}>
       <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label={`View reel by ${reel.username} on Instagram`}>
@@ -37,7 +37,7 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
             fill
             style={{ objectFit: 'cover' }}
             data-ai-hint={reel.dataAiHint}
-            sizes="(max-width: 640px) 80vw, 300px"
+            sizes="(max-width: 640px) 80vw, 250px" // Adjusted max size slightly
             className="transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full">
@@ -67,3 +67,4 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
     </Card>
   );
 }
+
