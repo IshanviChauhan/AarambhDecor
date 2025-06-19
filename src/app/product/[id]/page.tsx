@@ -68,7 +68,7 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  // const [quantity, setQuantity] = useState(1); // Quantity state removed
   const [emblaApi, setEmblaApi] = useState<CarouselApi>();
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
   const [confirmDialogState, setConfirmDialogState] = useState<{
@@ -172,13 +172,14 @@ export default function ProductDetailPage() {
     setConfirmDialogState({ isOpen: false, productId: null, productName: null });
   };
 
-  const handleIncreaseQuantity = () => {
-    setQuantity(prev => prev + 1);
-  };
+  // Quantity handler functions removed
+  // const handleIncreaseQuantity = () => {
+  //   setQuantity(prev => prev + 1);
+  // };
 
-  const handleDecreaseQuantity = () => {
-    setQuantity(prev => Math.max(1, prev - 1));
-  };
+  // const handleDecreaseQuantity = () => {
+  //   setQuantity(prev => Math.max(1, prev - 1));
+  // };
 
   const isProductWishlisted = product ? wishlistItems.includes(product.id) : false;
 
@@ -294,16 +295,7 @@ export default function ProductDetailPage() {
 
             <Separator className="my-2" />
 
-            <div className="flex items-center space-x-3 my-3">
-              <p className="text-sm font-medium text-foreground">Quantity:</p>
-              <Button variant="outline" size="icon" onClick={handleDecreaseQuantity} className="h-8 w-8" aria-label="Decrease quantity">
-                <Minus className="h-4 w-4" />
-              </Button>
-              <span className="w-10 text-center text-base font-medium">{quantity}</span>
-              <Button variant="outline" size="icon" onClick={handleIncreaseQuantity} className="h-8 w-8" aria-label="Increase quantity">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
+            {/* Quantity selection UI removed */}
 
             <div className="flex flex-col sm:flex-row gap-3">
               <WishlistIcon
@@ -471,3 +463,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+
