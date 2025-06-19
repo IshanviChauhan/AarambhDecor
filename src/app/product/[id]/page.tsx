@@ -312,10 +312,7 @@ export default function ProductDetailPage() {
                     />
                   </div>
                 ))}
-                {/* Placeholder divs to maintain 2x2 structure for the small images grid */}
-                {Array.from({ length: Math.max(0, 4 - safeImageUrls.slice(1, 5).length) }).map((_, i) => (
-                  <div key={`gallery-placeholder-${i}`} className="aspect-square bg-muted/30 rounded-md"></div>
-                ))}
+                {/* Explicit placeholders removed. CSS Grid will leave empty cells if not enough images. */}
               </div>
             </div>
           ) : (
