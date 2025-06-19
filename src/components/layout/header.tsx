@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, UserPlus, LogIn, UserCircle2, LogOut } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, UserPlus, LogIn, UserCircle2, LogOut as LogOutIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -15,39 +15,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from '@/components/ui/separator';
-import { auth } from '@/lib/firebase'; // Import Firebase auth instance
-import { signOut } from 'firebase/auth';
-import { useToast } from '@/hooks/use-toast'; // For logout toast
+import { useSession, signOut } from 'next-auth/react'; // Import NextAuth hooks
+import { useToast } from '@/hooks/use-toast';
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session, status } = useSession(); // Get session data and status
   const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true); // Indicates component has mounted on the client
-  }, []);
-
-  // Check login status when component mounts on client or when storage changes
-  useEffect(() => {
-    if (isClient) {
-      const checkLoginStatus = () => {
-        const userId = localStorage.getItem('tempUserId');
-        setIsLoggedIn(!!userId);
-      };
-
-      checkLoginStatus(); // Initial check
-
-      // Listen for storage changes to reflect login/logout from other tabs/windows
-      window.addEventListener('storage', checkLoginStatus);
-      return () => {
-        window.removeEventListener('storage', checkLoginStatus);
-      };
-    }
-  }, [isClient]);
+  
+  const isLoadingSession = status === "loading";
+  const isLoggedIn = status === "authenticated" && !!session;
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
@@ -57,24 +36,11 @@ export default function Header() {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-    setIsMobileMenuOpen(false); // Close mobile menu after click
+    setIsMobileMenuOpen(false);
   };
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth); // Sign out from Firebase
-      console.log("User signed out from Firebase.");
-    } catch (error) {
-      console.error("Error signing out from Firebase:", error);
-      toast({
-        title: "Logout Error",
-        description: "Could not sign out from Firebase. Local session cleared.",
-        variant: "destructive"
-      });
-    }
-    // Always clear local user indicator and update UI regardless of Firebase sign-out success
-    localStorage.removeItem('tempUserId'); 
-    setIsLoggedIn(false); 
+    await signOut({ redirect: false }); // Sign out from NextAuth
     setIsMobileMenuOpen(false); 
     router.push('/'); 
     toast({
@@ -84,7 +50,6 @@ export default function Header() {
     });
   };
 
-  // Helper function to create navigation links for DRYness
   const NavLink = ({ href, label, icon: Icon, onClick, ariaLabel }: { href: string; label: string; icon: React.ElementType; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void; ariaLabel?: string }) => (
     <Button asChild variant="ghost" className="w-full md:w-auto justify-start md:justify-center text-base md:text-sm py-3 md:py-2 px-2 md:px-3" onClick={() => setIsMobileMenuOpen(false)}>
       <Link href={href} aria-label={ariaLabel || label} onClick={onClick}>
@@ -116,40 +81,36 @@ export default function Header() {
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-0 sm:gap-1">
             <NavLink href="/" label="Home" icon={Home} />
             <NavLink href="/collections" label="Collections" icon={LayoutGrid} />
             <NavLink href="/#ai-decor-advisor" label="AI Advisor" icon={Sparkles} onClick={handleAiAdvisorClick} />
             
-            {isClient && isLoggedIn ? (
+            {isLoadingSession ? (
+              <>
+                <Button variant="ghost" disabled className="text-sm justify-center py-2 px-3 opacity-50"><UserCircle2 className="mr-2 h-4 w-4" />Loading...</Button>
+              </>
+            ) : isLoggedIn ? (
               <>
                 <NavLink href="/profile" label="Profile" icon={UserCircle2} />
                 <Button variant="ghost" onClick={handleLogout} aria-label="Logout" className="text-sm justify-center py-2 px-3">
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
+                  <LogOutIcon className="mr-2 h-4 w-4" /> Logout
                 </Button>
               </>
-            ) : isClient ? ( // Only render if client and not logged in
+            ) : (
               <>
                 <NavLink href="/register" label="Register" icon={UserPlus} />
-                <NavLink href="/signin" label="Login" icon={LogIn} />
-              </>
-            ) : ( // SSR or pre-client state: render disabled placeholders for layout consistency
-              <>
-                <Button variant="ghost" disabled className="text-sm justify-center py-2 px-3 opacity-50"><UserPlus className="mr-2 h-4 w-4" />Register</Button>
-                <Button variant="ghost" disabled className="text-sm justify-center py-2 px-3 opacity-50"><LogIn className="mr-2 h-4 w-4" />Login</Button>
+                <NavLink href="/auth/signin" label="Login" icon={LogIn} />
               </>
             )}
           </nav>
 
-          {/* Cart Icon (Common for Desktop & Mobile Trigger) */}
           <Button asChild variant="ghost" className="relative" size="icon">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
             </Link>
           </Button>
 
-          {/* Mobile Menu Trigger */}
           <div className="md:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -178,23 +139,20 @@ export default function Header() {
 
                 <Separator className="my-4" />
                 <div className="flex flex-col space-y-1">
-                    {isClient && isLoggedIn ? (
+                    {isLoadingSession ? (
+                       <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 opacity-50" disabled><UserCircle2 className="mr-3 h-5 w-5 text-primary" />Loading...</Button>
+                    ) : isLoggedIn ? (
                       <>
                         <NavLink href="/profile" label="My Profile" icon={UserCircle2} />
                         <Button variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={handleLogout}>
-                          <LogOut className="mr-3 h-5 w-5 text-primary" /> Logout
+                          <LogOutIcon className="mr-3 h-5 w-5 text-primary" /> Logout
                         </Button>
                       </>
-                    ) : isClient ? (
+                    ) : (
                       <>
                         <NavLink href="/register" label="Register" icon={UserPlus} />
-                        <NavLink href="/signin" label="Login" icon={LogIn} />
+                        <NavLink href="/auth/signin" label="Login" icon={LogIn} />
                       </>
-                    ) : (
-                        <>
-                         <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 opacity-50" disabled><UserPlus className="mr-3 h-5 w-5 text-primary" />Register</Button>
-                         <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 opacity-50" disabled><LogIn className="mr-3 h-5 w-5 text-primary" />Login</Button>
-                        </>
                     )}
                 </div>
               </SheetContent>
