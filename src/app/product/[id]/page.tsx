@@ -280,48 +280,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <section id="photo-gallery" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
-          {safeImageUrls.length > 1 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
-              {/* Large Image Container */}
-              <div className="md:col-span-2 md:row-span-2 relative rounded-md overflow-hidden shadow-md bg-card aspect-square md:aspect-auto">
-                <Image
-                  src={safeImageUrls[0].url}
-                  alt={`${product.name} - Main gallery view`}
-                  fill
-                  style={{ objectFit: 'contain' }} 
-                  className="rounded-md"
-                  data-ai-hint={safeImageUrls[0].dataAiHint}
-                  sizes="(max-width: 767px) 100vw, 66vw"
-                  priority={false} 
-                />
-              </div>
-
-              {/* Small Images Grid Container */}
-              <div className="md:row-span-2 grid grid-cols-2 gap-2 md:gap-4">
-                {safeImageUrls.slice(1, 5).map((image, index) => (
-                  <div key={`gallery-thumb-${index}`} className="relative aspect-square rounded-md overflow-hidden shadow-md bg-card">
-                    <Image
-                      src={image.url}
-                      alt={`${product.name} - Gallery thumbnail ${index + 1}`}
-                      fill
-                      style={{ objectFit: 'contain' }} 
-                      className="rounded-md"
-                      data-ai-hint={image.dataAiHint}
-                      sizes="(max-width: 767px) 50vw, 17vw"
-                    />
-                  </div>
-                ))}
-                {/* Explicit placeholders removed. CSS Grid will leave empty cells if not enough images. */}
-              </div>
-            </div>
-          ) : (
-             <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
-                <Info className="h-8 w-8 text-primary mx-auto mb-3" />
-                <p className="text-muted-foreground">Detailed gallery views are not applicable as only one image is provided for this product.</p>
-            </Card>
-          )}
-        </section>
+        {/* Photo Gallery Section Removed */}
 
         <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
@@ -370,4 +329,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
