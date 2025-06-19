@@ -1,9 +1,10 @@
-export { default } from "next-auth/middleware"
+// This file is deprecated. Redirect or show message.
+// For now, let's make it a redirect to the new auth page to avoid confusion.
+import { redirect } from 'next/navigation';
 
-export const config = { 
-  matcher: [
-    "/profile/:path*",
-    "/add-product/:path*",
-    // Add any other routes you want to protect with NextAuth.js middleware
-  ] 
-};
+export default function DeprecatedSignInPage() {
+  redirect('/auth/signin'); // Redirect to the new NextAuth sign-in page
+  return null;
+}
+
+// The problematic 'export const config' has been removed from this file.
