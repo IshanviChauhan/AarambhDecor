@@ -31,8 +31,6 @@ export interface Product {
 
 export interface InstagramReel {
   id: string;
-  thumbnailUrl: string;
-  dataAiHint: string; // For placeholder images
   instagramUrl: string;
   caption?: string;
   username: string;
@@ -40,3 +38,4 @@ export interface InstagramReel {
   likes?: string;
   comments?: string;
 }
+
