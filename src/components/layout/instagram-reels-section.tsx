@@ -9,14 +9,14 @@ import { Instagram as InstagramIcon, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import MOCK_REELS_DATA from '@/lib/data/mock-reels.json';
+import REELS_DATA from '@/lib/data/reels.json';
 
 export function InstagramReelsSection() {
   const [reels, setReels] = useState<InstagramReel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setReels(MOCK_REELS_DATA);
+    setReels(REELS_DATA);
     setIsLoading(false);
   }, []);
 
