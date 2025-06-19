@@ -20,6 +20,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
@@ -52,6 +54,8 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => {
 
 const MAX_SUGGESTIONS = 4;
 const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
+const SPECIAL_PRICE_STRINGS = ["DM for Price", "Contact for Price"];
+const SPECIAL_PRICE_DISPLAY_TEXT = "Connect with us for the best deal";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -59,7 +63,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]); // To find product names for suggested items
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -90,16 +94,20 @@ export default function ProductDetailPage() {
           const fetchedProduct = await getProductById(productId);
           setProduct(fetchedProduct);
 
-          const fetchedAllProducts = await getProducts();
-          setAllProducts(fetchedAllProducts); // Store all products
-
           if (fetchedProduct && fetchedProduct.category) {
+            const fetchedAllProducts = await getProducts();
+            setAllProducts(fetchedAllProducts); 
+            
             const categorySuggestions = fetchedAllProducts.filter(
               p => p.id !== fetchedProduct.id && p.category === fetchedProduct.category
             ).slice(0, MAX_SUGGESTIONS);
             setSuggestedProducts(categorySuggestions);
           } else {
             setSuggestedProducts([]);
+             if(fetchedProduct) { // still set all products if product exists but no category
+                const fetchedAllProducts = await getProducts();
+                setAllProducts(fetchedAllProducts);
+            }
           }
 
         } catch (error) {
@@ -211,6 +219,10 @@ export default function ProductDetailPage() {
     ? product.imageUrls 
     : [{ url: 'https://placehold.co/800x600.png', dataAiHint: 'placeholder image' }];
 
+  const displayPrice = product.price && SPECIAL_PRICE_STRINGS.includes(product.price)
+    ? SPECIAL_PRICE_DISPLAY_TEXT
+    : product.price;
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -230,16 +242,16 @@ export default function ProductDetailPage() {
                         safeImageUrls.length > 1 && "cursor-pointer"
                     )}
                     onClick={() => {
-                      if (safeImageUrls.length > 1) {
-                        emblaApi?.scrollNext();
+                      if (safeImageUrls.length > 1 && emblaApi) {
+                        emblaApi.scrollNext();
                       }
                     }}
                     role={safeImageUrls.length > 1 ? "button" : undefined}
                     tabIndex={safeImageUrls.length > 1 ? 0 : undefined}
                     onKeyDown={(e) => {
-                        if (safeImageUrls.length > 1 && (e.key === 'Enter' || e.key === ' ')) {
+                        if (safeImageUrls.length > 1 && emblaApi && (e.key === 'Enter' || e.key === ' ')) {
                           e.preventDefault();
-                          emblaApi?.scrollNext();
+                          emblaApi.scrollNext();
                         }
                     }}
                     aria-label={safeImageUrls.length > 1 ? `View next image for ${product.name}` : `Image ${index + 1} of ${product.name}`}
@@ -257,6 +269,7 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
+            {/* CarouselPrevious and CarouselNext are removed as per click-to-advance */}
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
@@ -267,8 +280,13 @@ export default function ProductDetailPage() {
             
             <p className="text-muted-foreground text-base leading-relaxed">{product.description}</p>
 
-            {product.price && (
-              <p className="text-3xl font-semibold text-foreground">{product.price}</p>
+            {displayPrice && (
+              <p className={cn(
+                "text-3xl font-semibold",
+                 SPECIAL_PRICE_STRINGS.includes(product.price || "") ? "text-accent" : "text-foreground"
+              )}>
+                {displayPrice}
+              </p>
             )}
              <p className="text-sm text-muted-foreground flex items-center">
               <Package className="mr-2 h-4 w-4 text-primary" /> Shipping calculated at checkout.
@@ -383,7 +401,7 @@ export default function ProductDetailPage() {
              <Carousel
                 opts={{
                   align: "start",
-                  loop: suggestedProducts.length > 3, 
+                  loop: suggestedProducts.length > (typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : typeof window !== 'undefined' && window.innerWidth < 1024 ? 2 : 3), 
                 }}
                 className="w-full max-w-5xl mx-auto group"
               >
@@ -401,7 +419,36 @@ export default function ProductDetailPage() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                {/* CarouselPrevious and CarouselNext are conditionally rendered if suggestedProducts.length > 1 in carousel component */}
+                 <CarouselPrevious
+                    variant="ghost"
+                    className={cn(
+                      "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
+                      "h-10 w-10 rounded-full",
+                      "bg-background/70 text-foreground/70",
+                      "hover:bg-background/90 hover:text-primary",
+                      "shadow-md",
+                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                      "transition-opacity duration-200 ease-in-out",
+                      "md:left-[-20px]",
+                      "disabled:opacity-30 disabled:cursor-not-allowed",
+                      suggestedProducts.length <= (typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : typeof window !== 'undefined' && window.innerWidth < 1024 ? 2 : 3) && "hidden"
+                    )}
+                />
+                <CarouselNext
+                    variant="ghost"
+                    className={cn(
+                      "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
+                      "h-10 w-10 rounded-full",
+                      "bg-background/70 text-foreground/70",
+                      "hover:bg-background/90 hover:text-primary",
+                      "shadow-md",
+                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                      "transition-opacity duration-200 ease-in-out",
+                      "md:right-[-20px]",
+                      "disabled:opacity-30 disabled:cursor-not-allowed",
+                      suggestedProducts.length <= (typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : typeof window !== 'undefined' && window.innerWidth < 1024 ? 2 : 3) && "hidden"
+                    )}
+                />
               </Carousel>
           </section>
         )}
@@ -424,3 +471,6 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+
+
+    

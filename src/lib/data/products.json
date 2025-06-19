@@ -360,8 +360,8 @@
   },
   {
     "id": "p16",
-    "name": "Handcrafted Floral Wall Art",
-    "description": "Add a splash of color and elegance to your space with this stunning handcrafted wall art! 🌿 Perfect for living rooms, entryways, or balconies",
+    "name": "Handcrafted Floral Wall Art (36 inch)",
+    "description": "Add a splash of color and elegance to your space with this stunning handcrafted wall art! Perfect for living rooms, entryways, or balconies.",
     "careInstructions": "Wipe clean with a soft, dry cloth. Avoid direct sunlight.",
     "imageUrls": [
       {
@@ -381,18 +381,18 @@
     "category": "Wall Art",
     "featured": false,
     "sizeAndDimensions": "36x36x2.5 inches",
-    "material": "Metal",
+    "material": "Metal (Assumed)",
     "reviews": []
   },
   {
     "id": "p17",
-    "name": "Rose Gold Colored Mirror",
+    "name": "Rose Gold Colored Mirror (30x20)",
     "description": "Add a pop of elegance to your space with our Colored Mirror – where art meets reflection. Available in Rose Gold Mirror finish, this stunning piece is perfect for contemporary interiors.",
     "careInstructions": "Wipe clean with a soft, dry cloth. Use glass cleaner for mirror.",
     "imageUrls": [
       {
         "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/508633784_17844168237510460_3506375482965849041_n.jpg?stp=dst-jpg_e35_p480x480_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjExNTJ4MTUzNi5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFCobRjVbvhzl6nTgKkdCYGK3mDPMgDdO6cF16PTv2Zm_pMfMttmXuUccXNfqgemPbbYzMwm6dv5_NoaPwjLaho&_nc_ohc=krN1TXcXZAMQ7kNvwEzF2ev&_nc_gid=TAVehxDN2wRnce5FF89hCw&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NjI4MzQ0NDQ5NDUxMzE5Ng%3D%3D.3-ccb7-5&oh=00_AfN16oQzfWPMGdwkzFGmNZjw_Xcim9nPdCjqTS6sdmEsmQ&oe=6859DED7&_nc_sid=22de04",
-        "dataAiHint": "colored mirror"
+        "dataAiHint": "colored mirror rosegold"
       }
     ],
     "price": "Rs. 5850",
@@ -422,13 +422,13 @@
   },
   {
     "id": "p19",
-    "name": "Chic Colored Mirror (Large)",
+    "name": "Chic Colored Mirror (Large - 20x30)",
     "description": "Elevate your walls with our chic Colored Mirrors – a perfect blend of simplicity and sophistication. Available in Clear, Grey, Black, and Rose Gold finishes to suit every style.",
     "careInstructions": "Wipe clean with a soft, dry cloth. Use glass cleaner for mirror.",
     "imageUrls": [
       {
         "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/508398872_17844170847510460_4374402707303105896_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjkwMng5MDQuc2RyLmY3NTc2MS5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFCobRjVbvhzl6nTgKkdCYGK3mDPMgDdO6cF16PTv2Zm_pMfMttmXuUccXNfqgemPbbYzMwm6dv5_NoaPwjLaho&_nc_ohc=-ilva8z2WnsQ7kNvwG4BlDH&_nc_gid=TAVehxDN2wRnce5FF89hCw&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NjI5MTU4NTU2MzIzMTY0Ng%3D%3D.3-ccb7-5&oh=00_AfPchFNSSjtZkC7zlx2Z8X4QtDxyoR2mHozWuO9tFPdYQw&oe=6859CEB9&_nc_sid=22de04",
-        "dataAiHint": "colored mirrors"
+        "dataAiHint": "colored mirrors group"
       }
     ],
     "price": "Rs. 4999",
@@ -440,13 +440,13 @@
   },
   {
     "id": "p20",
-    "name": "Chic Colored Mirror (Small)",
+    "name": "Chic Colored Mirror (Small - 18x24)",
     "description": "Elevate your walls with our chic Colored Mirrors – a perfect blend of simplicity and sophistication. Available in Clear, Grey, Black, and Rose Gold finishes to suit every style.",
     "careInstructions": "Wipe clean with a soft, dry cloth. Use glass cleaner for mirror.",
     "imageUrls": [
       {
         "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/508398872_17844170847510460_4374402707303105896_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjkwMng5MDQuc2RyLmY3NTc2MS5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFCobRjVbvhzl6nTgKkdCYGK3mDPMgDdO6cF16PTv2Zm_pMfMttmXuUccXNfqgemPbbYzMwm6dv5_NoaPwjLaho&_nc_ohc=-ilva8z2WnsQ7kNvwG4BlDH&_nc_gid=TAVehxDN2wRnce5FF89hCw&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NjI5MTU4NTU2MzIzMTY0Ng%3D%3D.3-ccb7-5&oh=00_AfPchFNSSjtZkC7zlx2Z8X4QtDxyoR2mHozWuO9tFPdYQw&oe=6859CEB9&_nc_sid=22de04",
-        "dataAiHint": "colored mirrors small"
+        "dataAiHint": "colored mirrors group"
       }
     ],
     "price": "Rs. 3899",
@@ -464,7 +464,7 @@
     "imageUrls": [
       {
         "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/508332599_17844171990510460_8553542488341145729_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjEzMzJ4MTMzMi5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFCobRjVbvhzl6nTgKkdCYGK3mDPMgDdO6cF16PTv2Zm_pMfMttmXuUccXNfqgemPbbYzMwm6dv5_NoaPwjLaho&_nc_ohc=x9o1I9xYNocQ7kNvwF41PBW&_nc_gid=TAVehxDN2wRnce5FF89hCw&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NjI5NTYxNDIwMDU0OTU4Mg%3D%3D.3-ccb7-5&oh=00_AfMuMUAy28ImdRo0LIEcPjZCkoYy1Vv9H5Tjl36PMJyUfg&oe=6859F793&_nc_sid=22de04",
-        "dataAiHint": "round mirror colored"
+        "dataAiHint": "round mirror various"
       }
     ],
     "price": "Rs. 6599",
@@ -482,7 +482,7 @@
     "imageUrls": [
       {
         "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/508332599_17844171990510460_8553542488341145729_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjEzMzJ4MTMzMi5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFCobRjVbvhzl6nTgKkdCYGK3mDPMgDdO6cF16PTv2Zm_pMfMttmXuUccXNfqgemPbbYzMwm6dv5_NoaPwjLaho&_nc_ohc=x9o1I9xYNocQ7kNvwF41PBW&_nc_gid=TAVehxDN2wRnce5FF89hCw&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NjI5NTYxNDIwMDU0OTU4Mg%3D%3D.3-ccb7-5&oh=00_AfMuMUAy28ImdRo0LIEcPjZCkoYy1Vv9H5Tjl36PMJyUfg&oe=6859F793&_nc_sid=22de04",
-        "dataAiHint": "rectangular mirror colored"
+        "dataAiHint": "rectangular mirror various"
       }
     ],
     "price": "Rs. 5099",
@@ -495,7 +495,7 @@
   {
     "id": "p23",
     "name": "Retro Romeo Car Wall Art",
-    "description": "Vintage Vibes on Your Wall! 🚗 Add a retro charm to your space with this “Retro Romeo” wall art. Perfect for car enthusiasts & statement decor lovers!",
+    "description": "Vintage Vibes on Your Wall! Add a retro charm to your space with this “Retro Romeo” wall art. Perfect for car enthusiasts & statement decor lovers!",
     "careInstructions": "Wipe clean with a soft, dry cloth.",
     "imageUrls": [
       {
@@ -565,7 +565,7 @@
     "category": "Table Decor",
     "featured": false,
     "sizeAndDimensions": "7.5 x 4 x 12 inches",
-    "material": "Metal/Resin",
+    "material": "Metal/Resin (Assumed)",
     "reviews": []
   },
   {
@@ -593,7 +593,7 @@
   {
     "id": "p28",
     "name": "Peacock Table (Cast Aluminium)",
-    "description": "Grace in Every Detail 🦚 Add a royal touch to your space with our Peacock Table – a fusion of art and function. Made of premium cast aluminium in a gold finish, this statement piece is perfect for modern luxury interiors. DM to order | Limited stock",
+    "description": "Grace in Every Detail. Add a royal touch to your space with our Peacock Table – a fusion of art and function. Made of premium cast aluminium in a gold finish, this statement piece is perfect for modern luxury interiors.",
     "careInstructions": "Wipe clean with a soft, dry cloth. Avoid abrasive cleaners.",
     "imageUrls": [
       {
@@ -601,7 +601,7 @@
         "dataAiHint": "peacock table"
       }
     ],
-    "price": "DM for Price",
+    "price": "Contact for Price",
     "category": "Tables",
     "featured": false,
     "sizeAndDimensions": "14x14x24 inches",
@@ -611,7 +611,7 @@
   {
     "id": "p29",
     "name": "Quirky Dog Butler Table",
-    "description": "Meet the coolest butler in town 🕶️🐾 This quirky dog table brings personality and charm to any corner! Dressed to impress and holding it down in style, it’s made to turn heads. Limited stock – DM to order!",
+    "description": "Meet the coolest butler in town. This quirky dog table brings personality and charm to any corner! Dressed to impress and holding it down in style, it’s made to turn heads.",
     "careInstructions": "Wipe clean with a soft, dry cloth.",
     "imageUrls": [
       {
@@ -623,7 +623,7 @@
     "category": "Tables",
     "featured": false,
     "sizeAndDimensions": "14x14x22 inches",
-    "material": "Resin/Metal",
+    "material": "Resin/Metal (Assumed)",
     "reviews": []
   }
 ]

@@ -6,10 +6,8 @@ import type { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-// ShoppingCart icon and Button for Add to Cart are removed
 import { WishlistIcon } from './wishlist-icon';
 import { cn } from '@/lib/utils';
-// useToast is removed as it's handled by parent components for wishlist
 
 interface ProductCardProps {
   product: Product;
@@ -17,6 +15,9 @@ interface ProductCardProps {
   onToggleWishlist: (productId: string) => void;
   className?: string;
 }
+
+const SPECIAL_PRICE_STRINGS = ["DM for Price", "Contact for Price"];
+const SPECIAL_PRICE_DISPLAY_TEXT = "Connect with us for the best deal";
 
 export function ProductCard({ product, isWishlisted, onToggleWishlist, className: propClassName }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -36,7 +37,6 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, className
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
-      // Reset to first image when not hovering if there are multiple images
       if (imagesToDisplay.length > 1) {
         setCurrentImageIndex(0);
       }
@@ -58,10 +58,13 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, className
   const handleMouseLeave = () => {
     if (imagesToDisplay.length > 1) {
       setIsHovering(false);
-      // The useEffect will reset currentImageIndex to 0 when isHovering becomes false
     }
   };
   
+  const displayPrice = product.price && SPECIAL_PRICE_STRINGS.includes(product.price)
+    ? SPECIAL_PRICE_DISPLAY_TEXT
+    : product.price;
+
   return (
     <Card className={cn(
       "shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden",
@@ -119,10 +122,14 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, className
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground mb-2 line-clamp-3">{product.description}</CardDescription>
         </div>
-        {product.price && (
+        {displayPrice && (
           <div className="flex justify-between items-center mt-auto pt-2">
-            <p className="font-semibold text-primary text-lg">{product.price}</p>
-            {/* Add to Cart button removed */}
+            <p className={cn(
+              "font-semibold text-lg",
+              SPECIAL_PRICE_STRINGS.includes(product.price || "") ? "text-accent text-base" : "text-primary"
+            )}>
+              {displayPrice}
+            </p>
           </div>
         )}
       </CardContent>
@@ -131,3 +138,5 @@ export function ProductCard({ product, isWishlisted, onToggleWishlist, className
     </Card>
   );
 }
+
+    
