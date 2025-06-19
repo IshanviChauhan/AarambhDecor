@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useActionState } from 'react'; // Import useActionState
 import Link from 'next/link';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
@@ -17,13 +17,15 @@ import { Loader2, LogIn, AlertTriangle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 import { SignInSchema, type SignInInput } from '@/lib/schemas';
-// Server action 'signInUserAction' is no longer used for this page.
+import { signInUserAction, type SignInUserFormState } from './actions'; // Import the server action
+
+const initialFormState: SignInUserFormState = { message: null, success: false, errors: undefined, userId: undefined };
 
 export default function SignInPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
+
+  const [formState, formAction, isActionPending] = useActionState(signInUserAction, initialFormState);
 
   const form = useForm<SignInInput>({
     resolver: zodResolver(SignInSchema),
@@ -33,58 +35,43 @@ export default function SignInPage() {
     },
   });
 
-  const onSubmit = async (data: SignInInput) => {
-    setIsLoading(true);
-    setApiError(null);
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success && result.userId) {
+  useEffect(() => {
+    if (formState.message) {
+      if (formState.success && formState.userId) {
         toast({
           title: 'Login Successful',
-          description: result.message || 'Welcome back! You will be redirected shortly.',
+          description: formState.message || 'Welcome back! You will be redirected shortly.',
           variant: 'default',
         });
         form.reset();
         if (typeof window !== 'undefined') {
-          localStorage.setItem('tempUserId', result.userId);
+          localStorage.setItem('tempUserId', formState.userId);
         }
         router.push('/profile');
-      } else {
-        const errorMessage = result.message || 'Login failed. Please check your credentials.';
+      } else if (!formState.success) {
         toast({
           title: 'Login Error',
-          description: errorMessage,
+          description: formState.message || 'An error occurred.',
           variant: 'destructive',
         });
-        setApiError(errorMessage);
-        // Optionally set form errors if API provides field-specific errors
-        if (result.errors) {
-             Object.entries(result.errors).forEach(([field, messages]) => {
-                if (Array.isArray(messages) && messages.length > 0) {
-                    form.setError(field as keyof SignInInput, { type: 'server', message: messages.join(', ') });
-                }
-            });
+        if (formState.errors) {
+          Object.entries(formState.errors).forEach(([field, messages]) => {
+             if (messages && field !== '_form') {
+              form.setError(field as keyof SignInInput, { type: 'server', message: messages.join(', ') });
+            }
+          });
         }
       }
-    } catch (error) {
-      console.error("Sign-in page fetch error:", error);
-      const errorMessage = 'An unexpected error occurred. Please try again.';
-      toast({
-        title: 'Login Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      setApiError(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState, toast, router]); // form.reset was added, so form dependency
+
+  // This function is called by form.handleSubmit for client-side validation.
+  // The actual submission to `formAction` is handled by React due to the <form action={formAction}>.
+  const handleClientValidationOnly = (data: SignInInput) => {
+    console.log("SignInPage: Client-side validation passed. Data for Server Action:", data);
+    // No need to explicitly call formAction here when using <form action={formAction}>
+    // However, if not using the native form action attribute, you'd call formAction(new FormData(form.control._formRef.current)) or similar.
   };
 
   return (
@@ -122,7 +109,8 @@ export default function SignInPage() {
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(handleClientValidationOnly)}
+                action={formAction} // Wire up the server action
                 className="space-y-6"
               >
                 <FormField control={form.control} name="email" render={({ field }) => (
@@ -141,17 +129,17 @@ export default function SignInPage() {
                   </FormItem>
                 )} />
 
-                {apiError && !form.formState.errors.email && !form.formState.errors.password && (
+                {formState.errors?._form && !formState.success && (
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Login Error</AlertTitle>
-                    <AlertDescription>{apiError}</AlertDescription>
+                    <AlertDescription>{formState.errors._form.join(', ')}</AlertDescription>
                   </Alert>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
-                  {isLoading ? 'Logging In...' : 'Login'}
+                <Button type="submit" className="w-full" disabled={isActionPending}>
+                  {isActionPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+                  {isActionPending ? 'Logging In...' : 'Login'}
                 </Button>
               </form>
             </Form>
