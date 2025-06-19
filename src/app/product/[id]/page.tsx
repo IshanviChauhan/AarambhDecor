@@ -274,8 +274,7 @@ export default function ProductDetailPage() {
             </div>
             
             <div className="w-full pt-4">
-              {/* Accordion for small screens */}
-              <Accordion type="single" collapsible className="w-full block md:hidden">
+              <Accordion type="single" collapsible className="w-full">
                 {product.sizeAndDimensions && (
                   <AccordionItem value="size">
                     <AccordionTrigger className="text-lg font-semibold hover:no-underline">
@@ -307,43 +306,6 @@ export default function ProductDetailPage() {
                   </AccordionItem>
                 )}
               </Accordion>
-
-              {/* Grid for medium and larger screens */}
-              <div className="hidden md:grid md:grid-cols-1 lg:grid-cols-3 md:gap-x-6 md:gap-y-4">
-                {product.sizeAndDimensions && (
-                  <div className="mb-4 md:mb-0">
-                    <h4 className="flex items-center text-lg font-semibold mb-1">
-                      <Ruler className="mr-2 h-5 w-5 text-primary" />
-                      Dimensions
-                    </h4>
-                    <p className="text-base text-muted-foreground">
-                      {product.sizeAndDimensions}
-                    </p>
-                  </div>
-                )}
-                {product.material && (
-                  <div className="mb-4 md:mb-0">
-                    <h4 className="flex items-center text-lg font-semibold mb-1">
-                      <Tag className="mr-2 h-5 w-5 text-primary" />
-                      Material
-                    </h4>
-                    <p className="text-base text-muted-foreground">
-                      {product.material}
-                    </p>
-                  </div>
-                )}
-                {product.careInstructions && (
-                  <div className="mb-4 md:mb-0">
-                    <h4 className="flex items-center text-lg font-semibold mb-1">
-                      <ShieldCheck className="mr-2 h-5 w-5 text-primary" />
-                      Care Instructions
-                    </h4>
-                    <p className="text-base text-muted-foreground">
-                      {product.careInstructions}
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
 
           </div>
@@ -391,8 +353,6 @@ export default function ProductDetailPage() {
               </CardContent>
             </Card>
         </section>
-        
-        {/* Removed Product Gallery Section */}
         
         {suggestedProducts.length > 0 && (
           <section id="suggested-products" className="mt-12 md:mt-20 animate-fade-in-up animation-delay-200">
