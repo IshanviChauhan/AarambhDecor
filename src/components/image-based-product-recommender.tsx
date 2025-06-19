@@ -245,7 +245,7 @@ export function ImageBasedProductRecommender() {
                         alt={product.name}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover"
+                        className="object-contain" // Changed from object-cover
                         data-ai-hint={displayImage.dataAiHint}
                       />
                     </div>
