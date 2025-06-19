@@ -40,7 +40,7 @@ export function InstagramReelsSection() {
       <div className="container mx-auto px-2 md:px-4">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 md:mb-10">
           <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-            <InstagramIcon className="h-8 w-8 text-primary" />
+            {/* <InstagramIcon className="h-8 w-8 text-primary" /> */}
             <h2 className="text-2xl md:text-3xl font-headline text-foreground">
               Explore More on Instagram
             </h2>
@@ -64,7 +64,7 @@ export function InstagramReelsSection() {
           <CarouselPrevious
             variant="ghost"
             className={cn(
-              "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
+              "absolute left-[-10px] top-1/2 ",
               "h-10 w-10 rounded-full",
               "bg-background/70 text-foreground/70 hover:bg-background/90 hover:text-primary shadow-md",
               "opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200",
@@ -76,7 +76,7 @@ export function InstagramReelsSection() {
           <CarouselNext
             variant="ghost"
             className={cn(
-              "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
+              "absolute right-[-10px] top-1/2",
               "h-10 w-10 rounded-full",
               "bg-background/70 text-foreground/70 hover:bg-background/90 hover:text-primary shadow-md",
               "opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200",
