@@ -4,7 +4,6 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Truck } from 'lucide-react';
-import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 export default function ShippingReturnsPage() {
   return (
@@ -25,7 +24,6 @@ export default function ShippingReturnsPage() {
           </CardContent>
         </Card>
       </main>
-      <InstagramReelsSection />
       <Footer />
     </div>
   );

@@ -18,7 +18,7 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
 
   return (
     <Card className={cn(
-      "overflow-hidden rounded-lg shadow-lg w-[220px] sm:w-[250px] flex-shrink-0 snap-start bg-card border-border/70",
+      "overflow-hidden rounded-lg shadow-lg w-[300px] sm:w-[250px] flex-shrink-0 snap-start bg-card border-border/70",
       "transition-all duration-300 ease-in-out hover:shadow-xl group",
       className
     )}>

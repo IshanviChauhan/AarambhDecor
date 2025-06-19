@@ -4,9 +4,11 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 // Explicit 'icons' field removed to rely on convention (e.g., src/app/favicon.ico)
+// Setting icons to an empty array to prevent issues if favicon handling is problematic
 export const metadata: Metadata = {
   title: 'Aarambh Decor',
   description: 'Discover inspiration with Aarambh Decor. Curated home decor items and AI-powered style suggestions.',
+  icons: [], 
 };
 
 export const viewport: Viewport = {

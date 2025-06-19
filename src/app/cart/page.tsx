@@ -7,7 +7,6 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { ShoppingBag, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
-import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 export default function CartPage() {
   const [isClient, setIsClient] = useState(false);
@@ -53,7 +52,6 @@ export default function CartPage() {
             </Button>
         </div>
       </main>
-      <InstagramReelsSection />
       <Footer />
     </div>
   );

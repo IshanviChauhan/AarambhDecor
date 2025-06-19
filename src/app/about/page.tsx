@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, Instagram } from 'lucide-react';
 import Link from 'next/link';
-import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 // Simple inline SVG for WhatsApp icon
 const WhatsAppIcon = () => (
@@ -87,7 +86,6 @@ export default function AboutUsPage() {
           </CardContent>
         </Card>
       </main>
-      <InstagramReelsSection />
       <Footer />
     </div>
   );
