@@ -23,11 +23,11 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
   }
   console.log(`seedProductsToFirestore: Attempting to seed ${MOCK_PRODUCTS.length} products...`);
 
-  const batch = writeBatch(db);
+  const batch = writeBatch(db!); // Use db!
   let seededCount = 0;
 
   MOCK_PRODUCTS.forEach(product => {
-    const productDocRef = doc(db, 'products', product.id);
+    const productDocRef = doc(db!, 'products', product.id); // Use db!
     const productData: Omit<Product, 'id'> = {
       name: product.name,
       description: product.description,
@@ -62,15 +62,16 @@ export async function getProducts(): Promise<Product[]> {
   }
   try {
     console.log('getProducts: Attempting to fetch products from Firestore...');
-    const productsColRef = collection(db, 'products');
+    const productsColRef = collection(db!, 'products'); // Use db!
     let productsSnap = await getDocs(productsColRef);
 
     if (productsSnap.empty) {
       console.log('getProducts: Firestore is empty. Attempting to seed database with mock data from products.json...');
-      const seedResult = await seedProductsToFirestore();
+      // seedProductsToFirestore already checks for db, so no need for db! here in the call
+      const seedResult = await seedProductsToFirestore(); 
       if (seedResult.success && seedResult.count && seedResult.count > 0) {
         console.log(`getProducts: Seeding successful: ${seedResult.message}. Re-fetching products from Firestore.`);
-        productsSnap = await getDocs(productsColRef);
+        productsSnap = await getDocs(productsColRef); // productsColRef was defined with db!
         if (productsSnap.empty) {
           console.warn("getProducts: Firestore is still empty after successful seeding and re-fetch. This might indicate an issue with data propagation or Firestore rules. Falling back to MOCK_PRODUCTS (from products.json).");
           return MOCK_PRODUCTS;
@@ -112,7 +113,7 @@ export async function getProductById(id: string): Promise<Product | null> {
   }
   try {
     console.log(`getProductById: Attempting to fetch product with ID ${id} from Firestore...`);
-    const productDocRef = doc(db, 'products', id);
+    const productDocRef = doc(db!, 'products', id); // Use db!
     const productSnap = await getDoc(productDocRef);
 
     if (productSnap.exists()) {
@@ -133,14 +134,14 @@ export async function getProductById(id: string): Promise<Product | null> {
       } as Product;
     } else {
       console.log(`getProductById: Product with ID ${id} not found in Firestore.`);
-      const productsColRef = collection(db, 'products');
+      const productsColRef = collection(db!, 'products'); // Use db!
       const quickCheckSnap = await getDocs(query(productsColRef, limit(1)));
       if (quickCheckSnap.empty) {
         console.log(`getProductById: Product ${id} not found, and products collection seems empty. Attempting to seed...`);
-        const seedResult = await seedProductsToFirestore();
+        const seedResult = await seedProductsToFirestore(); // seedProductsToFirestore already checks for db
          if (seedResult.success && seedResult.count && seedResult.count > 0) {
             console.log(`getProductById: Seeding successful after ${id} not found. Re-fetching product ${id}.`);
-            const productSnapAfterSeed = await getDoc(productDocRef);
+            const productSnapAfterSeed = await getDoc(productDocRef); // productDocRef defined with db!
             if (productSnapAfterSeed.exists()) {
               console.log(`getProductById: Product ${id} found after seeding.`);
               const data = productSnapAfterSeed.data();
@@ -182,7 +183,7 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> {
   }
   try {
     console.log(`getFeaturedProducts: Attempting to fetch ${count} featured products from Firestore...`);
-    const productsColRef = collection(db, 'products');
+    const productsColRef = collection(db!, 'products'); // Use db!
     let featuredProductsQuery = query(productsColRef, where('featured', '==', true), limit(count));
     let productsSnap = await getDocs(featuredProductsQuery);
 
@@ -190,15 +191,15 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> {
 
     if (productsSnap.empty) {
       console.log("getFeaturedProducts: 'featured' query returned no results. Checking if entire collection is empty for seeding...");
-      const allProductsCheckQuery = query(productsColRef, limit(1));
+      const allProductsCheckQuery = query(productsColRef, limit(1)); // productsColRef defined with db!
       const anyProductSnap = await getDocs(allProductsCheckQuery);
 
       if (anyProductSnap.empty) {
         console.log('getFeaturedProducts: Products collection is entirely empty. Attempting to seed database with mock data...');
-        const seedResult = await seedProductsToFirestore();
+        const seedResult = await seedProductsToFirestore(); // seedProductsToFirestore already checks for db
         if (seedResult.success && seedResult.count && seedResult.count > 0) {
           console.log(`getFeaturedProducts: Seeding successful: ${seedResult.message}. Re-fetching featured products.`);
-          productsSnap = await getDocs(featuredProductsQuery);
+          productsSnap = await getDocs(featuredProductsQuery); // featuredProductsQuery defined with db!
           if (productsSnap.empty) {
               console.warn("getFeaturedProducts: 'featured' query still empty after successful seed.");
           }
@@ -209,7 +210,7 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> {
       
       if (productsSnap.empty) { 
          console.log("getFeaturedProducts: No 'featured' products found. Falling back to a general query for any products.");
-         const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); 
+         const fallbackQuery = query(productsColRef, orderBy('name'), limit(count)); // productsColRef defined with db!
          productsSnap = await getDocs(fallbackQuery);
          if (productsSnap.empty) {
            console.log("getFeaturedProducts: Fallback query also returned no results. The collection might be truly empty or seeding failed. Falling back to MOCK_PRODUCTS.");
@@ -248,3 +249,4 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> {
     return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count);
   }
 }
+
