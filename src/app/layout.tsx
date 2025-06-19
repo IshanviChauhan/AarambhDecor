@@ -2,11 +2,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-// import { AuthProvider } from '@/contexts/auth-context'; 
+// import { AuthProvider } from '@/contexts/auth-context';
 
 export const metadata: Metadata = {
   title: 'Aarambh Decor',
   description: 'Discover inspiration with Aarambh Decor. Curated home decor items and AI-powered style suggestions.',
+  icons: null, // This will prevent Next.js from serving default/convention-based favicons
 };
 
 export default function RootLayout({
