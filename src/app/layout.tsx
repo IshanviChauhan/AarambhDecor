@@ -7,7 +7,9 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: 'Aarambh Decor',
   description: 'Discover inspiration with Aarambh Decor. Curated home decor items and AI-powered style suggestions.',
-  // By removing 'icons: null', Next.js will look for /app/favicon.ico by convention
+  icons: {
+    icon: '/favicon.ico', // Explicitly set the path to favicon.ico
+  },
 };
 
 export default function RootLayout({
