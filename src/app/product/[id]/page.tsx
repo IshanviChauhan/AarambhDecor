@@ -282,12 +282,9 @@ export default function ProductDetailPage() {
 
         <section id="photo-gallery" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           {safeImageUrls.length > 1 ? (
-            <div 
-              className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-2 md:gap-4" 
-              style={{maxHeight: '80vh', overflow: 'hidden'}}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
               {/* Large Image Container */}
-              <div className="md:col-span-2 md:row-span-2 relative rounded-md overflow-hidden shadow-md bg-card">
+              <div className="md:col-span-2 md:row-span-2 relative rounded-md overflow-hidden shadow-md bg-card aspect-square md:aspect-auto">
                 <Image
                   src={safeImageUrls[0].url}
                   alt={`${product.name} - Main gallery view`}
@@ -301,7 +298,7 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Small Images Grid Container */}
-              <div className="grid grid-cols-2 grid-rows-2 gap-2 md:gap-4">
+              <div className="md:row-span-2 grid grid-cols-2 gap-2 md:gap-4">
                 {safeImageUrls.slice(1, 5).map((image, index) => (
                   <div key={`gallery-thumb-${index}`} className="relative aspect-square rounded-md overflow-hidden shadow-md bg-card">
                     <Image
@@ -315,16 +312,16 @@ export default function ProductDetailPage() {
                     />
                   </div>
                 ))}
-                {/* Placeholder divs to maintain 2x2 structure */}
-                {Array.from({ length: Math.max(0, 4 - (safeImageUrls.length - 1)) }).map((_, i) => (
-                  <div key={`gallery-placeholder-${i}`} className="aspect-square bg-card rounded-md"></div>
+                {/* Placeholder divs to maintain 2x2 structure for the small images grid */}
+                {Array.from({ length: 4 - safeImageUrls.slice(1, 5).length }).map((_, i) => (
+                  <div key={`gallery-placeholder-${i}`} className="aspect-square bg-muted/30 rounded-md"></div>
                 ))}
               </div>
             </div>
           ) : (
              <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
                 <Info className="h-8 w-8 text-primary mx-auto mb-3" />
-                <p className="text-muted-foreground">More images coming soon for this product.</p>
+                <p className="text-muted-foreground">Detailed gallery views are not available as only one image is provided for this product.</p>
             </Card>
           )}
         </section>
