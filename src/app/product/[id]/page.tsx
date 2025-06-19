@@ -281,25 +281,45 @@ export default function ProductDetailPage() {
         </div>
 
         <section id="photo-gallery" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
-          <div className="flex items-center space-x-3 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M20.4 14.5L16 10 4 20"/></svg>
-            <h2 className="text-2xl lg:text-3xl font-headline text-foreground">Product Gallery</h2>
-          </div>
           {safeImageUrls.length > 1 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {safeImageUrls.map((image, index) => (
-                <div key={`gallery-${index}`} className="relative aspect-square rounded-md overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 animate-pop-in" style={{ animationDelay: `${index * 50}ms` }}>
-                  <Image
-                    src={image.url}
-                    alt={`${product.name} - Gallery Image ${index + 1}`}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    className="rounded-md"
-                    data-ai-hint={image.dataAiHint}
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                  />
-                </div>
-              ))}
+            <div 
+              className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-2 md:gap-4" 
+              style={{maxHeight: '80vh', overflow: 'hidden'}}
+            >
+              {/* Large Image Container */}
+              <div className="md:col-span-2 md:row-span-2 relative rounded-md overflow-hidden shadow-md bg-card">
+                <Image
+                  src={safeImageUrls[0].url}
+                  alt={`${product.name} - Main gallery view`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className="rounded-md"
+                  data-ai-hint={safeImageUrls[0].dataAiHint}
+                  sizes="(max-width: 767px) 100vw, 66vw"
+                  priority={false} 
+                />
+              </div>
+
+              {/* Small Images Grid Container */}
+              <div className="grid grid-cols-2 grid-rows-2 gap-2 md:gap-4">
+                {safeImageUrls.slice(1, 5).map((image, index) => (
+                  <div key={`gallery-thumb-${index}`} className="relative aspect-square rounded-md overflow-hidden shadow-md bg-card">
+                    <Image
+                      src={image.url}
+                      alt={`${product.name} - Gallery thumbnail ${index + 1}`}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-md"
+                      data-ai-hint={image.dataAiHint}
+                      sizes="(max-width: 767px) 50vw, 17vw"
+                    />
+                  </div>
+                ))}
+                {/* Placeholder divs to maintain 2x2 structure */}
+                {Array.from({ length: Math.max(0, 4 - (safeImageUrls.length - 1)) }).map((_, i) => (
+                  <div key={`gallery-placeholder-${i}`} className="aspect-square bg-card rounded-md"></div>
+                ))}
+              </div>
             </div>
           ) : (
              <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
