@@ -30,14 +30,14 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
           <span className="text-sm font-semibold text-foreground">{reel.username}</span>
         </div>
 
-        <div className="relative aspect-[9/16] w-full bg-muted/30 overflow-hidden">
+        <div className="relative aspect-[4/5] w-full bg-muted/30 overflow-hidden"> {/* Changed aspect ratio here */}
           <Image
             src={reel.thumbnailUrl}
             alt={reel.caption || `Instagram reel by ${reel.username}`}
             fill
             style={{ objectFit: 'cover' }}
             data-ai-hint={reel.dataAiHint}
-            sizes="(max-width: 640px) 80vw, 250px" // Adjusted max size slightly
+            sizes="(max-width: 640px) 80vw, 250px"
             className="transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full">
