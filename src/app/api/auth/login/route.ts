@@ -1,10 +1,12 @@
+// This API route is a remnant of a previous NextAuth setup and is no longer used.
+// Authentication is handled by Firebase.
+// This file can be safely deleted.
+import { NextResponse } from 'next/server';
 
-export { default } from "next-auth/middleware"
+export async function GET(request: Request) {
+  return NextResponse.json({ message: 'This authentication API route is deprecated and no longer functional.' }, { status: 404 });
+}
 
-export const config = { 
-  matcher: [
-    "/profile/:path*",
-    "/add-product/:path*",
-    // Add any other routes you want to protect with NextAuth.js middleware
-  ] 
-};
+export async function POST(request: Request) {
+  return NextResponse.json({ message: 'This authentication API route is deprecated and no longer functional.' }, { status: 404 });
+}
