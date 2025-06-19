@@ -103,7 +103,7 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     fill
-                    style={{ objectFit: 'cover', objectPosition: 'top' }} // Changed from className
+                    style={{ objectFit: 'contain', objectPosition: 'centre'}} // Changed from className
                     data-ai-hint={image.dataAiHint}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     priority={index === 0} // Prioritize the first image

@@ -70,7 +70,7 @@ export default function ProductDetailPage() {
             );
             setSuggestedProducts(categorySuggestions.slice(0, MAX_SUGGESTIONS));
           } else {
-            setSuggestedProducts([]); // No category or no product, so no suggestions
+            setSuggestedProducts([]);
           }
 
         } catch (error) {
@@ -150,15 +150,6 @@ export default function ProductDetailPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
-        <div className="mb-6 animate-fade-in-down">
-          <Button variant="outline" asChild size="sm">
-            <Link href="/collections">
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Back to Collections
-            </Link>
-          </Button>
-        </div>
-
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           <Carousel 
             className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200 group" 
@@ -181,38 +172,42 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-             <CarouselPrevious
-                variant="ghost"
-                className={cn(
-                  "absolute left-2 top-1/2 z-10",
-                  "h-10 w-10 rounded-full",
-                  "bg-background/70 text-foreground/70",
-                  "hover:bg-background/90 hover:text-primary",
-                  "shadow-md",
-                  "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                  "transition-opacity duration-200 ease-in-out",
-                  "flex items-center justify-center",
-                  "border-none p-0",
-                  "transform-none hover:transform-none active:transform-none",
-                  "translate-y-[-50%]" 
-                )}
-              />
-              <CarouselNext
-                variant="ghost"
-                className={cn(
-                  "absolute right-2 top-1/2 z-10",
-                  "h-10 w-10 rounded-full",
-                  "bg-background/70 text-foreground/70",
-                  "hover:bg-background/90 hover:text-primary",
-                  "shadow-md",
-                  "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                  "transition-opacity duration-200 ease-in-out",
-                  "flex items-center justify-center",
-                  "border-none p-0",
-                  "transform-none hover:transform-none active:transform-none",
-                  "translate-y-[-50%]"
-                )}
-              />
+            {safeImageUrls.length > 1 && (
+              <>
+                <CarouselPrevious
+                  variant="ghost"
+                  className={cn(
+                    "absolute left-2 top-1/2 z-10",
+                    "h-10 w-10 rounded-full",
+                    "bg-background/70 text-foreground/70",
+                    "hover:bg-background/90 hover:text-primary",
+                    "shadow-md",
+                    "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                    "transition-opacity duration-200 ease-in-out",
+                    "flex items-center justify-center",
+                    "border-none p-0",
+                    "transform-none hover:transform-none active:transform-none",
+                    "translate-y-[-50%]" 
+                  )}
+                />
+                <CarouselNext
+                  variant="ghost"
+                  className={cn(
+                    "absolute right-2 top-1/2 z-10",
+                    "h-10 w-10 rounded-full",
+                    "bg-background/70 text-foreground/70",
+                    "hover:bg-background/90 hover:text-primary",
+                    "shadow-md",
+                    "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                    "transition-opacity duration-200 ease-in-out",
+                    "flex items-center justify-center",
+                    "border-none p-0",
+                    "transform-none hover:transform-none active:transform-none",
+                    "translate-y-[-50%]"
+                  )}
+                />
+              </>
+            )}
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
@@ -294,10 +289,8 @@ export default function ProductDetailPage() {
                 )}
               </Accordion>
             </div>
-
           </div>
         </div>
-
 
         <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
@@ -370,34 +363,38 @@ export default function ProductDetailPage() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                 <CarouselPrevious
-                    variant="ghost"
-                    className={cn(
-                      "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
-                      "h-10 w-10 rounded-full",
-                      "bg-background/70 text-foreground/70",
-                      "hover:bg-background/90 hover:text-primary",
-                      "shadow-md",
-                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                      "transition-opacity duration-200 ease-in-out",
-                      "md:left-[-20px]",
-                      "disabled:opacity-30 disabled:cursor-not-allowed"
-                    )}
-                />
-                <CarouselNext
-                    variant="ghost"
-                    className={cn(
-                      "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
-                      "h-10 w-10 rounded-full",
-                      "bg-background/70 text-foreground/70",
-                      "hover:bg-background/90 hover:text-primary",
-                      "shadow-md",
-                      "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                      "transition-opacity duration-200 ease-in-out",
-                      "md:right-[-20px]",
-                      "disabled:opacity-30 disabled:cursor-not-allowed"
-                    )}
-                />
+                {suggestedProducts.length > 1 && (
+                  <>
+                    <CarouselPrevious
+                        variant="ghost"
+                        className={cn(
+                          "absolute left-[-10px] top-1/2 -translate-y-1/2 z-10",
+                          "h-10 w-10 rounded-full",
+                          "bg-background/70 text-foreground/70",
+                          "hover:bg-background/90 hover:text-primary",
+                          "shadow-md",
+                          "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                          "transition-opacity duration-200 ease-in-out",
+                          "md:left-[-20px]",
+                          "disabled:opacity-30 disabled:cursor-not-allowed"
+                        )}
+                    />
+                    <CarouselNext
+                        variant="ghost"
+                        className={cn(
+                          "absolute right-[-10px] top-1/2 -translate-y-1/2 z-10",
+                          "h-10 w-10 rounded-full",
+                          "bg-background/70 text-foreground/70",
+                          "hover:bg-background/90 hover:text-primary",
+                          "shadow-md",
+                          "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                          "transition-opacity duration-200 ease-in-out",
+                          "md:right-[-20px]",
+                          "disabled:opacity-30 disabled:cursor-not-allowed"
+                        )}
+                    />
+                  </>
+                )}
               </Carousel>
           </section>
         )}
@@ -406,3 +403,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+
