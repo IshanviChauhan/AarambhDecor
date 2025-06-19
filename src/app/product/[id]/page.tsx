@@ -76,7 +76,6 @@ export default function ProductDetailPage() {
 
             if (finalSuggestions.length < MAX_SUGGESTIONS) {
               const otherSuggestions = potentialSuggestions.filter(p => !finalSuggestions.some(s => s.id === p.id));
-              // Shuffle otherSuggestions to make them a bit random
               const shuffledOthers = otherSuggestions.sort(() => 0.5 - Math.random());
               finalSuggestions = [
                 ...finalSuggestions,
@@ -273,39 +272,80 @@ export default function ProductDetailPage() {
                 disabled={!product}
               />
             </div>
-
-            <Accordion type="single" collapsible className="w-full pt-4">
-              {product.sizeAndDimensions && (
-                <AccordionItem value="size">
-                  <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                    <Ruler className="mr-2 h-5 w-5 text-primary" /> Dimensions
-                  </AccordionTrigger>
-                  <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
-                    {product.sizeAndDimensions}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-              {product.material && (
-                 <AccordionItem value="material">
-                  <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                    <Tag className="mr-2 h-5 w-5 text-primary" /> Material
-                  </AccordionTrigger>
-                  <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
-                    {product.material}
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-              {product.careInstructions && (
-                <AccordionItem value="care">
+            
+            <div className="w-full pt-4">
+              {/* Accordion for small screens */}
+              <Accordion type="single" collapsible className="w-full block md:hidden">
+                {product.sizeAndDimensions && (
+                  <AccordionItem value="size">
                     <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                    <ShieldCheck className="mr-2 h-5 w-5 text-primary" /> Care Instructions
+                      <Ruler className="mr-2 h-5 w-5 text-primary" /> Dimensions
                     </AccordionTrigger>
                     <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
-                    {product.careInstructions}
+                      {product.sizeAndDimensions}
                     </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
+                  </AccordionItem>
+                )}
+                {product.material && (
+                   <AccordionItem value="material">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <Tag className="mr-2 h-5 w-5 text-primary" /> Material
+                    </AccordionTrigger>
+                    <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
+                      {product.material}
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                {product.careInstructions && (
+                  <AccordionItem value="care">
+                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <ShieldCheck className="mr-2 h-5 w-5 text-primary" /> Care Instructions
+                      </AccordionTrigger>
+                      <AccordionContent className="text-base text-muted-foreground pt-2 pl-1">
+                      {product.careInstructions}
+                      </AccordionContent>
+                  </AccordionItem>
+                )}
+              </Accordion>
+
+              {/* Grid for medium and larger screens */}
+              <div className="hidden md:grid md:grid-cols-1 lg:grid-cols-3 md:gap-x-6 md:gap-y-4">
+                {product.sizeAndDimensions && (
+                  <div className="mb-4 md:mb-0">
+                    <h4 className="flex items-center text-lg font-semibold mb-1">
+                      <Ruler className="mr-2 h-5 w-5 text-primary" />
+                      Dimensions
+                    </h4>
+                    <p className="text-base text-muted-foreground">
+                      {product.sizeAndDimensions}
+                    </p>
+                  </div>
+                )}
+                {product.material && (
+                  <div className="mb-4 md:mb-0">
+                    <h4 className="flex items-center text-lg font-semibold mb-1">
+                      <Tag className="mr-2 h-5 w-5 text-primary" />
+                      Material
+                    </h4>
+                    <p className="text-base text-muted-foreground">
+                      {product.material}
+                    </p>
+                  </div>
+                )}
+                {product.careInstructions && (
+                  <div className="mb-4 md:mb-0">
+                    <h4 className="flex items-center text-lg font-semibold mb-1">
+                      <ShieldCheck className="mr-2 h-5 w-5 text-primary" />
+                      Care Instructions
+                    </h4>
+                    <p className="text-base text-muted-foreground">
+                      {product.careInstructions}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -351,7 +391,9 @@ export default function ProductDetailPage() {
               </CardContent>
             </Card>
         </section>
-
+        
+        {/* Removed Product Gallery Section */}
+        
         {suggestedProducts.length > 0 && (
           <section id="suggested-products" className="mt-12 md:mt-20 animate-fade-in-up animation-delay-200">
             <h2 className="text-2xl lg:text-3xl font-headline text-foreground text-center mb-8 md:mb-10">
