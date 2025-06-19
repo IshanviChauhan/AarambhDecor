@@ -4,6 +4,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HelpCircle } from 'lucide-react';
+import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 export default function FAQPage() {
   return (
@@ -24,6 +25,7 @@ export default function FAQPage() {
           </CardContent>
         </Card>
       </main>
+      <InstagramReelsSection />
       <Footer />
     </div>
   );

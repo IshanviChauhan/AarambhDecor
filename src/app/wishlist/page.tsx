@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
 
@@ -204,6 +205,7 @@ export default function WishlistPage() {
           </div>
         )}
       </main>
+      <InstagramReelsSection />
       <Footer />
       <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
         <AlertDialogContent>

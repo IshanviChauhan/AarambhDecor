@@ -28,3 +28,15 @@ export interface Product {
   material?: string;
   reviews?: Review[];
 }
+
+export interface InstagramReel {
+  id: string;
+  thumbnailUrl: string;
+  dataAiHint: string; // For placeholder images
+  instagramUrl: string;
+  caption?: string;
+  username: string;
+  profileImageUrl: string;
+  likes?: string;
+  comments?: string;
+}

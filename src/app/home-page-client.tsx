@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 interface HomePageClientProps {
   initialFeaturedProducts: Product[];
@@ -285,6 +286,7 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
             </div>
           </section>
         </main>
+        <InstagramReelsSection />
         <Footer />
       </div>
       <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>

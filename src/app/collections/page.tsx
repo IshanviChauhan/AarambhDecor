@@ -33,6 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 
 const MIN_PRICE_DEFAULT = 0;
@@ -473,6 +474,7 @@ function CollectionsPageContent() {
           </section>
         </div>
       </main>
+      <InstagramReelsSection />
       <Footer />
       <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
         <AlertDialogContent>

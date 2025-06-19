@@ -4,6 +4,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail } from 'lucide-react';
+import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 export default function ContactPage() {
   return (
@@ -27,6 +28,7 @@ export default function ContactPage() {
           </CardContent>
         </Card>
       </main>
+      <InstagramReelsSection />
       <Footer />
     </div>
   );

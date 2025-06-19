@@ -37,6 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { InstagramReelsSection } from '@/components/layout/instagram-reels-section';
 
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
@@ -453,6 +454,7 @@ export default function ProductDetailPage() {
           </section>
         )}
       </main>
+      <InstagramReelsSection />
       <Footer />
       <AlertDialog open={confirmDialogState.isOpen} onOpenChange={(open) => { if (!open) handleCancelRemove(); }}>
         <AlertDialogContent>
@@ -471,6 +473,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
-
-    
