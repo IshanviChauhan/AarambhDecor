@@ -7,7 +7,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Filter, Search, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Filter, Search, Layers, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -50,6 +50,7 @@ function CollectionsPageContent() {
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [sortOrder, setSortOrder] = useState<string>(searchParams.get('sort') || 'default');
   const [currentPage, setCurrentPage] = useState(1);
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
   const [confirmDialogState, setConfirmDialogState] = useState<{
@@ -107,25 +108,31 @@ function CollectionsPageContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  useEffect(() => {
+    if (isLoadingProducts || !isClient) return;
+    const sortFromUrl = searchParams.get('sort') || 'default';
+    if (sortFromUrl !== sortOrder) {
+      setSortOrder(sortFromUrl);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, isLoadingProducts, isClient]);
+
+
   const { minProductPrice: derivedMinPrice, maxProductPrice: derivedMaxPrice } = useMemo(() => {
     if (isLoadingProducts || allProducts.length === 0) {
         return { minProductPrice: MIN_PRICE_DEFAULT, maxProductPrice: MAX_PRICE_DEFAULT };
     }
-    // Get all prices that are numbers (includes 0 for "DM for Price" items after parsing)
     const allParsedNumericPrices = allProducts.map(p => parsePrice(p.price)).filter(p => !isNaN(p));
 
-    if (allParsedNumericPrices.length === 0) { // No products with parsable prices at all
+    if (allParsedNumericPrices.length === 0) { 
         return { minProductPrice: MIN_PRICE_DEFAULT, maxProductPrice: MAX_PRICE_DEFAULT };
     }
 
-    const minP = Math.min(...allParsedNumericPrices); // This will correctly be 0 if "DM for Price" items exist
-    const maxP = Math.max(...allParsedNumericPrices); // This will be 0 if all items are "DM for Price" or actual 0 price
+    const minP = Math.min(...allParsedNumericPrices); 
+    const maxP = Math.max(...allParsedNumericPrices); 
 
     return { 
         minProductPrice: minP, 
-        // If maxP is 0 (e.g., all items are "DM for Price" or actual 0 price), 
-        // and minP is also 0, set slider max to MAX_PRICE_DEFAULT to make it usable.
-        // Otherwise, use the actual maxP, ensuring it's not less than minP.
         maxProductPrice: (maxP === 0 && minP === 0) ? MAX_PRICE_DEFAULT : Math.max(minP, maxP)
     };
   }, [allProducts, isLoadingProducts]);
@@ -154,8 +161,8 @@ function CollectionsPageContent() {
     newMin = isNaN(newMin) ? derivedMinPrice : newMin;
     newMax = isNaN(newMax) ? derivedMaxPrice : newMax;
     
-    newMin = Math.max(derivedMinPrice, Math.min(newMax, newMin)); // Clamp min against derivedMin and newMax
-    newMax = Math.max(newMin, Math.min(derivedMaxPrice, newMax)); // Clamp max against newMin and derivedMax
+    newMin = Math.max(derivedMinPrice, Math.min(newMax, newMin)); 
+    newMax = Math.max(newMin, Math.min(derivedMaxPrice, newMax)); 
 
 
     if (priceRange[0] !== newMin || priceRange[1] !== newMax) {
@@ -205,7 +212,6 @@ function CollectionsPageContent() {
 
     productsToFilter = productsToFilter.filter(p => {
       const price = parsePrice(p.price);
-      // This filter ensures "DM for Price" (parsed as 0) are included if priceRange[0] is 0.
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
@@ -217,8 +223,17 @@ function CollectionsPageContent() {
         (p.category && p.category.toLowerCase().includes(lowerSearchTerm))
       );
     }
+
+    // Apply sorting
+    if (sortOrder === 'price-asc') {
+      productsToFilter.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+    } else if (sortOrder === 'price-desc') {
+      productsToFilter.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+    }
+    // If sortOrder is 'default', no explicit sort is applied here, relying on the initial order.
+
     return productsToFilter;
-  }, [isLoadingProducts, allProducts, selectedCategory, priceRange, searchTerm]);
+  }, [isLoadingProducts, allProducts, selectedCategory, priceRange, searchTerm, sortOrder]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE) || 1;
@@ -313,6 +328,16 @@ function CollectionsPageContent() {
     currentParams.set('maxPrice', newRange[1].toString());
     updateUrlParamsAndResetPage(currentParams);
   };
+
+  const handleSortOrderChange = (newSortOrder: string) => {
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+    if (newSortOrder && newSortOrder !== 'default') {
+      currentParams.set('sort', newSortOrder);
+    } else {
+      currentParams.delete('sort'); 
+    }
+    updateUrlParamsAndResetPage(currentParams);
+  };
   
   const handleCollectionSearch = useCallback((newSearchTerm: string) => {
     setSearchTerm(newSearchTerm); 
@@ -390,7 +415,7 @@ function CollectionsPageContent() {
                     onValueChange={handlePriceChange} 
                     min={derivedMinPrice}
                     max={derivedMaxPrice}
-                    step={derivedMaxPrice > 500 ? 50: 10} // Smaller step for smaller ranges
+                    step={derivedMaxPrice > 500 ? 50: 10} 
                     minStepsBetweenThumbs={1}
                     className="my-4"
                     aria-label="Price range slider"
@@ -400,6 +425,23 @@ function CollectionsPageContent() {
                     <span>Rs. {priceRange[0].toLocaleString()}</span>
                     <span>Rs. {priceRange[1].toLocaleString()}</span>
                   </div>
+                </div>
+                <div>
+                  <h3 className="text-md font-semibold mb-2 text-foreground">Sort By</h3>
+                  <Select
+                    onValueChange={handleSortOrderChange}
+                    value={sortOrder}
+                    disabled={isLoadingProducts || allProducts.length === 0}
+                  >
+                    <SelectTrigger className="w-full text-base">
+                      <SelectValue placeholder="Sort by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default" className="text-base">Relevance</SelectItem>
+                      <SelectItem value="price-asc" className="text-base">Price: Low to High</SelectItem>
+                      <SelectItem value="price-desc" className="text-base">Price: High to Low</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
@@ -462,7 +504,7 @@ function CollectionsPageContent() {
                  <Search className="h-12 w-12 text-primary mx-auto mb-4 opacity-70" />
                 <p className="font-semibold text-xl mb-2">No Products Found</p>
                 <p>
-                {(searchTerm || selectedCategory || searchParams.get('minPrice') || searchParams.get('maxPrice')) ? 
+                {(searchTerm || selectedCategory || searchParams.get('minPrice') || searchParams.get('maxPrice') || (sortOrder !== 'default')) ? 
                   `Your filters did not match any products.`
                   : "There are no products in this collection yet."
                 }
