@@ -126,8 +126,7 @@ export default function Header() {
                   <NavLink href="/" label="Home" icon={Home} />
                   <NavLink href="/collections" label="Collections" icon={LayoutGrid} />
                   <NavLink href="/#ai-decor-advisor" label="AI Advisor" icon={Sparkles} onClick={handleAiAdvisorClick} />
-                  {/* Wishlist NavLink for mobile - icon fill might need adjustment if NavLink doesn't support it directly */}
-                  <NavLink href="/wishlist" label="Wishlist" icon={Heart} ariaLabel="View Wishlist" isFilled={isClient && hasWishlistItems} />
+                  {/* Wishlist NavLink removed from here for mobile view */}
                 </nav>
               </SheetContent>
             </Sheet>
