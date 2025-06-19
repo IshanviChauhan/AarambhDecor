@@ -1,21 +1,35 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This file is for Prisma, an ORM typically used with SQL databases or MongoDB.
+// The Aarambh Lookbook application primarily uses Firestore, which is a NoSQL database
+// accessed via the Firebase SDK (see src/lib/firebase.ts).
+// Prisma is NOT used to connect to or manage the Firestore database in this project.
+// The configurations below are commented out to prevent errors, as they would
+// require a separate SQL/MongoDB database and a DATABASE_URL.
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  // binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"] // Adjusted for potential OpenSSL issues
 }
 
+/*
 datasource db {
-  provider = "postgresql" // Or "mysql", "sqlite", "sqlserver", "mongodb"
-  url      = env("DATABASE_URL")
+  // provider = "postgresql" // Or "mysql", "sqlite", "sqlserver", "mongodb" 
+  // url      = env("DATABASE_URL")
+  // If you were to use Prisma with a SQL database, you would uncomment and configure this.
+  // For example, for SQLite:
+  // provider = "sqlite"
+  // url      = "file:./dev.db"
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String
+  password  String // This would typically store a hashed password
   firstName String
   lastName  String
-  phone     String? // Making phone optional as it often is
-  address   String[] // Array of strings for address
+  phone     String? // Made optional as per previous discussions
+  address   String[] // Array of strings for address lines
+  // Other fields as needed, e.g., createdAt, updatedAt
+  // createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
 }
+*/
