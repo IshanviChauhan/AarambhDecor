@@ -24,7 +24,7 @@ export function InstagramReelCard({ reel, className }: InstagramReelCardProps) {
       <Link href={reel.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label={`View reel by ${reel.username} on Instagram`}>
         <div className="p-3 flex items-center space-x-2 border-b border-border/50">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={reel.profileImageUrl} alt={reel.username} data-ai-hint="profile logo"/>
+            <AvatarImage src={reel.profileImageUrl} alt={reel.username} data-ai-hint="logo"/>
             <AvatarFallback>{reel.username.substring(0, 1).toUpperCase()}</AvatarFallback>
           </Avatar>
           <span className="text-sm font-semibold text-foreground">{reel.username}</span>
