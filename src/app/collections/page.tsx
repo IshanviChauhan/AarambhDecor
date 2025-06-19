@@ -7,7 +7,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Filter, Search, Layers } from 'lucide-react';
+import { Loader2, Filter, Search, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -27,6 +27,7 @@ import { getProducts } from '@/app/products/actions';
 
 const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = 10000;
+const PRODUCTS_PER_PAGE = 10;
 
 function CollectionsPageContent() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -38,6 +39,7 @@ function CollectionsPageContent() {
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -182,6 +184,36 @@ function CollectionsPageContent() {
     return productsToFilter;
   }, [isLoadingProducts, allProducts, selectedCategory, priceRange, searchTerm]);
 
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE) || 1;
+  }, [filteredProducts.length]);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  useEffect(() => {
+    if (isLoadingProducts || !isClient) return;
+
+    const pageFromUrlString = searchParams.get('page');
+    let pageNum = 1;
+    if (pageFromUrlString) {
+        const parsed = parseInt(pageFromUrlString, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+            pageNum = parsed;
+        }
+    }
+    
+    const newTotalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE) || 1;
+    const validPage = Math.max(1, Math.min(pageNum, newTotalPages));
+    
+    if (currentPage !== validPage) {
+      setCurrentPage(validPage);
+    }
+  }, [searchParams, isLoadingProducts, isClient, filteredProducts.length, currentPage, setCurrentPage]);
+
+
   const handleToggleWishlist = (productId: string) => {
     console.log("Wishlist functionality disabled for product:", productId);
     toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
@@ -190,6 +222,11 @@ function CollectionsPageContent() {
   const handleAddToCart = (product: Product) => {
      console.log("Add to cart clicked for product:", product.name);
     toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
+  };
+  
+  const updateUrlParamsAndResetPage = (newParams: URLSearchParams) => {
+    newParams.delete('page'); 
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
   const handleCategoryFilter = (categoryValue: string) => {
@@ -200,7 +237,7 @@ function CollectionsPageContent() {
     } else {
       currentParams.delete('category');
     }
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
+    updateUrlParamsAndResetPage(currentParams);
   };
 
   const handlePriceChange = (newRange: [number, number]) => {
@@ -208,7 +245,7 @@ function CollectionsPageContent() {
     const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
     currentParams.set('minPrice', newRange[0].toString());
     currentParams.set('maxPrice', newRange[1].toString());
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
+    updateUrlParamsAndResetPage(currentParams);
   };
   
   const handleCollectionSearch = useCallback((newSearchTerm: string) => {
@@ -219,9 +256,22 @@ function CollectionsPageContent() {
     } else {
       currentParams.delete('search');
     }
-    router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
+    updateUrlParamsAndResetPage(currentParams);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, pathname, searchParams]);
 
+  const handlePageNavigation = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+        const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
+        if (newPage === 1) {
+            currentParams.delete('page');
+        } else {
+            currentParams.set('page', newPage.toString());
+        }
+        router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
+        // The useEffect listening to searchParams will update `currentPage` state
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -304,19 +354,46 @@ function CollectionsPageContent() {
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
                 <p className="ml-4 text-lg text-muted-foreground">Loading collection...</p>
               </div>
-            ) : filteredProducts.length > 0 ? (
-              <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isWishlisted={false} 
-                    onToggleWishlist={handleToggleWishlist} 
-                    onAddToCart={handleAddToCart} 
-                    isProductInCart={false} 
-                  />
-                ))}
-              </div>
+            ) : paginatedProducts.length > 0 ? (
+              <>
+                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+                  {paginatedProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      isWishlisted={false} 
+                      onToggleWishlist={handleToggleWishlist} 
+                      onAddToCart={handleAddToCart} 
+                      isProductInCart={false} 
+                    />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <div className="mt-12 flex items-center justify-center space-x-2 sm:space-x-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageNavigation(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 sm:px-4"
+                    >
+                      <ChevronLeft className="h-5 w-5 sm:mr-1" />
+                      <span className="hidden sm:inline">Previous</span>
+                    </Button>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageNavigation(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                       className="px-3 py-2 sm:px-4"
+                    >
+                      <span className="hidden sm:inline">Next</span>
+                      <ChevronRight className="h-5 w-5 sm:ml-1" />
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center text-muted-foreground text-lg py-10">
                  <Search className="h-12 w-12 text-primary mx-auto mb-4 opacity-70" />
