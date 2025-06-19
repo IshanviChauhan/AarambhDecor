@@ -4,8 +4,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu } from 'lucide-react';
-// UserPlus, LogIn, UserCircle2, LogOutIcon removed
+import { LayoutGrid, Home, Sparkles, Menu, Heart } from 'lucide-react';
+// ShoppingCart icon is removed from imports as it's no longer used.
 import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -15,18 +15,31 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-// Separator and useToast might not be needed if logout toast is removed
-// For now, keep useToast if other toasts might be used by header, otherwise it can be removed.
-// Since logout is gone, useToast is likely not needed here.
+import { cn } from '@/lib/utils';
+
+const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  // const { toast } = useToast(); // Removed as logout toast is gone
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // isLoggedIn and isLoadingSession states are removed
+  const [hasWishlistItems, setHasWishlistItems] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
-  // useEffect for session checking is removed
+  useEffect(() => {
+    setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const checkWishlist = () => {
+        const storedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+        setHasWishlistItems(storedWishlist ? JSON.parse(storedWishlist).length > 0 : false);
+      };
+      checkWishlist(); // Initial check
+      window.addEventListener('storage', checkWishlist); // Listen for changes from other tabs
+      return () => {
+        window.removeEventListener('storage', checkWishlist);
+      };
+    }
+  }, []);
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
@@ -39,15 +52,22 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  // handleLogout function is removed
-
-  const NavLink = ({ href, label, icon: Icon, onClick, ariaLabel }: { href: string; label: string; icon: React.ElementType; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void; ariaLabel?: string }) => (
+  const NavLink = ({ href, label, icon: Icon, onClick, ariaLabel, isFilled }: { href: string; label: string; icon: React.ElementType; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void; ariaLabel?: string; isFilled?: boolean }) => (
     <Button asChild variant="ghost" className="w-full md:w-auto justify-start md:justify-center text-base md:text-sm py-3 md:py-2 px-2 md:px-3" onClick={() => setIsMobileMenuOpen(false)}>
       <Link href={href} aria-label={ariaLabel || label} onClick={onClick}>
-        <Icon className="mr-3 md:mr-2 h-5 md:h-4 w-5 md:w-4 text-primary md:text-current" /> {label}
+        <Icon className={cn("mr-3 md:mr-2 h-5 md:h-4 w-5 md:w-4 text-primary md:text-current", isFilled && "fill-primary")} /> {label}
       </Link>
     </Button>
   );
+  
+  const HeaderIconButton = ({ href, label, icon: Icon, isFilled }: { href: string; label: string; icon: React.ElementType; isFilled?: boolean }) => (
+    <Button asChild variant="ghost" className="relative" size="icon">
+      <Link href={href} aria-label={label}>
+        <Icon className={cn("h-5 w-5", isFilled && "fill-primary text-primary")} />
+      </Link>
+    </Button>
+  );
+
 
   return (
     <header className="py-4 px-2 md:px-4 border-b border-border/50 shadow-sm sticky top-0 bg-background/95 backdrop-blur-sm z-50">
@@ -76,16 +96,13 @@ export default function Header() {
             <NavLink href="/" label="Home" icon={Home} />
             <NavLink href="/collections" label="Collections" icon={LayoutGrid} />
             <NavLink href="/#ai-decor-advisor" label="AI Advisor" icon={Sparkles} onClick={handleAiAdvisorClick} />
-            {/* Auth related links (Profile, Logout, Register, Login) are removed */}
+            <HeaderIconButton href="/wishlist" label="View Wishlist" icon={Heart} isFilled={isClient && hasWishlistItems} />
           </nav>
+          
+          {/* Shopping Cart Button is removed */}
 
-          <Button asChild variant="ghost" className="relative" size="icon">
-            <Link href="/cart" aria-label="View Cart">
-              <ShoppingCart className="h-5 w-5" />
-            </Link>
-          </Button>
-
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center">
+             <HeaderIconButton href="/wishlist" label="View Wishlist" icon={Heart} isFilled={isClient && hasWishlistItems} />
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Open menu">
@@ -109,8 +126,9 @@ export default function Header() {
                   <NavLink href="/" label="Home" icon={Home} />
                   <NavLink href="/collections" label="Collections" icon={LayoutGrid} />
                   <NavLink href="/#ai-decor-advisor" label="AI Advisor" icon={Sparkles} onClick={handleAiAdvisorClick} />
+                  {/* Wishlist NavLink for mobile - icon fill might need adjustment if NavLink doesn't support it directly */}
+                  <NavLink href="/wishlist" label="Wishlist" icon={Heart} ariaLabel="View Wishlist" isFilled={isClient && hasWishlistItems} />
                 </nav>
-                {/* Auth related links (Profile, Logout, Register, Login) are removed from mobile menu footer */}
               </SheetContent>
             </Sheet>
           </div>
