@@ -24,7 +24,8 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
-import { getProductById } from '@/app/products/actions';
+import { getProductById, getProducts } from '@/app/products/actions';
+import { ProductCard } from '@/components/product-card';
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
   return (
@@ -39,12 +40,15 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => {
   );
 };
 
+const MAX_SUGGESTIONS = 4;
+
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -53,20 +57,45 @@ export default function ProductDetailPage() {
   useEffect(() => {
     setIsClient(true);
     if (productId) {
-      const fetchProduct = async () => {
+      const fetchProductAndSuggestions = async () => {
         setIsLoading(true);
         try {
           const fetchedProduct = await getProductById(productId);
           setProduct(fetchedProduct);
+
+          if (fetchedProduct) {
+            const allProducts = await getProducts();
+            const potentialSuggestions = allProducts.filter(p => p.id !== fetchedProduct.id);
+            
+            let finalSuggestions: Product[] = [];
+
+            if (fetchedProduct.category) {
+              const categorySuggestions = potentialSuggestions.filter(p => p.category === fetchedProduct.category);
+              finalSuggestions = categorySuggestions.slice(0, MAX_SUGGESTIONS);
+            }
+
+            if (finalSuggestions.length < MAX_SUGGESTIONS) {
+              const otherSuggestions = potentialSuggestions.filter(p => !finalSuggestions.some(s => s.id === p.id));
+              // Shuffle otherSuggestions to make them a bit random
+              const shuffledOthers = otherSuggestions.sort(() => 0.5 - Math.random());
+              finalSuggestions = [
+                ...finalSuggestions,
+                ...shuffledOthers.slice(0, MAX_SUGGESTIONS - finalSuggestions.length)
+              ];
+            }
+            setSuggestedProducts(finalSuggestions);
+          }
+
         } catch (error) {
-          console.error("Failed to fetch product:", error);
-          toast({ title: "Error", description: "Could not load product details.", variant: "destructive" });
+          console.error("Failed to fetch product details or suggestions:", error);
+          toast({ title: "Error", description: "Could not load product details or suggestions.", variant: "destructive" });
           setProduct(null);
+          setSuggestedProducts([]);
         } finally {
           setIsLoading(false);
         }
       };
-      fetchProduct();
+      fetchProductAndSuggestions();
     }
   }, [productId, toast]);
 
@@ -280,8 +309,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Photo Gallery Section Removed */}
-
         <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
             <MessageCircle className="h-7 w-7 text-primary" />
@@ -324,8 +351,30 @@ export default function ProductDetailPage() {
               </CardContent>
             </Card>
         </section>
+
+        {suggestedProducts.length > 0 && (
+          <section id="suggested-products" className="mt-12 md:mt-20 animate-fade-in-up animation-delay-200">
+            <h2 className="text-2xl lg:text-3xl font-headline text-foreground text-center mb-8 md:mb-10">
+              You may also like
+            </h2>
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8">
+              {suggestedProducts.map((suggestedProduct) => (
+                <ProductCard
+                  key={suggestedProduct.id}
+                  product={suggestedProduct}
+                  isWishlisted={false} 
+                  onToggleWishlist={handleToggleWishlist} 
+                  onAddToCart={handleAddToCart} 
+                  isProductInCart={false}
+                  className="w-[calc(50%-theme(spacing.2))] sm:w-[calc(33.333%-theme(spacing.4))] md:w-[calc(25%-theme(spacing.6))] lg:max-w-[280px]"
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <Footer />
     </div>
   );
 }
+
