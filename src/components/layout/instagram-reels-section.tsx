@@ -64,7 +64,7 @@ export function InstagramReelsSection() {
           <CarouselPrevious
             variant="ghost"
             className={cn(
-              "absolute left-[-10px] top-1/2 ",
+              "absolute left-[-10px] top-1/2", // Removed -translate-y-1/2
               "h-10 w-10 rounded-full",
               "bg-background/70 text-foreground/70 hover:bg-background/90 hover:text-primary shadow-md",
               "opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200",
@@ -76,7 +76,7 @@ export function InstagramReelsSection() {
           <CarouselNext
             variant="ghost"
             className={cn(
-              "absolute right-[-10px] top-1/2",
+              "absolute right-[-10px] top-1/2", // Removed -translate-y-1/2
               "h-10 w-10 rounded-full",
               "bg-background/70 text-foreground/70 hover:bg-background/90 hover:text-primary shadow-md",
               "opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200",
@@ -90,3 +90,4 @@ export function InstagramReelsSection() {
     </section>
   );
 }
+
