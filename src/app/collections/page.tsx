@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, Suspense, useCallback } from 'react';
-import type { Product } from '@/lib/types'; // Removed CartItem as it's disabled
+import type { Product } from '@/lib/types'; 
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { ProductCard } from '@/components/product-card';
@@ -29,9 +29,7 @@ const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = 10000;
 
 function CollectionsPageContent() {
-  // Removed wishlist and cartItems state
   const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   
   const searchParams = useSearchParams();
@@ -39,15 +37,10 @@ function CollectionsPageContent() {
   const pathname = usePathname();
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [minProductPrice, setMinProductPrice] = useState(MIN_PRICE_DEFAULT);
-  const [maxProductPrice, setMaxProductPrice] = useState(MAX_PRICE_DEFAULT);
-  const [priceRange, setPriceRange] = useState<[number, number]>([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
-  
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  // Removed useAuth
 
   useEffect(() => {
     setIsClient(true);
@@ -89,39 +82,50 @@ function CollectionsPageContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  useEffect(() => {
-    if (isLoadingProducts) return;
-
-    if (allProducts.length > 0) {
-        const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && !isNaN(p));
-        const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
-        const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
-        
-        setMinProductPrice(minP);
-        setMaxProductPrice(maxP);
-
-        const urlMinPriceStr = searchParams.get('minPrice');
-        const urlMaxPriceStr = searchParams.get('maxPrice');
-        
-        let initialMin = urlMinPriceStr ? parseInt(urlMinPriceStr, 10) : minP;
-        let initialMax = urlMaxPriceStr ? parseInt(urlMaxPriceStr, 10) : maxP;
-        
-        initialMin = isNaN(initialMin) ? minP : initialMin;
-        initialMax = isNaN(initialMax) ? maxP : initialMax;
-
-        initialMin = Math.max(minP, Math.min(maxP, initialMin));
-        initialMax = Math.max(minP, Math.min(maxP, initialMax));
-        
-        if (initialMin > initialMax) initialMin = initialMax;
-        
-        setPriceRange([initialMin, initialMax]);
-    } else {
-         setMinProductPrice(MIN_PRICE_DEFAULT);
-         setMaxProductPrice(MAX_PRICE_DEFAULT);
-         setPriceRange([MIN_PRICE_DEFAULT, MAX_PRICE_DEFAULT]);
+  const { minProductPrice: derivedMinPrice, maxProductPrice: derivedMaxPrice } = useMemo(() => {
+    if (allProducts.length === 0 || isLoadingProducts) {
+        return { minProductPrice: MIN_PRICE_DEFAULT, maxProductPrice: MAX_PRICE_DEFAULT };
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allProducts, searchParams, isLoadingProducts]);
+    const prices = allProducts.map(p => parsePrice(p.price)).filter(p => p > 0 && !isNaN(p));
+    const minP = prices.length > 0 ? Math.min(...prices) : MIN_PRICE_DEFAULT;
+    const maxP = prices.length > 0 ? Math.max(...prices) : MAX_PRICE_DEFAULT;
+    return { minProductPrice: minP, maxProductPrice: maxP };
+  }, [allProducts, isLoadingProducts]);
+
+  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
+    const urlMinPriceStr = searchParams.get('minPrice');
+    const urlMaxPriceStr = searchParams.get('maxPrice');
+    const initialMinFromUrl = urlMinPriceStr ? parseInt(urlMinPriceStr, 10) : undefined;
+    const initialMaxFromUrl = urlMaxPriceStr ? parseInt(urlMaxPriceStr, 10) : undefined;
+    
+    return [
+        initialMinFromUrl ?? MIN_PRICE_DEFAULT, 
+        initialMaxFromUrl ?? MAX_PRICE_DEFAULT
+    ];
+  });
+
+  useEffect(() => {
+    if (isLoadingProducts || allProducts.length === 0) return;
+
+    const urlMinPriceStr = searchParams.get('minPrice');
+    const urlMaxPriceStr = searchParams.get('maxPrice');
+
+    let newMin = urlMinPriceStr ? parseInt(urlMinPriceStr, 10) : derivedMinPrice;
+    let newMax = urlMaxPriceStr ? parseInt(urlMaxPriceStr, 10) : derivedMaxPrice;
+
+    newMin = isNaN(newMin) ? derivedMinPrice : newMin;
+    newMax = isNaN(newMax) ? derivedMaxPrice : newMax;
+
+    newMin = Math.max(derivedMinPrice, Math.min(derivedMaxPrice, newMin));
+    newMax = Math.max(derivedMinPrice, Math.min(derivedMaxPrice, newMax));
+
+    if (newMin > newMax) newMin = newMax;
+    
+    if (priceRange[0] !== newMin || priceRange[1] !== newMax) {
+        setPriceRange([newMin, newMax]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, [searchParams, derivedMinPrice, derivedMaxPrice, isLoadingProducts, allProducts.length]);
 
 
   useEffect(() => {
@@ -152,12 +156,9 @@ function CollectionsPageContent() {
   }, [searchParams, categories, isLoadingProducts, selectedCategory, router, pathname, isClient]);
 
 
-  // Removed useEffects for wishlist and cart local storage
-
-  useEffect(() => {
+  const filteredProducts = useMemo(() => {
     if (isLoadingProducts) {
-        setFilteredProducts([]); 
-        return;
+        return [];
     }
     let productsToFilter = [...allProducts];
 
@@ -178,24 +179,17 @@ function CollectionsPageContent() {
         (p.category && p.category.toLowerCase().includes(lowerSearchTerm))
       );
     }
-    setFilteredProducts(productsToFilter);
-  }, [selectedCategory, allProducts, priceRange, searchTerm, isLoadingProducts]);
+    return productsToFilter;
+  }, [isLoadingProducts, allProducts, selectedCategory, priceRange, searchTerm]);
 
   const handleToggleWishlist = (productId: string) => {
-    // Wishlist functionality is disabled
     console.log("Wishlist functionality disabled for product:", productId);
     toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
   };
 
   const handleAddToCart = (product: Product) => {
-    // Cart functionality is disabled
      console.log("Add to cart clicked for product:", product.name);
     toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
-  };
-
-  const isProductInCart = (productId: string) => {
-    // Cart functionality is disabled
-    return false;
   };
 
   const handleCategoryFilter = (categoryValue: string) => {
@@ -279,8 +273,8 @@ function CollectionsPageContent() {
                   <Slider
                     value={priceRange} 
                     onValueChange={handlePriceChange} 
-                    min={minProductPrice}
-                    max={maxProductPrice}
+                    min={derivedMinPrice}
+                    max={derivedMaxPrice}
                     step={50}
                     minStepsBetweenThumbs={1}
                     className="my-4"
@@ -316,10 +310,10 @@ function CollectionsPageContent() {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    isWishlisted={false} // Wishlist disabled
-                    onToggleWishlist={handleToggleWishlist} // Will show disabled message
-                    onAddToCart={handleAddToCart} // Will show disabled message
-                    isProductInCart={false} // Cart disabled
+                    isWishlisted={false} 
+                    onToggleWishlist={handleToggleWishlist} 
+                    onAddToCart={handleAddToCart} 
+                    isProductInCart={false} 
                   />
                 ))}
               </div>
@@ -351,3 +345,4 @@ export default function CollectionsPage() {
     </Suspense>
   )
 }
+
