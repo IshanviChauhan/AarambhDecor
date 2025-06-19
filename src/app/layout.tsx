@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: 'Aarambh Decor',
   description: 'Discover inspiration with Aarambh Decor. Curated home decor items and AI-powered style suggestions.',
-  icons: null, // This will prevent Next.js from serving default/convention-based favicons
+  // By removing 'icons: null', Next.js will look for /app/favicon.ico by convention
 };
 
 export default function RootLayout({
@@ -24,7 +24,6 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col" suppressHydrationWarning={true}>
-        {/* AuthProvider was a stub and has been removed */}
         {children}
         <Toaster />
       </body>
