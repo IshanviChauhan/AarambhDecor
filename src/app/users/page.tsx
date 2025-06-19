@@ -1,16 +1,29 @@
 
-// This page (/src/app/users/page.tsx) is deprecated and no longer used.
-// User profile functionality is at /profile.
-// Registration is at /register.
-// Sign-in is at /signin.
-// This file can be safely deleted or kept as a redirect if absolutely necessary,
-// but it's better to remove dead code.
+// This page and its functionality have been removed as user management/profiles
+// are no longer part of the application.
+import Header from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle } from 'lucide-react';
 
-import { redirect } from 'next/navigation';
-
-export default function DeprecatedUsersPage() {
-  // Redirect to the homepage or another relevant page
-  redirect('/'); 
-  // Or return null if you prefer not to redirect and just want it to be a dead end
-  // return null; 
+export default function RemovedUsersPage() {
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <AlertTriangle className="mx-auto h-12 w-12 text-destructive mb-4" />
+            <CardTitle className="font-headline text-2xl text-destructive">Feature Removed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              User-specific pages are no longer available.
+            </p>
+          </CardContent>
+        </Card>
+      </main>
+      <Footer />
+    </div>
+  );
 }

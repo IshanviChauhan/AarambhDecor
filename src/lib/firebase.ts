@@ -1,6 +1,6 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
+// Auth related imports like getAuth, browserLocalPersistence, setPersistence are removed
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
@@ -30,7 +30,7 @@ const firebaseConfig = {
 console.log("--- Firebase Configuration Object (src/lib/firebase.ts) ---");
 console.log("Environment Type:", typeof window !== 'undefined' ? "Client" : "Server");
 console.log("Using API Key:", firebaseConfig.apiKey ? "Present" : "MISSING or undefined in config");
-console.log("Using Auth Domain:", firebaseConfig.authDomain ? "Present" : "MISSING or undefined in config");
+console.log("Using Auth Domain:", firebaseConfig.authDomain ? "Present" : "MISSING or undefined in config"); // Auth Domain still part of config, but Auth service not initialized
 console.log("Using Project ID:", firebaseConfig.projectId ? "Present" : "MISSING or undefined in config");
 // Add other config values if needed for detailed logging
 console.log("---------------------------------------------------------");
@@ -64,27 +64,15 @@ try {
     );
   }
   // Re-throw the error to ensure the application doesn't proceed with a broken Firebase setup.
-  // However, in a production environment, you might want to handle this more gracefully
-  // or ensure the build fails if config is missing. For development, re-throwing helps visibility.
-  if (typeof window === 'undefined') { // Only re-throw on server-side to potentially stop build/start
+  if (typeof window === 'undefined') { 
     throw e;
   } else {
-    // On client-side, log extensively but don't necessarily crash the entire app if other parts can function
     console.error("Firebase initialization failed on the client. Some Firebase features may not work.");
   }
 }
 
-// These services depend on 'app' being successfully initialized.
-// Defensive initialization: only try to get auth, db, storage if app was initialized
-const auth = app ? getAuth(app) : null; // Nullable if app init failed
-const db = app ? getFirestore(app) : null; // Nullable if app init failed
-const storage = app ? getStorage(app) : null; // Nullable if app init failed
+// Firebase Auth service (auth) is no longer initialized or exported.
+const db = app ? getFirestore(app) : null; 
+const storage = app ? getStorage(app) : null; 
 
-if (auth && typeof window !== 'undefined') {
-  setPersistence(auth, browserLocalPersistence)
-    .catch((error) => {
-      console.error("Error setting Firebase auth persistence (src/lib/firebase.ts):", error);
-    });
-}
-
-export { app, auth, db, storage };
+export { app, db, storage };

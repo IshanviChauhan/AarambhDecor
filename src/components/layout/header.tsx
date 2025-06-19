@@ -4,7 +4,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu, UserPlus, LogIn, UserCircle2, LogOut as LogOutIcon } from 'lucide-react';
+import { LayoutGrid, Home, Sparkles, ShoppingCart, Menu } from 'lucide-react';
+// UserPlus, LogIn, UserCircle2, LogOutIcon removed
 import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -14,29 +15,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-// useSession and signOut from next-auth/react are removed
+// Separator and useToast might not be needed if logout toast is removed
+// For now, keep useToast if other toasts might be used by header, otherwise it can be removed.
+// Since logout is gone, useToast is likely not needed here.
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Removed as logout toast is gone
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State for Firebase-based login
-  const [isLoadingSession, setIsLoadingSession] = useState(true); // To mimic loading state
+  // isLoggedIn and isLoadingSession states are removed
 
-  useEffect(() => {
-    // Check for tempUserId from localStorage to simulate session loading
-    // This is a simplified way to handle UI for Firebase auth without a context/global state manager
-    const tempUserId = localStorage.getItem('tempUserId');
-    if (tempUserId) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-    setIsLoadingSession(false); // Done checking
-  }, [pathname]); // Re-check on path change if needed
+  // useEffect for session checking is removed
 
   const handleAiAdvisorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
@@ -49,19 +39,7 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleLogout = () => {
-    // Firebase logout would typically be handled via auth.signOut()
-    // For now, we'll just clear the localStorage item and update state
-    localStorage.removeItem('tempUserId');
-    setIsLoggedIn(false);
-    setIsMobileMenuOpen(false);
-    router.push('/');
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out.",
-      variant: "default"
-    });
-  };
+  // handleLogout function is removed
 
   const NavLink = ({ href, label, icon: Icon, onClick, ariaLabel }: { href: string; label: string; icon: React.ElementType; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void; ariaLabel?: string }) => (
     <Button asChild variant="ghost" className="w-full md:w-auto justify-start md:justify-center text-base md:text-sm py-3 md:py-2 px-2 md:px-3" onClick={() => setIsMobileMenuOpen(false)}>
@@ -98,24 +76,7 @@ export default function Header() {
             <NavLink href="/" label="Home" icon={Home} />
             <NavLink href="/collections" label="Collections" icon={LayoutGrid} />
             <NavLink href="/#ai-decor-advisor" label="AI Advisor" icon={Sparkles} onClick={handleAiAdvisorClick} />
-            
-            {isLoadingSession ? (
-              <>
-                <Button variant="ghost" disabled className="text-sm justify-center py-2 px-3 opacity-50"><UserCircle2 className="mr-2 h-4 w-4" />Loading...</Button>
-              </>
-            ) : isLoggedIn ? (
-              <>
-                <NavLink href="/profile" label="Profile" icon={UserCircle2} />
-                <Button variant="ghost" onClick={handleLogout} aria-label="Logout" className="text-sm justify-center py-2 px-3">
-                  <LogOutIcon className="mr-2 h-4 w-4" /> Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <NavLink href="/register" label="Register" icon={UserPlus} />
-                <NavLink href="/signin" label="Login" icon={LogIn} />
-              </>
-            )}
+            {/* Auth related links (Profile, Logout, Register, Login) are removed */}
           </nav>
 
           <Button asChild variant="ghost" className="relative" size="icon">
@@ -149,25 +110,7 @@ export default function Header() {
                   <NavLink href="/collections" label="Collections" icon={LayoutGrid} />
                   <NavLink href="/#ai-decor-advisor" label="AI Advisor" icon={Sparkles} onClick={handleAiAdvisorClick} />
                 </nav>
-
-                <Separator className="my-4" />
-                <div className="flex flex-col space-y-1">
-                    {isLoadingSession ? (
-                       <Button variant="ghost" className="w-full justify-start text-base py-3 px-2 opacity-50" disabled><UserCircle2 className="mr-3 h-5 w-5 text-primary" />Loading...</Button>
-                    ) : isLoggedIn ? (
-                      <>
-                        <NavLink href="/profile" label="My Profile" icon={UserCircle2} />
-                        <Button variant="ghost" className="w-full justify-start text-base py-3 px-2" onClick={handleLogout}>
-                          <LogOutIcon className="mr-3 h-5 w-5 text-primary" /> Logout
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <NavLink href="/register" label="Register" icon={UserPlus} />
-                        <NavLink href="/signin" label="Login" icon={LogIn} />
-                      </>
-                    )}
-                </div>
+                {/* Auth related links (Profile, Logout, Register, Login) are removed from mobile menu footer */}
               </SheetContent>
             </Sheet>
           </div>
