@@ -64,15 +64,23 @@ try {
     );
   }
   // Re-throw the error to ensure the application doesn't proceed with a broken Firebase setup.
-  throw e;
+  // However, in a production environment, you might want to handle this more gracefully
+  // or ensure the build fails if config is missing. For development, re-throwing helps visibility.
+  if (typeof window === 'undefined') { // Only re-throw on server-side to potentially stop build/start
+    throw e;
+  } else {
+    // On client-side, log extensively but don't necessarily crash the entire app if other parts can function
+    console.error("Firebase initialization failed on the client. Some Firebase features may not work.");
+  }
 }
 
 // These services depend on 'app' being successfully initialized.
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+// Defensive initialization: only try to get auth, db, storage if app was initialized
+const auth = app ? getAuth(app) : null; // Nullable if app init failed
+const db = app ? getFirestore(app) : null; // Nullable if app init failed
+const storage = app ? getStorage(app) : null; // Nullable if app init failed
 
-if (typeof window !== 'undefined') {
+if (auth && typeof window !== 'undefined') {
   setPersistence(auth, browserLocalPersistence)
     .catch((error) => {
       console.error("Error setting Firebase auth persistence (src/lib/firebase.ts):", error);
