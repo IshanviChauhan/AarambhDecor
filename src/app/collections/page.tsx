@@ -28,6 +28,7 @@ import { getProducts } from '@/app/products/actions';
 const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = 10000;
 const PRODUCTS_PER_PAGE = 10;
+const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
 
 function CollectionsPageContent() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -40,12 +41,19 @@ function CollectionsPageContent() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [currentPage, setCurrentPage] = useState(1);
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const storedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+      if (storedWishlist) {
+        setWishlistItems(JSON.parse(storedWishlist));
+      }
+    }
     async function fetchInitialProducts() {
       console.log("CollectionsPage: Fetching initial products...");
       setIsLoadingProducts(true);
@@ -215,14 +223,24 @@ function CollectionsPageContent() {
 
 
   const handleToggleWishlist = (productId: string) => {
-    console.log("Wishlist functionality disabled for product:", productId);
-    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
+    if (!isClient) return;
+    const product = allProducts.find(p => p.id === productId);
+    const productName = product?.name || "Product";
+
+    setWishlistItems(prev => {
+      const newWishlist = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+      toast({
+        title: prev.includes(productId) ? "Removed from Wishlist" : "Added to Wishlist",
+        description: `${productName} has been ${prev.includes(productId) ? 'removed from' : 'added to'} your wishlist.`,
+        variant: "default"
+      });
+      return newWishlist;
+    });
   };
 
-  const handleAddToCart = (product: Product) => {
-     console.log("Add to cart clicked for product:", product.name);
-    toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
-  };
+  // Add to Cart functionality removed
+  // const handleAddToCart = (product: Product) => { ... };
   
   const updateUrlParamsAndResetPage = (newParams: URLSearchParams) => {
     newParams.delete('page'); 
@@ -269,7 +287,6 @@ function CollectionsPageContent() {
             currentParams.set('page', newPage.toString());
         }
         router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
-        // The useEffect listening to searchParams will update `currentPage` state
     }
   };
 
@@ -361,10 +378,8 @@ function CollectionsPageContent() {
                     <ProductCard
                       key={product.id}
                       product={product}
-                      isWishlisted={false} 
-                      onToggleWishlist={handleToggleWishlist} 
-                      onAddToCart={handleAddToCart} 
-                      isProductInCart={false} 
+                      isWishlisted={wishlistItems.includes(product.id)} 
+                      onToggleWishlist={handleToggleWishlist}
                     />
                   ))}
                 </div>
@@ -422,4 +437,3 @@ export default function CollectionsPage() {
     </Suspense>
   )
 }
-

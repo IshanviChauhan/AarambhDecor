@@ -24,15 +24,13 @@ interface HomePageClientProps {
   errorFetchingInitialData: boolean;
 }
 
+const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
+
 export default function HomePageClient({ initialFeaturedProducts, initialAllProducts, errorFetchingInitialData }: HomePageClientProps) {
-  // State now initialized from props
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialFeaturedProducts);
   const [allProductsForSearch, setAllProductsForSearch] = useState<Product[]>(initialAllProducts);
-  
-  // This state indicates if there was an issue loading initial data from server,
-  // or if client logic determines products are "loading" or unavailable.
   const [productsUnavailable, setProductsUnavailable] = useState(errorFetchingInitialData);
-
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -42,13 +40,17 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const storedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+      if (storedWishlist) {
+        setWishlistItems(JSON.parse(storedWishlist));
+      }
+    }
+
     if (errorFetchingInitialData) {
         toast({ title: "Error", description: "Could not load initial products for the homepage. Some features might be limited.", variant: "destructive" });
-        // Update state to reflect that products are unavailable if an error occurred
         setProductsUnavailable(true);
     }
-    // Update local state if props change (e.g., after a server action followed by revalidation)
-    // This might not be strictly necessary if navigation handles re-fetching, but good for consistency
     setFeaturedProducts(initialFeaturedProducts);
     setAllProductsForSearch(initialAllProducts);
 
@@ -56,14 +58,24 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
   }, [initialFeaturedProducts, initialAllProducts, errorFetchingInitialData]);
 
   const handleToggleWishlist = (productId: string) => {
-    console.log("Wishlist functionality disabled for product:", productId);
-    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
+    if (!isClient) return;
+    const product = featuredProducts.find(p => p.id === productId) || allProductsForSearch.find(p => p.id === productId);
+    const productName = product?.name || "Product";
+
+    setWishlistItems(prev => {
+      const newWishlist = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+      toast({
+        title: prev.includes(productId) ? "Removed from Wishlist" : "Added to Wishlist",
+        description: `${productName} has been ${prev.includes(productId) ? 'removed from' : 'added to'} your wishlist.`,
+        variant: "default"
+      });
+      return newWishlist;
+    });
   };
 
-  const handleAddToCart = (product: Product) => {
-    console.log("Add to cart clicked for product:", product.name);
-    toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
-  };
+  // Add to Cart functionality removed
+  // const handleAddToCart = (product: Product) => { ... };
 
   const handleHomepageSearch = (searchTerm: string) => {
     const trimmedSearchTerm = searchTerm.trim();
@@ -96,8 +108,6 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
     }
   };
   
-  // Determine if products are considered "loading" or unavailable for display
-  // This is true if an error occurred OR if products array is empty without an error (implies no data)
   const showLoadingOrNoProductsMessage = productsUnavailable || (!errorFetchingInitialData && featuredProducts.length === 0);
 
 
@@ -157,7 +167,7 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
             </div>
             {showLoadingOrNoProductsMessage ? (
               <div className="flex justify-center items-center h-64">
-                {productsUnavailable && ! (featuredProducts.length > 0) ? ( // Show error/unavailable only if truly no products AND error
+                {productsUnavailable && ! (featuredProducts.length > 0) ? (
                      <p className="text-center text-destructive text-lg">Featured products could not be loaded. Please try again later.</p>
                 ) : (
                     <>
@@ -180,10 +190,8 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
                       <div className="p-1 h-full flex">
                         <ProductCard
                           product={product}
-                          isWishlisted={false} 
-                          onToggleWishlist={handleToggleWishlist} 
-                          onAddToCart={handleAddToCart} 
-                          isProductInCart={false} 
+                          isWishlisted={wishlistItems.includes(product.id)} 
+                          onToggleWishlist={handleToggleWishlist}
                           className="w-full flex flex-col"
                         />
                       </div>

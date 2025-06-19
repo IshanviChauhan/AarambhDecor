@@ -6,27 +6,22 @@ import type { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+// ShoppingCart icon and Button for Add to Cart are removed
 import { WishlistIcon } from './wishlist-icon';
-import { ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-
+// useToast is removed as it's handled by parent components for wishlist
 
 interface ProductCardProps {
   product: Product;
-  isWishlisted: boolean; // Will effectively be false and non-interactive
-  onToggleWishlist: (productId: string) => void; // Will show disabled message
-  onAddToCart: (product: Product) => void; // Will show disabled message
-  isProductInCart?: boolean; // Will be false
+  isWishlisted: boolean;
+  onToggleWishlist: (productId: string) => void;
   className?: string;
 }
 
-export function ProductCard({ product, className: propClassName }: ProductCardProps) {
+export function ProductCard({ product, isWishlisted, onToggleWishlist, className: propClassName }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const { toast } = useToast();
 
   const imagesToDisplay = product.imageUrls && product.imageUrls.length > 0
     ? product.imageUrls
@@ -41,6 +36,10 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      // Reset to first image when not hovering if there are multiple images
+      if (imagesToDisplay.length > 1) {
+        setCurrentImageIndex(0);
+      }
     }
     return () => {
       if (intervalRef.current) {
@@ -48,6 +47,7 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
       }
     };
   }, [isHovering, imagesToDisplay.length]);
+
 
   const handleMouseEnter = () => {
     if (imagesToDisplay.length > 1) {
@@ -58,21 +58,10 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
   const handleMouseLeave = () => {
     if (imagesToDisplay.length > 1) {
       setIsHovering(false);
-      setCurrentImageIndex(0);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      // The useEffect will reset currentImageIndex to 0 when isHovering becomes false
     }
   };
-
-  const handleDisabledWishlist = () => {
-    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
-  };
-
-  const handleDisabledCart = () => {
-     toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
-  };
-
+  
   return (
     <Card className={cn(
       "shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden",
@@ -86,7 +75,7 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
       >
         <Link href={`/product/${product.id}`} aria-label={`View details for ${product.name}`}>
           <div
-            className="relative w-full aspect-square rounded-t-lg overflow-hidden" // Added overflow-hidden
+            className="relative w-full aspect-square rounded-t-lg overflow-hidden"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -103,10 +92,10 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
                     src={image.url}
                     alt={`${product.name} image ${index + 1}`}
                     fill
-                    style={{ objectFit: 'contain', objectPosition: 'centre'}} // Changed from className
+                    style={{ objectFit: 'contain', objectPosition: 'center'}}
                     data-ai-hint={image.dataAiHint}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    priority={index === 0} // Prioritize the first image
+                    priority={index === 0}
                   />
                 </div>
               ))}
@@ -115,10 +104,9 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
         </Link>
         <div className="absolute top-2 right-2 z-10">
           <WishlistIcon
-            isWishlisted={false} // Always false
-            onClick={handleDisabledWishlist} // Show disabled message
+            isWishlisted={isWishlisted}
+            onClick={() => onToggleWishlist(product.id)}
             className="bg-background/70 hover:bg-background"
-            disabled // Visually disable
           />
         </div>
       </CardHeader>
@@ -134,15 +122,7 @@ export function ProductCard({ product, className: propClassName }: ProductCardPr
         {product.price && (
           <div className="flex justify-between items-center mt-auto pt-2">
             <p className="font-semibold text-primary text-lg">{product.price}</p>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleDisabledCart} // Show disabled message
-              aria-label="Add to cart (disabled)"
-            >
-              <ShoppingCart className="h-4 w-4" />
-            </Button>
+            {/* Add to Cart button removed */}
           </div>
         )}
       </CardContent>

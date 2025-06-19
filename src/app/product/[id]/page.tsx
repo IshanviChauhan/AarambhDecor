@@ -9,7 +9,7 @@ import Footer from '@/components/layout/footer';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from '@/components/wishlist-icon';
-import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send, Plus, Minus, Package } from 'lucide-react';
+import { MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send, Plus, Minus, Package } from 'lucide-react'; // ShoppingCart removed
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -22,7 +22,7 @@ import {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  type CarouselApi, // Added CarouselApi type
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 import { getProductById, getProducts } from '@/app/products/actions';
@@ -42,6 +42,7 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => {
 };
 
 const MAX_SUGGESTIONS = 4;
+const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -54,10 +55,18 @@ export default function ProductDetailPage() {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [emblaApi, setEmblaApi] = useState<CarouselApi>(); // State for Embla Carousel API
+  const [emblaApi, setEmblaApi] = useState<CarouselApi>();
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const storedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+      if (storedWishlist) {
+        setWishlistItems(JSON.parse(storedWishlist));
+      }
+    }
+
     if (productId) {
       const fetchProductAndSuggestions = async () => {
         setIsLoading(true);
@@ -69,7 +78,7 @@ export default function ProductDetailPage() {
             const allProducts = await getProducts();
             const categorySuggestions = allProducts.filter(
               p => p.id !== fetchedProduct.id && p.category === fetchedProduct.category
-            ).slice(0, MAX_SUGGESTIONS); // Limit suggestions here
+            ).slice(0, MAX_SUGGESTIONS);
             setSuggestedProducts(categorySuggestions);
           } else {
             setSuggestedProducts([]);
@@ -89,27 +98,34 @@ export default function ProductDetailPage() {
   }, [productId, toast]);
 
   const handleToggleWishlist = (id: string) => {
-    console.log("Wishlist functionality disabled for product:", id);
-    toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
+    if (!isClient) return;
+    const currentProduct = product?.id === id ? product : suggestedProducts.find(p => p.id === id);
+    const productName = currentProduct?.name || "Product";
+
+    setWishlistItems(prev => {
+      const newWishlist = prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id];
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(newWishlist));
+      toast({
+        title: prev.includes(id) ? "Removed from Wishlist" : "Added to Wishlist",
+        description: `${productName} has been ${prev.includes(id) ? 'removed from' : 'added to'} your wishlist.`,
+        variant: "default"
+      });
+      return newWishlist;
+    });
   };
 
-  const handleAddToCart = (p: Product) => {
-    console.log("Add to cart clicked for product:", p.name, "with quantity:", quantity);
-    toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
-  };
+  // Add to cart functionality is removed
+  // const handleAddToCart = (p: Product) => { ... };
 
   const handleIncreaseQuantity = () => {
     setQuantity(prev => prev + 1);
-    console.log("Quantity increased (visual only)");
   };
 
   const handleDecreaseQuantity = () => {
     setQuantity(prev => Math.max(1, prev - 1));
-    console.log("Quantity decreased (visual only)");
   };
 
-  const isProductInCart = false;
-  const isProductWishlisted = false;
+  const isProductWishlisted = product ? wishlistItems.includes(product.id) : false;
 
   if (isLoading || !isClient) {
     return (
@@ -226,19 +242,11 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                className="flex-1 h-12 px-8 py-2 rounded-md text-sm font-medium" 
-                onClick={() => handleAddToCart(product)}
-                disabled={!product}
-              >
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                Add to Cart (Feature Disabled)
-              </Button>
+              {/* Add to Cart Button removed */}
               <WishlistIcon
                 isWishlisted={isProductWishlisted}
                 onClick={() => handleToggleWishlist(product.id)}
                 className="w-full sm:w-auto h-12 px-4 border border-input text-lg"
-                disabled={!product}
               />
             </div>
             
@@ -340,17 +348,15 @@ export default function ProductDetailPage() {
                       <div className="p-1 h-full flex">
                         <ProductCard
                           product={suggestedProduct}
-                          isWishlisted={false} 
-                          onToggleWishlist={handleToggleWishlist} 
-                          onAddToCart={handleAddToCart} 
-                          isProductInCart={false}
+                          isWishlisted={wishlistItems.includes(suggestedProduct.id)} 
+                          onToggleWishlist={handleToggleWishlist}
                           className="w-full flex flex-col" 
                         />
                       </div>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                {suggestedProducts.length > 1 && ( // Only show arrows if there's more than one item
+                {suggestedProducts.length > 1 && (
                   <>
                     <CarouselPrevious
                         variant="ghost"
@@ -390,4 +396,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
