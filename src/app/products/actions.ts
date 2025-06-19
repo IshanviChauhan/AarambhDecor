@@ -13,6 +13,10 @@ interface SeedResult {
 }
 
 export async function seedProductsToFirestore(): Promise<SeedResult> {
+  if (!db) {
+    console.error("seedProductsToFirestore: Firestore database instance is not available. Aborting seed.");
+    return { success: false, message: "Database service is not available. Seeding aborted." };
+  }
   if (MOCK_PRODUCTS.length === 0) {
     console.warn("seedProductsToFirestore: No mock products found to seed.");
     return { success: false, message: "No mock products found to seed." };
@@ -31,7 +35,7 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
       imageUrls: product.imageUrls.map(img => ({ url: img.url, dataAiHint: img.dataAiHint } as ProductImage)),
       price: product.price,
       category: product.category,
-      featured: product.featured || false, // Changed from isLatest
+      featured: product.featured || false,
       sizeAndDimensions: product.sizeAndDimensions,
       material: product.material,
       reviews: product.reviews ? product.reviews.map(r => ({ ...r } as Review)) : [],
@@ -52,6 +56,10 @@ export async function seedProductsToFirestore(): Promise<SeedResult> {
 }
 
 export async function getProducts(): Promise<Product[]> {
+  if (!db) {
+    console.error("getProducts: Firestore database instance is not available. Falling back to MOCK_PRODUCTS.");
+    return MOCK_PRODUCTS;
+  }
   try {
     console.log('getProducts: Attempting to fetch products from Firestore...');
     const productsColRef = collection(db, 'products');
@@ -83,7 +91,7 @@ export async function getProducts(): Promise<Product[]> {
         imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
         price: data.price || 'Rs. 0',
         category: data.category || 'Uncategorized',
-        featured: data.featured || false, // Changed from isLatest
+        featured: data.featured || false,
         sizeAndDimensions: data.sizeAndDimensions || 'N/A',
         material: data.material || 'N/A',
         reviews: data.reviews || [],
@@ -98,6 +106,10 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
+  if (!db) {
+    console.error(`getProductById: Firestore database instance is not available for product ${id}. Returning null.`);
+    return null;
+  }
   try {
     console.log(`getProductById: Attempting to fetch product with ID ${id} from Firestore...`);
     const productDocRef = doc(db, 'products', id);
@@ -114,7 +126,7 @@ export async function getProductById(id: string): Promise<Product | null> {
         imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
         price: data.price || 'Rs. 0',
         category: data.category || 'Uncategorized',
-        featured: data.featured || false, // Changed from isLatest
+        featured: data.featured || false,
         sizeAndDimensions: data.sizeAndDimensions || 'N/A',
         material: data.material || 'N/A',
         reviews: data.reviews || [],
@@ -140,7 +152,7 @@ export async function getProductById(id: string): Promise<Product | null> {
                 imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
                 price: data.price || 'Rs. 0',
                 category: data.category || 'Uncategorized',
-                featured: data.featured || false, // Changed from isLatest
+                featured: data.featured || false,
                 sizeAndDimensions: data.sizeAndDimensions || 'N/A',
                 material: data.material || 'N/A',
                 reviews: data.reviews || [],
@@ -163,11 +175,15 @@ export async function getProductById(id: string): Promise<Product | null> {
   }
 }
 
-export async function getFeaturedProducts(count: number): Promise<Product[]> { // Renamed from getLatestProducts
+export async function getFeaturedProducts(count: number): Promise<Product[]> {
+  if (!db) {
+    console.error("getFeaturedProducts: Firestore database instance is not available. Falling back to MOCK_PRODUCTS.");
+    return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count);
+  }
   try {
     console.log(`getFeaturedProducts: Attempting to fetch ${count} featured products from Firestore...`);
     const productsColRef = collection(db, 'products');
-    let featuredProductsQuery = query(productsColRef, where('featured', '==', true), limit(count)); // Changed from isLatest
+    let featuredProductsQuery = query(productsColRef, where('featured', '==', true), limit(count));
     let productsSnap = await getDocs(featuredProductsQuery);
 
     let productsToReturn: Product[] = [];
@@ -212,7 +228,7 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> { /
         imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : [{ url: 'https://placehold.co/600x400.png', dataAiHint: 'placeholder image' }],
         price: data.price || 'Rs. 0',
         category: data.category || 'Uncategorized',
-        featured: data.featured || false, // Changed from isLatest
+        featured: data.featured || false,
         sizeAndDimensions: data.sizeAndDimensions || 'N/A',
         material: data.material || 'N/A',
         reviews: data.reviews || [],
@@ -221,7 +237,7 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> { /
 
     if (productsToReturn.length === 0 && MOCK_PRODUCTS.length > 0) {
         console.warn("getFeaturedProducts: All Firestore fetches resulted in no products. Falling back to MOCK_PRODUCTS for featured products.");
-        return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count); // Changed from isLatest
+        return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count);
     }
     
     console.log(`getFeaturedProducts: Fetched ${productsToReturn.length} products.`);
@@ -229,7 +245,6 @@ export async function getFeaturedProducts(count: number): Promise<Product[]> { /
 
   } catch (error) {
     console.error("getFeaturedProducts: Error fetching featured products:", error, "Falling back to MOCK_PRODUCTS.");
-    return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count); // Changed from isLatest
+    return MOCK_PRODUCTS.filter(p => p.featured).slice(0, count);
   }
 }
-
