@@ -22,6 +22,7 @@ import {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  type CarouselApi, // Added CarouselApi type
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 import { getProductById, getProducts } from '@/app/products/actions';
@@ -53,6 +54,7 @@ export default function ProductDetailPage() {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [emblaApi, setEmblaApi] = useState<CarouselApi>(); // State for Embla Carousel API
 
   useEffect(() => {
     setIsClient(true);
@@ -67,8 +69,8 @@ export default function ProductDetailPage() {
             const allProducts = await getProducts();
             const categorySuggestions = allProducts.filter(
               p => p.id !== fetchedProduct.id && p.category === fetchedProduct.category
-            );
-            setSuggestedProducts(categorySuggestions.slice(0, MAX_SUGGESTIONS));
+            ).slice(0, MAX_SUGGESTIONS); // Limit suggestions here
+            setSuggestedProducts(categorySuggestions);
           } else {
             setSuggestedProducts([]);
           }
@@ -152,13 +154,33 @@ export default function ProductDetailPage() {
       <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           <Carousel 
-            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200 group" 
+            setApi={setEmblaApi}
+            className="w-full max-w-full md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto animate-fade-in-down animation-delay-200" 
             opts={{ loop: safeImageUrls.length > 1 }}
           >
             <CarouselContent>
               {safeImageUrls.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="relative aspect-square md:aspect-[1/1] rounded-lg overflow-hidden shadow-lg bg-card">
+                  <div 
+                    className={cn(
+                        "relative aspect-square md:aspect-[1/1] rounded-lg overflow-hidden shadow-lg bg-card",
+                        safeImageUrls.length > 1 && "cursor-pointer"
+                    )}
+                    onClick={() => {
+                      if (safeImageUrls.length > 1) {
+                        emblaApi?.scrollNext();
+                      }
+                    }}
+                    role={safeImageUrls.length > 1 ? "button" : undefined}
+                    tabIndex={safeImageUrls.length > 1 ? 0 : undefined}
+                    onKeyDown={(e) => {
+                        if (safeImageUrls.length > 1 && (e.key === 'Enter' || e.key === ' ')) {
+                          e.preventDefault();
+                          emblaApi?.scrollNext();
+                        }
+                    }}
+                    aria-label={safeImageUrls.length > 1 ? `View next image for ${product.name}` : `Image ${index + 1} of ${product.name}`}
+                  >
                     <Image
                       src={image.url}
                       alt={`${product.name} - Image ${index + 1}`}
@@ -172,42 +194,7 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {safeImageUrls.length > 1 && (
-              <>
-                <CarouselPrevious
-                  variant="ghost"
-                  className={cn(
-                    "absolute left-2 top-1/2 z-10",
-                    "h-10 w-10 rounded-full",
-                    "bg-background/70 text-foreground/70",
-                    "hover:bg-background/90 hover:text-primary",
-                    "shadow-md",
-                    "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                    "transition-opacity duration-200 ease-in-out",
-                    "flex items-center justify-center",
-                    "border-none p-0",
-                    "transform-none hover:transform-none active:transform-none",
-                    "translate-y-[-50%]" 
-                  )}
-                />
-                <CarouselNext
-                  variant="ghost"
-                  className={cn(
-                    "absolute right-2 top-1/2 z-10",
-                    "h-10 w-10 rounded-full",
-                    "bg-background/70 text-foreground/70",
-                    "hover:bg-background/90 hover:text-primary",
-                    "shadow-md",
-                    "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-                    "transition-opacity duration-200 ease-in-out",
-                    "flex items-center justify-center",
-                    "border-none p-0",
-                    "transform-none hover:transform-none active:transform-none",
-                    "translate-y-[-50%]"
-                  )}
-                />
-              </>
-            )}
+            {/* CarouselPrevious and CarouselNext are removed */}
           </Carousel>
 
           <div className="flex flex-col space-y-4 animate-fade-in-up animation-delay-400">
@@ -363,7 +350,7 @@ export default function ProductDetailPage() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                {suggestedProducts.length > 1 && (
+                {suggestedProducts.length > 1 && ( // Only show arrows if there's more than one item
                   <>
                     <CarouselPrevious
                         variant="ghost"
