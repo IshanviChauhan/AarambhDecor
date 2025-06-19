@@ -3,20 +3,19 @@
 
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import type { Product, Review, ProductImage } from '@/lib/types'; // Removed CartItem
+import type { Product, Review, ProductImage } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { WishlistIcon } from '@/components/wishlist-icon';
-import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send } from 'lucide-react';
+import { ShoppingCart, Star, MessageCircle, ChevronLeft, Loader2, AlertTriangle, Info, Tag, Ruler, ShieldCheck, Send, Plus, Minus, Package } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-// Removed Input, Textarea, Label for review form
 import {
   Carousel,
   CarouselContent,
@@ -44,15 +43,12 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const router = useRouter();
-  // Removed useAuth and user
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // Removed wishlist and cartItems state
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-
-  // Removed review form state
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     setIsClient(true);
@@ -74,27 +70,28 @@ export default function ProductDetailPage() {
     }
   }, [productId, toast]);
 
-  // Removed useEffects for wishlist and cart localStorage
-
   const handleToggleWishlist = (id: string) => {
-    // Wishlist functionality is disabled
-     console.log("Wishlist functionality disabled for product:", id);
+    console.log("Wishlist functionality disabled for product:", id);
     toast({ title: "Feature Disabled", description: "Wishlist functionality is currently unavailable.", variant: "default"});
   };
 
   const handleAddToCart = (p: Product) => {
-    // Cart functionality is disabled
-    console.log("Add to cart clicked for product:", p.name);
+    console.log("Add to cart clicked for product:", p.name, "with quantity:", quantity);
     toast({ title: "Cart Disabled", description: "User-specific cart functionality is currently unavailable.", variant: "default" });
   };
 
-  // Removed handleReviewSubmit as review submission is disabled
+  const handleIncreaseQuantity = () => {
+    setQuantity(prev => prev + 1);
+    console.log("Quantity increased (visual only)");
+  };
 
-  // const isProductInCart = product ? cartItems.some(item => item.id === product.id) : false; // Cart disabled
-  // const isProductWishlisted = product ? wishlist.has(product.id) : false; // Wishlist disabled
+  const handleDecreaseQuantity = () => {
+    setQuantity(prev => Math.max(1, prev - 1));
+    console.log("Quantity decreased (visual only)");
+  };
+
   const isProductInCart = false;
   const isProductWishlisted = false;
-
 
   if (isLoading || !isClient) {
     return (
@@ -172,7 +169,7 @@ export default function ProductDetailPage() {
              <CarouselPrevious
                 variant="ghost"
                 className={cn(
-                  "absolute left-2 top-1/2  z-10",
+                  "absolute left-2 top-1/2 z-10",
                   "h-10 w-10 rounded-full",
                   "bg-background/70 text-foreground/70",
                   "hover:bg-background/90 hover:text-primary",
@@ -208,13 +205,28 @@ export default function ProductDetailPage() {
               <Badge variant="secondary" className="w-fit text-sm py-1 px-3">{product.category}</Badge>
             )}
             <h1 className="text-3xl lg:text-4xl font-headline text-primary">{product.name}</h1>
-            {product.price && (
-              <p className="text-3xl font-semibold text-foreground">{product.price}</p>
-            )}
             
             <p className="text-muted-foreground text-base leading-relaxed">{product.description}</p>
 
-            <Separator className="my-4" />
+            {product.price && (
+              <p className="text-3xl font-semibold text-foreground">{product.price}</p>
+            )}
+             <p className="text-sm text-muted-foreground flex items-center">
+              <Package className="mr-2 h-4 w-4 text-primary" /> Shipping calculated at checkout.
+            </p>
+
+            <Separator className="my-2" />
+
+            <div className="flex items-center space-x-3 my-3">
+              <p className="text-sm font-medium text-foreground">Quantity:</p>
+              <Button variant="outline" size="icon" onClick={handleDecreaseQuantity} className="h-8 w-8" aria-label="Decrease quantity">
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="w-10 text-center text-base font-medium">{quantity}</span>
+              <Button variant="outline" size="icon" onClick={handleIncreaseQuantity} className="h-8 w-8" aria-label="Increase quantity">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
@@ -226,8 +238,8 @@ export default function ProductDetailPage() {
                 Add to Cart (Feature Disabled)
               </Button>
               <WishlistIcon
-                isWishlisted={isProductWishlisted} // Will be false
-                onClick={() => handleToggleWishlist(product.id)} // Will show disabled message
+                isWishlisted={isProductWishlisted}
+                onClick={() => handleToggleWishlist(product.id)}
                 className="w-full sm:w-auto h-12 px-4 border border-input text-lg"
                 disabled={!product}
               />
@@ -267,6 +279,35 @@ export default function ProductDetailPage() {
             </Accordion>
           </div>
         </div>
+
+        <section id="photo-gallery" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
+          <div className="flex items-center space-x-3 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M20.4 14.5L16 10 4 20"/></svg>
+            <h2 className="text-2xl lg:text-3xl font-headline text-foreground">Product Gallery</h2>
+          </div>
+          {safeImageUrls.length > 1 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {safeImageUrls.map((image, index) => (
+                <div key={`gallery-${index}`} className="relative aspect-square rounded-md overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 animate-pop-in" style={{ animationDelay: `${index * 50}ms` }}>
+                  <Image
+                    src={image.url}
+                    alt={`${product.name} - Gallery Image ${index + 1}`}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-md"
+                    data-ai-hint={image.dataAiHint}
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+             <Card className="py-8 px-4 text-center shadow-md border-border/70 animate-pop-in">
+                <Info className="h-8 w-8 text-primary mx-auto mb-3" />
+                <p className="text-muted-foreground">More images coming soon for this product.</p>
+            </Card>
+          )}
+        </section>
 
         <section id="reviews" className="mt-12 md:mt-16 animate-fade-in-up animation-delay-200">
           <div className="flex items-center space-x-3 mb-6">
@@ -315,3 +356,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+
