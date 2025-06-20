@@ -154,20 +154,30 @@ export default function HomePageClient({ initialFeaturedProducts, initialAllProd
         <Header />
         <main className="flex-grow container mx-auto px-2 py-8 md:py-12">
 
-          <section className="text-center pt-8 pb-12 md:pt-12 md:pb-16">
-            <h1 className="text-5xl md:text-6xl font-headline text-primary mb-6 animate-fade-in-down">
-              Discover Your Signature Style
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in-up">
-              Explore Aarambh Decor's curated collection of home decor that tells a story.
-              Find pieces that resonate with your soul and transform your space.
-            </p>
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground animate-fade-in-up animation-delay-200">
-              <Link href="/collections">
-                <ShoppingBag className="mr-2 h-5 w-5" />
-                Shop The Collection
-              </Link>
-            </Button>
+          <section
+            className="relative text-center bg-cover bg-fixed bg-center min-h-[60vh] md:min-h-[70vh] flex flex-col items-center justify-center"
+            style={{
+              backgroundImage:
+                "url('https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/506007921_17843711043510460_6632509365454219861_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QG4C2z8WDV8_p4pCL47RpA8QF9BGc-5A7-ysOvygWrlG62kTRvpj1rV1l38g0Ez5vqrrxrc1huvIzmEHK_A0Tl7&_nc_ohc=pvzG9wUr7H8Q7kNvwEuFqZH&_nc_gid=nQjJp0gaIB6aSR60PMpgbQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1NDY2MTM3MjI5NTY1NzkwMg%3D%3D.3-ccb7-5&oh=00_AfOAwg6OY-Sb3mBeStUs3WvIpLvil8-TLViMuLGFVhVnfg&oe=6854709F&_nc_sid=22de04')",
+            }}
+            aria-labelledby="hero-title"
+          >
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div className="relative z-10 p-4">
+              <h1 id="hero-title" className="text-5xl md:text-6xl font-headline text-white mb-6 animate-fade-in-down">
+                Discover Your Signature Style
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-8 animate-fade-in-up">
+                Explore Aarambh Decor's curated collection of home decor that tells a story.
+                Find pieces that resonate with your soul and transform your space.
+              </p>
+              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground animate-fade-in-up animation-delay-200">
+                <Link href="/collections">
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  Shop The Collection
+                </Link>
+              </Button>
+            </div>
           </section>
 
           <Separator className="my-12 md:my-16 border-border/70" />
