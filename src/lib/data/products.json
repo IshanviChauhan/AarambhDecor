@@ -604,7 +604,7 @@
     "price": "Rs. 5999",
     "category": "Tables",
     "featured": false,
-    "sizeAndDimensions": "14x14x24 inches",
+    "sizeAndDimensions": "14x14x24\"",
     "material": "Cast Aluminium",
     "reviews": []
   },
@@ -622,10 +622,186 @@
     "price": "Rs. 6500",
     "category": "Tables",
     "featured": false,
-    "sizeAndDimensions": "14x14x22 inches",
+    "sizeAndDimensions": "14x14x22”",
+    "material": "Resin/Metal (Assumed)",
+    "reviews": []
+  },
+  {
+    "id": "p30",
+    "name": "Carved Wooden Wall Shelf (24 inch)",
+    "description": "Not just shelves… but stories carved in wood. Add a touch of vintage charm to your walls with our intricately carved wall shelves – perfect for decor, frames, or your favorite keepsakes.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid direct sunlight and moisture. Treat with wood polish periodically.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/509774925_17844759846510460_5829396022175553783_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QEbIjuNMGW7VF8yNhu284ST0pnLk9ngrv3wgmVuvw2VbDNB25g_v14Pb2WxOwyHuBjiu2ek10AOUNoJy_SYR3xI&_nc_ohc=GORmdaZ27IsQ7kNvwGzlbT6&_nc_gid=WLm3LL287K_f8Wl5w1hLgQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1ODQ3ODk1NjAyNzA2NDIzNA%3D%3D.3-ccb7-5&oh=00_AfM14kUbWPWAQ-8kowu8mV9Q_dDiCWm2JCgCULbsntknBw&oe=68633F16&_nc_sid=22de04",
+        "dataAiHint": "carved shelf"
+      },
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/509681437_17844759855510460_8419230304901646549_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QEbIjuNMGW7VF8yNhu284ST0pnLk9ngrv3wgmVuvw2VbDNB25g_v14Pb2WxOwyHuBjiu2ek10AOUNoJy_SYR3xI&_nc_ohc=DEgP9GjLaLoQ7kNvwGsXmwM&_nc_gid=WLm3LL287K_f8Wl5w1hLgQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1ODQ3ODk1NjAyNzA3MTEwMA%3D%3D.3-ccb7-5&oh=00_AfM4IbzDTx9RQuQaZxbBzIXwEb9w8lMJ2DJgRshEz8IuZQ&oe=68634111&_nc_sid=22de04",
+        "dataAiHint": "carved shelf wood"
+      }
+    ],
+    "price": "Rs. 999",
+    "category": "Wall Shelves",
+    "featured": false,
+    "sizeAndDimensions": "24x5x4.5 inches",
+    "material": "Wood",
+    "reviews": []
+  },
+  {
+    "id": "p31",
+    "name": "Carved Wooden Wall Shelf (30 inch)",
+    "description": "Not just shelves… but stories carved in wood. Add a touch of vintage charm to your walls with our intricately carved wall shelves – perfect for decor, frames, or your favorite keepsakes.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid direct sunlight and moisture. Treat with wood polish periodically.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/509774925_17844759846510460_5829396022175553783_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QEbIjuNMGW7VF8yNhu284ST0pnLk9ngrv3wgmVuvw2VbDNB25g_v14Pb2WxOwyHuBjiu2ek10AOUNoJy_SYR3xI&_nc_ohc=GORmdaZ27IsQ7kNvwGzlbT6&_nc_gid=WLm3LL287K_f8Wl5w1hLgQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1ODQ3ODk1NjAyNzA2NDIzNA%3D%3D.3-ccb7-5&oh=00_AfM14kUbWPWAQ-8kowu8mV9Q_dDiCWm2JCgCULbsntknBw&oe=68633F16&_nc_sid=22de04",
+        "dataAiHint": "carved shelf"
+      },
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/509681437_17844759855510460_8419230304901646549_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTQ0MC5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QEbIjuNMGW7VF8yNhu284ST0pnLk9ngrv3wgmVuvw2VbDNB25g_v14Pb2WxOwyHuBjiu2ek10AOUNoJy_SYR3xI&_nc_ohc=DEgP9GjLaLoQ7kNvwGsXmwM&_nc_gid=WLm3LL287K_f8Wl5w1hLgQ&edm=APoiHPcBAAAA&ccb=7-5&ig_cache_key=MzY1ODQ3ODk1NjAyNzA3MTEwMA%3D%3D.3-ccb7-5&oh=00_AfM4IbzDTx9RQuQaZxbBzIXwEb9w8lMJ2DJgRshEz8IuZQ&oe=68634111&_nc_sid=22de04",
+        "dataAiHint": "carved shelf wood"
+      }
+    ],
+    "price": "Rs. 1299",
+    "category": "Wall Shelves",
+    "featured": false,
+    "sizeAndDimensions": "30x5x5 inches",
+    "material": "Wood",
+    "reviews": []
+  },
+  {
+    "id": "p32",
+    "name": "Handwoven Butterfly Wall Art",
+    "description": "Bring home the charm of Jaipur with our handwoven butterfly wall art. Framed in wood, crafted with care — a perfect blend of tradition and beauty for your space. Available as a set of 2 or a single piece.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid direct sunlight.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/502399029_17845390635510460_7302406820359287141_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjEwNzh4MTQzNy5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=Pa_rPGaAUcsQ7kNvwFmqahh&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MDY5ODc0MDA3MjQxMzkxNg%3D%3D.3-ccb7-5&oh=00_AfN99_EUbCRQ7i2P_QvXibh7_Y8YqD2I62Xz57Y1xYw1lw&oe=6863285B&_nc_sid=7a9f4b",
+        "dataAiHint": "butterfly art"
+      },
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/509868480_17845390689510460_1409848282819327736_n.jpg?se=-1&stp=dst-jpegr_e35_p640x640_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTkyMC5oZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=pfSmdEzZEDwQ7kNvwEmnK3c&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MDY5ODc0MDAyMjE3Mzg1NQ%3D%3D.3-ccb7-5&oh=00_AfMyP6DRI83EHK4-k00MO90QC9JqxTQ0lRJGi2m40qzDRw&oe=68631B60&_nc_sid=7a9f4b",
+        "dataAiHint": "butterfly art detail"
+      },
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/510964971_17845390698510460_6929160564873219588_n.jpg?se=-1&stp=dst-jpegr_e35_p640x640_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjE0NDB4MTkyMC5oZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=EyK1YaSatHgQ7kNvwH2fWrM&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MDY5ODc0MDAxMzg4NDg5Mw%3D%3D.3-ccb7-5&oh=00_AfNWmocR3daWhrhMuyUvLgs0pOOxskVlcjlWxD-97pXZ4g&oe=68631BFE&_nc_sid=7a9f4b",
+        "dataAiHint": "butterfly art room"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Wall Art",
+    "featured": false,
+    "sizeAndDimensions": "16.5 X 16.5 inches",
+    "material": "Handwoven fabric with wooden frame",
+    "reviews": []
+  },
+  {
+    "id": "p33",
+    "name": "Handwoven Textile Wall Art",
+    "description": "Turn your walls into windows of calm. This handwoven textile wall art captures the beauty of nature and heritage in every thread. Crafted with love, framed with elegance.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid direct sunlight.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/502493116_17845393107510460_4843530922178374617_n.jpg?se=-1&stp=dst-jpegr_e35_p640x640_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjE0NDB4MTkyMC5oZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=SARz4nt7ISQQ7kNvwHuxuyU&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MDcwNTAzNTA2NjcyMTE0OQ%3D%3D.3-ccb7-5&oh=00_AfN2kPvmVY248Gh97rH0akJdUk-niGOFq5YsBWWJLZ7RYQ&oe=6863272A&_nc_sid=7a9f4b",
+        "dataAiHint": "textile art"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Wall Art",
+    "featured": false,
+    "sizeAndDimensions": "18.5x27.5x1.5 inches",
+    "material": "Handwoven fabric with wooden frame",
+    "reviews": []
+  },
+  {
+    "id": "p34",
+    "name": "Copper Finish Tree Wall Art",
+    "description": "Rooted in elegance, branching into brilliance. Our copper tree wall art brings warmth, wisdom, and style to your space.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid abrasive cleaners.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/503981821_17845595850510460_2207970321597218216_n.jpg?stp=dst-jpg_e35_s640x640_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjE0NDB4MTIyMS5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=hDlDzm-Lc90Q7kNvwEJSLzc&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MTQ1NTYyNjU1NjM1MjU2Nw%3D%3D.3-ccb7-5&oh=00_AfMgEgtXxnQoxICsqCi5QqHDxQU--SUNvLe0pBH4IKbQYw&oe=68632C5D&_nc_sid=7a9f4b",
+        "dataAiHint": "tree art"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Wall Art",
+    "featured": false,
+    "sizeAndDimensions": "33x1.5x37 inches",
+    "material": "Iron in copper finish",
+    "reviews": []
+  },
+  {
+    "id": "p35",
+    "name": "3-Panel Flower Tree Wall Art",
+    "description": "Grace in every curve, beauty in every leaf. This 3-panel flower tree wall art brings nature’s charm indoors with a modern twist.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid abrasive cleaners.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/510911134_17845596438510460_8670120376935678363_n.jpg?stp=dst-jpg_e35_p640x640_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjE0NDB4MTU4Ni5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=D38RDG5A4BgQ7kNvwGUE-Fl&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MTQ1NzczMTU1MTcwMDgyNA%3D%3D.3-ccb7-5&oh=00_AfPG1Ij5C5lW7FJNmwwB4Kr4fM7HR8S6w349qVqFtAqi3Q&oe=68631D82&_nc_sid=7a9f4b",
+        "dataAiHint": "tree art panel"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Wall Art",
+    "featured": false,
+    "sizeAndDimensions": "36x3x36 inches",
+    "material": "Iron (Assumed)",
+    "reviews": []
+  },
+  {
+    "id": "p36",
+    "name": "Tree with Butterflies Wall Art",
+    "description": "Where nature comes alive — leaves that dance and butterflies that bloom. This handcrafted tree wall art brings a burst of color, life, and charm to any wall. Let your space tell a story of beauty and transformation.",
+    "careInstructions": "Wipe clean with a soft, dry cloth. Avoid abrasive cleaners.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/503743239_17845597308510460_847093347809493836_n.jpg?stp=dst-jpg_e35_s640x640_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjE0NDB4MTAzMi5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QGaCEO6Uv4DkPaRzqSy18uY4yXZ4aw1nJGQYyk4HAD-PkPD72ntvsawIFKa1Hh9MfnsM4o-f_VR6CxckBBHdtfS&_nc_ohc=0M4tWF7unQMQ7kNvwF45LRF&_nc_gid=Dwyh8iz2xNHHcfawn8tVSg&edm=AP4sbd4BAAAA&ccb=7-5&ig_cache_key=MzY2MTQ1OTg5OTc0NjY0MjM1Nw%3D%3D.3-ccb7-5&oh=00_AfNQiCIqbeKnHvZPnZyvERaS06QFbGUmfslspTx1l-3KqA&oe=68632806&_nc_sid=7a9f4b",
+        "dataAiHint": "tree art butterfly"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Wall Art",
+    "featured": false,
+    "sizeAndDimensions": "29x1x40.5 inches",
+    "material": "Metal (Assumed)",
+    "reviews": []
+  },
+  {
+    "id": "p37",
+    "name": "Black Horse Table",
+    "description": "Unleash bold elegance with our Black Horse Table – a perfect blend of art and function. Statement piece, Sculptural charm, Pure luxury!",
+    "careInstructions": "Wipe clean with a soft, dry cloth.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/510451331_17846142411510460_1576392546738396547_n.jpg?stp=dst-jpg_e35_p480x480_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjEyODF4MTYzNC5zZHIuZjgyNzg3LmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFijyPKWSMDP-bQYvbN4PVQLtKQnM3gZuIJPvkV1FkUAmuLHmDjKFsC7F0KIOu39MLBwQdMxp0XB1V4MPC9VPa6&_nc_ohc=ndoGguIAfawQ7kNvwHy2KI5&_nc_gid=QmPf8_2qwMmczIqclXFrnA&edm=AA5fTDYBAAAA&ccb=7-5&ig_cache_key=MzY2MzUwODgwMjk2NDkyOTIwMg%3D%3D.3-ccb7-5&oh=00_AfPDHZ6ydksifcKPTw1jnVgMctcZx8pI9uIgrM4GIN0JcA&oe=68631553&_nc_sid=7edfe2",
+        "dataAiHint": "horse table"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Tables",
+    "featured": false,
+    "sizeAndDimensions": "",
+    "material": "Resin/Metal (Assumed)",
+    "reviews": []
+  },
+  {
+    "id": "p38",
+    "name": "Golden Penguin Table",
+    "description": "Add a whimsical touch to your decor with our Golden Penguin Table! Quirky, classy, and a conversation starter!",
+    "careInstructions": "Wipe clean with a soft, dry cloth.",
+    "imageUrls": [
+      {
+        "url": "https://instagram.fdel11-3.fna.fbcdn.net/v/t51.2885-15/511553510_17846143926510460_4270378467525152533_n.jpg?stp=dst-jpg_e35_p480x480_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQuaW1hZ2VfdXJsZ2VuLjExMTJ4MTQ4My5zZHIuZjgyNzg3LmRlZmF1bHRfaW1hZ2UifQ&_nc_ht=instagram.fdel11-3.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFijyPKWSMDP-bQYvbN4PVQLtKQnM3gZuIJPvkV1FkUAmuLHmDjKFsC7F0KIOu39MLBwQdMxp0XB1V4MPC9VPa6&_nc_ohc=suJxwowmPUkQ7kNvwF8gBW1&_nc_gid=QmPf8_2qwMmczIqclXFrnA&edm=AA5fTDYBAAAA&ccb=7-5&ig_cache_key=MzY2MzUxMjAxNTcwMTI1NzU4MQ%3D%3D.3-ccb7-5&oh=00_AfPmY2-uFs8l-apIistWYqkh1ZvVgDJj2n_eqqoHuWxP5g&oe=68631C14&_nc_sid=7edfe2",
+        "dataAiHint": "penguin table"
+      }
+    ],
+    "price": "Connect to seal the deal",
+    "category": "Tables",
+    "featured": false,
+    "sizeAndDimensions": "",
     "material": "Resin/Metal (Assumed)",
     "reviews": []
   }
 ]
-
-    

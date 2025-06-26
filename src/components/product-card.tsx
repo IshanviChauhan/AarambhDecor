@@ -16,7 +16,7 @@ interface ProductCardProps {
   className?: string;
 }
 
-const SPECIAL_PRICE_STRINGS = ["DM for Price", "Contact for Price"];
+const SPECIAL_PRICE_STRINGS = ["DM for Price", "Contact for Price", "Connect to seal the deal"];
 const SPECIAL_PRICE_DISPLAY_TEXT = "Connect with us for the best deal";
 
 export function ProductCard({ product, isWishlisted, onToggleWishlist, className: propClassName }: ProductCardProps) {

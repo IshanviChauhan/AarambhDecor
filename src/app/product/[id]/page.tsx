@@ -54,7 +54,7 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => {
 
 const MAX_SUGGESTIONS = 4;
 const WISHLIST_STORAGE_KEY = 'aarambhDecorWishlist';
-const SPECIAL_PRICE_STRINGS = ["DM for Price", "Contact for Price"];
+const SPECIAL_PRICE_STRINGS = ["DM for Price", "Contact for Price", "Connect to seal the deal"];
 const SPECIAL_PRICE_DISPLAY_TEXT = "Connect with us for the best deal";
 
 export default function ProductDetailPage() {
@@ -463,4 +463,5 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+
 
