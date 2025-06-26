@@ -1,7 +1,7 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { Analytics } from "@vercel/analytics/next";
 
 // Explicit 'icons' field removed to rely on convention (e.g., src/app/favicon.ico)
 // Setting icons to an empty array to prevent issues if favicon handling is problematic
@@ -32,6 +32,7 @@ export default function RootLayout({
       <body className="font-body antialiased min-h-screen flex flex-col" suppressHydrationWarning={true}>
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
