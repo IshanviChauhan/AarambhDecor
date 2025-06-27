@@ -1,32 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const MobileNavLinks = ({ isMobileMenuOpen, handleMobileMenuToggle }) => {
+const MobileNavLinks = ({ isMobileMenuOpen, handleMobileMenuToggle, navLinks }) => {
   return (
     <>
       {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <ul className="bg-[#d8f4f2] space-y-4 p-4 text-left">
-            <li className="link">
-              <Link onClick={handleMobileMenuToggle} to="/">
-                FOR HER
-              </Link>
-            </li>
-            <li className="link">
-              <Link onClick={handleMobileMenuToggle} to="/shop">
-                FOR HIM
-              </Link>
-            </li>
-            <li className="link">
-              <Link onClick={handleMobileMenuToggle} to="/gifts">
-                ALL Collections
-              </Link>
-            </li>
-            <li className="link">
-              <Link onClick={handleMobileMenuToggle} to="/collection">
-                Gifts
-              </Link>
-            </li>
+        <div className="md:hidden bg-white">
+          <ul className="space-y-4 p-4 text-left">
+            {navLinks.map((link) => (
+              <li key={link.path}>
+                <Link
+                  to={link.path}
+                  onClick={handleMobileMenuToggle}
+                  className="flex items-center gap-2 text-text-dark hover:text-primary-color transition-colors"
+                >
+                  <i className={link.icon}></i>
+                  <span>{link.label}</span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       )}
