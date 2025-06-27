@@ -19,7 +19,7 @@ app.use(helmet());
 // CORS Configuration
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL || "http://localhost:5174"  , "https://himtajjewelry.com" ],
+    origin: [process.env.FRONTEND_URL || "http://localhost:5174" ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
