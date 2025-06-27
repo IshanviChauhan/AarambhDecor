@@ -4,27 +4,13 @@ import HomePageClient from './home-page-client'; // The refactored client part
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Loader2 } from 'lucide-react';
-import { getProducts, getFeaturedProducts, seedProductsToFirestore } from '@/app/products/actions'; // Added seedProductsToFirestore
+import { getProducts, getFeaturedProducts } from '@/app/products/actions';
 import type { Product } from '@/lib/types';
 
 const FEATURED_PRODUCTS_COUNT = 6;
 
 // This is the new Server Component entry for the `/` route
 export default async function Page() {
-  // --- ADDED FOR SEEDING/UPDATING PRODUCTS ---
-  // This will seed products from products.json (via MOCK_PRODUCTS) into Firestore.
-  // If a product ID already exists, it will be overwritten with the data from products.json.
-  // This effectively "makes changes in the database for existing products".
-  // Consider moving this to a more controlled environment for production (e.g., a specific admin action).
-  console.log("Homepage: Attempting to seed/update products from products.json...");
-  const seedResult = await seedProductsToFirestore();
-  if (seedResult.success) {
-    console.log("Homepage: Product seeding/update successful:", seedResult.message);
-  } else {
-    console.error("Homepage: Product seeding/update failed:", seedResult.message);
-  }
-  // --- END SEEDING/UPDATING CALL ---
-
   // Fetch data on the server
   let initialFeaturedProducts: Product[] = [];
   let initialAllProducts: Product[] = [];

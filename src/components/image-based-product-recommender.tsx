@@ -1,55 +1,21 @@
 
 'use client';
 
-import { useState, useRef, type ChangeEvent, useEffect } from 'react';
+import { useState, useRef, type ChangeEvent } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { recommendProductsFromImage, type RecommendProductsFromImageInput, type RecommendedProduct } from '@/ai/flows/recommend-products-from-image-flow';
-import type { Product } from '@/lib/types'; // Changed from MOCK_PRODUCTS import
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Wand2, Loader2, FileImage, ImageUp, CheckCircle, Info } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { getProducts } from '@/app/products/actions'; // Action to fetch products
-
-interface SimplifiedProductInfo {
-  id: string;
-  name: string;
-  description: string;
-  category?: string;
-}
+import { FileImage, ImageUp, Ban } from 'lucide-react';
 
 export function ImageBasedProductRecommender() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [recommendations, setRecommendations] = useState<RecommendedProduct[]>([]);
-  const [overallFeedback, setOverallFeedback] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
-  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    async function fetchInitialProducts() {
-      setIsLoadingProducts(true);
-      try {
-        const productsFromDb = await getProducts();
-        setAvailableProducts(productsFromDb);
-      } catch (error) {
-        console.error("Failed to fetch products for recommender:", error);
-        toast({ title: "Error", description: "Could not load products for AI recommender.", variant: "destructive" });
-        setAvailableProducts([]);
-      } finally {
-        setIsLoadingProducts(false);
-      }
-    }
-    fetchInitialProducts();
-  }, [toast]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -68,79 +34,11 @@ export function ImageBasedProductRecommender() {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-      setRecommendations([]); // Clear previous recommendations
-      setOverallFeedback(null);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedFile || !previewUrl) {
-      toast({
-        title: "No Image Selected",
-        description: "Please upload an image of your space first.",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (isLoadingProducts || availableProducts.length === 0) {
-      toast({
-        title: "Products Not Loaded",
-        description: "Product information is still loading or unavailable. Please try again shortly.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setRecommendations([]);
-    setOverallFeedback(null);
-
-    try {
-      const simplifiedProducts: SimplifiedProductInfo[] = availableProducts.map(p => ({
-        id: p.id,
-        name: p.name,
-        description: p.description.substring(0, 200) + (p.description.length > 200 ? '...' : ''),
-        category: p.category,
-      }));
-
-      const input: RecommendProductsFromImageInput = {
-        imageDataUri: previewUrl,
-        availableProductsJson: JSON.stringify(simplifiedProducts),
-      };
-      const result = await recommendProductsFromImage(input);
-      setRecommendations(result.recommendations || []);
-      setOverallFeedback(result.overallFeedback || null);
-
-      if (!result.recommendations || result.recommendations.length === 0) {
-        toast({
-          title: "No Specific Recommendations",
-          description: result.overallFeedback || "The AI couldn't find specific product matches for this image, but check out the general feedback!",
-          variant: "default"
-        });
-      }
-
-    } catch (error) {
-      console.error('Error getting recommendations:', error);
-      let errorMessage = "Failed to get recommendations. Please try again.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
-  };
-
-  const getFullProductDetails = (productId: string): Product | undefined => {
-    return availableProducts.find(p => p.id === productId);
   };
 
   return (
@@ -151,7 +49,7 @@ export function ImageBasedProductRecommender() {
           <CardTitle className="font-headline text-xl md:text-2xl">AI Decor Advisor</CardTitle>
         </div>
         <CardDescription className="pt-2 text-sm md:text-base">
-          Upload an image of your space, and our AI will recommend Aarambh Decor products that complement your style!
+          Upload an image of your space to get style recommendations!
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -165,7 +63,7 @@ export function ImageBasedProductRecommender() {
             accept="image/png, image/jpeg, image/webp"
             onChange={handleFileChange}
             ref={fileInputRef}
-            className="hidden" 
+            className="hidden"
           />
           <Button
             variant="outline"
@@ -195,77 +93,22 @@ export function ImageBasedProductRecommender() {
         )}
       </CardContent>
       <CardFooter className="flex flex-col items-stretch">
-        <Button onClick={handleSubmit} disabled={isLoading || !selectedFile || isLoadingProducts} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-          {isLoading ? (
+        <Button disabled={true} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyzing Your Space...
+              <Ban className="mr-2 h-4 w-4" />
+              AI Advisor is Offline
             </>
-          ) : isLoadingProducts ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading Product Data...
-            </>
-          )
-          : (
-            <>
-              <Wand2 className="mr-2 h-4 w-4" />
-              Get Product Recommendations
-            </>
-          )}
         </Button>
 
-        {overallFeedback && !isLoading && (
-            <Alert className="mt-6 text-left bg-secondary/30 border-secondary/50">
-                <Info className="h-5 w-5 text-primary" />
-                <AlertTitle className="font-headline text-base md:text-lg text-primary">AI Observations</AlertTitle>
-                <AlertDescription className="mt-2 whitespace-pre-wrap font-body text-foreground text-sm">
-                {overallFeedback}
-                </AlertDescription>
-            </Alert>
-        )}
-        
-        {recommendations.length > 0 && !isLoading && (
-          <div className="mt-8 space-y-6">
-            <div className="flex items-center space-x-2">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-                <h3 className="text-lg md:text-xl font-headline text-foreground">Our AI Recommends:</h3>
-            </div>
-            {recommendations.map((rec, index) => {
-              const product = getFullProductDetails(rec.productId);
-              if (!product) return null;
-              const displayImage = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : { url: 'https://placehold.co/300x300.png?text=Decor', dataAiHint: 'placeholder decor' };
-
-              return (
-                <Card key={index} className="overflow-hidden shadow-md border-border/70 animate-pop-in">
-                  <div className="md:flex">
-                    <div className="md:w-1/3 relative aspect-square md:aspect-auto">
-                       <Image
-                        src={displayImage.url}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-contain" // Changed from object-cover
-                        data-ai-hint={displayImage.dataAiHint}
-                      />
-                    </div>
-                    <div className="md:w-2/3 p-4 flex flex-col">
-                      <CardTitle className="font-headline text-base md:text-lg text-primary mb-1">{rec.productName}</CardTitle>
-                      <p className="text-xs md:text-sm text-muted-foreground mb-2 font-semibold">AI's Reason:</p>
-                      <CardDescription className="text-xs md:text-sm text-foreground mb-3 flex-grow">{rec.reason}</CardDescription>
-                      <Button asChild variant="outline" size="sm" className="mt-auto self-start text-xs md:text-sm">
-                        <Link href={`/product/${rec.productId}`}>View Product</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+        <Alert variant="destructive" className="mt-6 text-left">
+            <Ban className="h-5 w-5" />
+            <AlertTitle className="font-headline text-base md:text-lg">Feature Unavailable</AlertTitle>
+            <AlertDescription className="mt-2 font-body text-sm">
+            The AI Advisor backend has been removed and this feature is currently disabled.
+            </AlertDescription>
+        </Alert>
 
       </CardFooter>
     </Card>
   );
 }
-
