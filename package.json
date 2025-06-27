@@ -3,7 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm install --prefix Frontend",
-    "dev": "npm run dev --prefix Frontend"
+    "install:frontend": "npm install --prefix Frontend",
+    "install:backend": "npm install --prefix Backend",
+    "postinstall": "npm run install:frontend && npm run install:backend",
+    "dev:frontend": "npm run dev --prefix Frontend",
+    "dev:backend": "npm start --prefix Backend",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
