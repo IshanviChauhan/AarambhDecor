@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
   return (
     <>
-      <footer className="section__container footer__container bg-white p-4 lg:p-10">
+      <footer className="section__container footer__container bg-[#F9EBE1] p-4 lg:p-10">
         {/* Logo Section */}
         <div className="footer__col flex justify-center lg:justify-start">
           <img src="/nav_logo.png" className="w-32 h-32 lg:w-44 lg:h-48 lg:ml-10 lg:mt-3" alt="Logo" />
@@ -40,7 +40,7 @@ const Footer = () => {
       </footer>
 
       {/* Bottom Footer */}
-      <footer className="section__container3 text-black text-center p-4 lg:flex lg:justify-between flex-col lg:flex-row bg-white">
+      <footer className="section__container3 text-black text-center p-4 lg:flex lg:justify-between flex-col lg:flex-row">
         <p className="text-sm">©2025 Copyright Aarambh Decor. All Rights Reserved.</p>
       </footer>
     </>

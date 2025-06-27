@@ -39,11 +39,11 @@ const Categories = () => {
             className="group text-center transition-transform duration-300"
           >
             <div className="bg-white rounded-full p-2 border-2 border-transparent group-hover:border-primary-light group-hover:shadow-lg transition-all duration-300">
-                <img
+              <img
                 src={category.image}
                 alt={category.name}
                 className="mx-auto max-w-[100px] rounded-full transition-transform duration-300 group-hover:scale-110"
-                />
+              />
             </div>
             <h4 className="mt-4 font-header text-md font-semibold text-dark group-hover:text-primary transition-colors duration-300">
               {category.name}
@@ -56,22 +56,22 @@ const Categories = () => {
       <div className="md:hidden">
         <div className="flex space-x-6 overflow-x-auto scrollbar-hide pb-4">
           {categories.map((category) => (
-           <Link
-           key={category.name}
-           to={`/shop/category/${category.path}`}
-           className="flex-shrink-0 text-center w-[100px]"
-         >
-            <div className="bg-white rounded-full p-1 border">
+            <Link
+              key={category.name}
+              to={`/shop/category/${category.path}`}
+              className="flex-shrink-0 text-center w-[100px]"
+            >
+              <div className="bg-white rounded-full p-1 border">
                 <img
-                    src={category.image}
-                    alt={category.name}
-                    className="mx-auto w-full rounded-full"
+                  src={category.image}
+                  alt={category.name}
+                  className="mx-auto w-full rounded-full"
                 />
-            </div>
-           <h4 className="mt-2 text-xs font-semibold w-full text-center truncate">
-             {category.name}
-           </h4>
-         </Link>
+              </div>
+              <h4 className="mt-2 text-xs font-semibold w-full text-center truncate">
+                {category.name}
+              </h4>
+            </Link>
           ))}
         </div>
       </div>

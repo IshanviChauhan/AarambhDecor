@@ -5,9 +5,9 @@ import heroimg3 from "../../assets/background3.png"
 import heroimg4 from "../../assets/background4.png"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules'; // Import necessary modules
-import 'swiper/swiper-bundle.css'; 
+import 'swiper/swiper-bundle.css';
 
-const cards =[
+const cards = [
   {
     id: 1,
     image: heroimg1,
@@ -33,7 +33,7 @@ const cards =[
 const Hero = () => {
   return (
     <section className='section__container'>
-      <Swiper 
+      <Swiper
         modules={[Autoplay, Pagination, Navigation]}
         spaceBetween={30}
         slidesPerView={1}
