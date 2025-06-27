@@ -1,3 +1,4 @@
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -74,6 +75,9 @@ async function connectToDatabase() {
       console.log("MongoDB connected successfully!");
     } catch (error) {
       console.error("Error connecting to MongoDB:", error.message);
+      if (error.message.includes('querySrv ENOTFOUND')) {
+        console.error('\n[HINT] This error often means the hostname in your DB_URL is incorrect or there is a network issue (like a firewall) preventing DNS resolution. Please double-check your MongoDB connection string in the Backend/.env file.\n');
+      }
       process.exit(1); // Exit process if connection fails
     }
   }

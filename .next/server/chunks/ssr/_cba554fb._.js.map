@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 24, "column": 0}, "map": {"version":3,"sources":["file:///home/user/studio/src/app/signin/page.tsx"],"sourcesContent":["// This file is deprecated. Redirect or show message.\n// For now, let's make it a redirect to the new auth page to avoid confusion.\nimport { redirect } from 'next/navigation';\n\nexport default function DeprecatedSignInPage() {\n  redirect('/auth/signin'); // Redirect to the new NextAuth sign-in page\n  return null;\n}\n\n// The problematic 'export const config' has been removed from this file.\n"],"names":[],"mappings":"AAAA,qDAAqD;AACrD,6EAA6E;;;;AAC7E;AAAA;;AAEe,SAAS;IACtB,CAAA,GAAA,qLAAA,CAAA,WAAQ,AAAD,EAAE,iBAAiB,4CAA4C;IACtE,OAAO;AACT,EAEA,yEAAyE","debugId":null}}]
-}

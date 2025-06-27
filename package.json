@@ -1,4 +1,3 @@
-
 {
   "name": "himtaj-jewelry-monorepo",
   "private": true,
@@ -13,5 +12,8 @@
     "dev": "echo \"Run 'npm run start:backend' and 'npm run start:frontend' in separate terminals\""
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^6.17.0"
+  }
 }
