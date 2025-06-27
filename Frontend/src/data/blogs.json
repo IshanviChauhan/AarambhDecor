@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Elegant Designs and Exceptional Quality",
+    "subtitle": "Priya Mehta, Mumbai",
+    "testimonial": "I recently purchased a pair of earrings from Himtaj, and I couldn’t be happier! The intricate design and craftsmanship are stunning. I’ve received so many compliments every time I wear them. Thank you, Himtaj, for offering such exquisite jewelry!",
+      "imageUrl": "./tm1.png"
+  },
+  {
+    "id": 2,
+    "title": "Trusted Brand for Every Occasion",
+    "subtitle": "Rohini Sharma, Delhi",
+    "testimonial": "Himtaj has become my go-to online jewelry store for all occasions. Their collection is elegant yet affordable, and the quality is unmatched. The delivery was prompt, and the packaging was beautiful. Highly recommended!",
+   "imageUrl": "./tm10.webp"
+  },
+  {
+    "id": 3,
+    "title": "Great Customer Service",
+    "subtitle": "Ankit Verma, Bangalore",
+    "testimonial": "I was skeptical about ordering jewellery online, but Himtaj changed my perspective. The customer service team was super helpful and answered all my questions. The anklet I purchased is even more gorgeous in person!",
+     "imageUrl": "/testemonial10.png"
+  },
+  {
+    "id": 4,
+    "title": "Perfect Blend of Tradition and Modernity",
+    "subtitle": "Sanjay Patel, Ahmedabad",
+    "testimonial": "The designs at Himtaj beautifully blend traditional aesthetics with modern styles. I gifted a silver necklace set to my sister, and she loved it. Will shop here again!",
+     "imageUrl": "/testemonial9.png"
+  },
+  {
+    "id": 5,
+    "title": "Affordable Luxury",
+    "subtitle": "Neha Kapoor, Jaipur",
+    "testimonial": "I’m amazed how Himtaj offers such luxurious jewelry at affordable prices. The silver bangle I bought looks so premium and perfectly matches all my outfits. Shopping with Himtaj has been a delight!",
+  "imageUrl": "./testemonial11.jpg"
+  },
+  {
+    "id": 6,
+    "title": "Hassle-Free Shopping Experience",
+    "subtitle": "Arjun Desai, Pune",
+    "testimonial": "From browsing the collection to placing the order, everything was seamless. The website is user-friendly, and the detailed product descriptions helped me make the right choice. Can’t wait to shop again!",
+    "imageUrl": "./testemonial8.png"
+  }
+]
