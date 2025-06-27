@@ -1,4 +1,3 @@
-export const getBaseUrl = () =>
-  process.env.NODE_ENV === "production"
-    ? "http://localhost:4000"
-    : "http://localhost:4000";
+export const getBaseUrl = () => {
+  return import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+};

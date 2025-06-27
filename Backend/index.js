@@ -11,7 +11,7 @@ require("dotenv").config();
 const uploadImage = require("./utils/uploadimage");
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5000;
 
 app.use(helmet());
 
