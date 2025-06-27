@@ -8,30 +8,25 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules'; // Import nec
 import 'swiper/swiper-bundle.css'; 
 
 const cards =[
-
   {
     id: 1,
     image: heroimg1,
-    title:'papple'
-
+    title: 'Living Room Inspiration'
   },
   {
-    id: 1,
+    id: 2,
     image: heroimg2,
-    title:'papple'
-
+    title: 'Modern Kitchen Decor'
   },
   {
-    id: 1,
+    id: 3,
     image: heroimg3,
-    title:'papple'
-
+    title: 'Cozy Bedroom Finds'
   },
   {
-    id: 1,
+    id: 4,
     image: heroimg4,
-    title:'papple'
-
+    title: 'Outdoor & Patio'
   },
 ]
 
@@ -54,7 +49,7 @@ const Hero = () => {
         {cards.map((card) => (
           <SwiperSlide key={card.id}>
             <div className='hero__card'>
-              <img src={card.image} alt={card.title} className='w-full h-auto' />
+              <img src={card.image} alt={card.title} className='w-full h-auto rounded-lg' />
             </div>
           </SwiperSlide>
         ))}

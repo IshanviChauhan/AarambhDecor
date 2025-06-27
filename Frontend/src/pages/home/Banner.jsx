@@ -8,7 +8,7 @@ const Banner = () => {
           <p>
             Explore Aarambh Decor's curated collection of home decor that tells a
             story. Find pieces that resonate with your soul and transform your
-            space.
+            space into a sanctuary of style and comfort.
           </p>
           <Link to="/shop">
             <button className="btn flex items-center gap-2 mx-auto">

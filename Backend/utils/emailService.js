@@ -3,15 +3,15 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
-    user: process.env.GMAIL_USER, // Your Gmail address from .env file
-    pass: process.env.GMAIL_APP_PASSWORD, // Your App Password from .env file
+    user: "ishanvi.chauhan@gmail.com", // Your Gmail address
+    pass: "efvc yqsf attf mpbu",       // Replace with your App Password
   },
 });
 
 const sendEmail = async (email, subject, text) => {
   try {
     await transporter.sendMail({
-      from: `"Himtaj Jewelry" <${process.env.GMAIL_USER}>`,
+      from: '"Your App Name" <ishanvi.chauhan@gmail.com>',
       to: email,
       subject,
       text,
