@@ -1,26 +1,14 @@
-
-import { Outlet } from 'react-router-dom';
-import './App.css'
-
-import Footer from './components/Footer';
-import WhatsAppButton from './components/Whatsapp';
-import Navbar from './components/NavBar/Navbar';
-
+import './App.css';
 
 function App() {
-
-
   return (
-  
-      <>
-      <Navbar/>
-        <Outlet/>
-        <Footer/>
-      <WhatsAppButton/>
-      </>
-        
-    
-  )
+    <div className="App">
+      <header className="App-header">
+        <h1>Hello Vite + React!</h1>
+        <p>Your simple React project is ready.</p>
+      </header>
+    </div>
+  );
 }
 
 export default App;

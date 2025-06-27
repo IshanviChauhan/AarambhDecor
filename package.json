@@ -1,19 +1,9 @@
 {
-  "name": "himtaj-jewelry-monorepo",
-  "private": true,
+  "name": "himtaj-monorepo",
   "version": "1.0.0",
-  "description": "Root for Frontend and Backend packages",
+  "private": true,
   "scripts": {
-    "install:backend": "cd Backend && npm install",
-    "install:frontend": "cd Frontend && npm install",
-    "postinstall": "npm run install:frontend && npm run install:backend",
-    "start:backend": "cd Backend && npm start",
-    "start:frontend": "cd Frontend && npm run dev",
-    "dev": "echo \"Run 'npm run start:backend' and 'npm run start:frontend' in separate terminals\""
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "mongodb": "^6.17.0"
+    "postinstall": "npm install --prefix Frontend",
+    "dev": "npm run dev --prefix Frontend"
   }
 }
