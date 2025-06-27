@@ -1,0 +1,51 @@
+{
+  "sorted_middleware": [],
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge/chunks/_0d3699dc._.js",
+        "server/edge/chunks/[root-of-the-server]__dc15d093._.js",
+        "server/edge/chunks/edge-wrapper_594fdf6a.js"
+      ],
+      "name": "middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/profile/:path*{(\\\\.json)}?",
+          "originalSource": "/profile/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/profile{(\\\\.json)}?",
+          "originalSource": "/profile"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/add-product/:path*{(\\\\.json)}?",
+          "originalSource": "/add-product/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/add-product{(\\\\.json)}?",
+          "originalSource": "/add-product"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/signin{(\\\\.json)}?",
+          "originalSource": "/signin"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/register{(\\\\.json)}?",
+          "originalSource": "/register"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "env": {
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "cAgJVg/kNirGkKCOv4K45J5RI9umm4WkeFN5kZpRwHQ=",
+        "__NEXT_PREVIEW_MODE_ID": "51e7016c7bfd6934a66e7588fd066329",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "883dfefa55ba14a576ed7a38cd6ed54a83ad915830daf09aea3e3e1bc6246f93",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "f6807082dbabf00ee3994da7edc37efde31024b470f6bfb24dbea63398d2ef07"
+      }
+    }
+  },
+  "instrumentation": null,
+  "functions": {}
+}

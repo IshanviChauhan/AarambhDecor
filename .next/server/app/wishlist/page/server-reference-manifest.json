@@ -1,0 +1,16 @@
+{
+  "node": {
+    "009c0e4f9c36b44a23d3734f13b4298bc7b33dd084": {
+      "workers": {
+        "app/wishlist/page": {
+          "moduleId": "[project]/.next-internal/server/app/wishlist/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/products/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/wishlist/page": "action-browser"
+      }
+    }
+  },
+  "edge": {}
+}
