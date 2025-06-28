@@ -69,7 +69,7 @@ const AddProduct = () => {
         console.log("Submitting Product Data:", newProduct); // Debug payload
 
         try {
-          await addProduct(newProduct).unwrap();
+          const response = await addProduct(newProduct).unwrap();
           alert("Product added successfully!");
           navigate("/shop");
         } catch (err) {

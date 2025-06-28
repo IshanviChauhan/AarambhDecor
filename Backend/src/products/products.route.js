@@ -5,9 +5,9 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const redis = require("redis");
-const client = redis.createClient();
-
-
+const client = redis.createClient({
+  url: 'redis://localhost:6379'
+});
 
 client.on('connect', () => {
   console.log('Redis client connected');
@@ -16,7 +16,6 @@ client.on('connect', () => {
 client.on('error', (err) => {
   console.error('Redis client error:', err);
 })
-
 
 const validateObjectId = (req, res, next) => {
   const { id } = req.params;
