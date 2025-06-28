@@ -1,118 +1,73 @@
-import React from 'react'
-import { useLogoutUserMutation } from '../../src/redux/features/auth/authApi';
+import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useLogoutUserMutation } from '../../src/redux/features/auth/authApi';
+import { logout } from '../../src/redux/features/auth/authSlice';
+
+const navLinks = [
+  { to: '/dashboard/admin', icon: 'ri-dashboard-line', text: 'Dashboard' },
+  { to: '/dashboard/add-new-post', icon: 'ri-add-box-line', text: 'Add Product' },
+  { to: '/dashboard/manage-products', icon: 'ri-list-check-2', text: 'Manage Products' },
+  { to: '/dashboard/users', icon: 'ri-group-line', text: 'Users' },
+  { to: '/dashboard/manage-orders', icon: 'ri-shopping-cart-line', text: 'Manage Orders' },
+  { to: '/dashboard/add-coupon', icon: 'ri-coupon-3-line', text: 'Add Coupon' },
+  { to: '/dashboard/deals-banners', icon: 'ri-price-tag-3-line', text: 'Deals & Banners' },
+];
 
 const AdminDashboard = () => {
   const [logoutUser] = useLogoutUserMutation();
-  const dispatch = useDispatch()
-  const handleLogout = async (s) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
     try {
       await logoutUser().unwrap();
-      dispatch(logout())
-
+      dispatch(logout());
+      navigate('/');
     } catch (err) {
       console.error("Failed to logout:", err);
     }
-  }
+  };
+
   return (
-    <div className="space-y-5 bg-white p-8 md:h-screen flex flex-col justify-between">
+    <div className="bg-gray-50 text-gray-800 p-4 md:h-screen flex flex-col justify-between rounded-lg shadow-sm">
       <div>
-        <div className="nav__logo">
-          <Link to="/" >Himtaj<span>.</span></Link>
-          <p className='text-xs italic'>Admin dashboard</p>
+        <div className="flex items-center gap-3 p-2 mb-6">
+          <Link to="/" className="nav__logo text-2xl">
+            Aarambh Decor<span className="text-primary">.</span>
+          </Link>
         </div>
-        <hr className='mt-5' />
-        <ul className="space-y-5 pt-5">
-          <li>
-            <NavLink
-              to="/dashboard/admin"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/dashboard/add-new-post"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Add New Post
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/dashboard/manage-products"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Manage Products
-            </NavLink>
-          </li>
-
-          <li className="mb-3">
-            <NavLink
-              to="/dashboard/users"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Users
-            </NavLink>
-          </li>
-          <li className="mb-3">
-            <NavLink
-              to="/dashboard/manage-orders"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Manage Orders
-            </NavLink>
-          </li>
-
-
-          <li className="mb-3">
-            <NavLink
-              to="/dashboard/add-coupon"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Add Coupon
-            </NavLink>
-          </li>
-
-
-
-          <li className="mb-3">
-            <NavLink
-              to="/dashboard/deals-banners"
-              className={({ isActive }) =>
-                isActive ? "text-blue-600 font-bold" : "text-black"
-              }
-            >
-              Deals & Banners
-            </NavLink>
-          </li>
+        <ul className="space-y-2">
+          {navLinks.map((link) => (
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                end
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded-lg transition-colors duration-200 ${
+                    isActive ? 'bg-primary-light text-primary-dark font-semibold' : 'hover:bg-gray-200'
+                  }`
+                }
+              >
+                <i className={`${link.icon} text-xl`}></i>
+                <span>{link.text}</span>
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </div>
 
-      <div className="mb-3">
-        <hr className="mb-3" />
+      <div className="mt-6 border-t pt-4">
         <button
           onClick={handleLogout}
-          className="text-white bg-red-500 font-medium px-5 py-1 rounded-sm">
-          Logout
+          className="flex items-center gap-3 w-full p-3 rounded-lg text-red-500 hover:bg-red-100 transition-colors duration-200"
+        >
+          <i className="ri-logout-box-r-line text-xl"></i>
+          <span>Logout</span>
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;

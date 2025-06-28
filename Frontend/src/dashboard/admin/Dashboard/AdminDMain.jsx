@@ -1,28 +1,26 @@
 import React from 'react';
-import AdminStats from './AdminStates';
 import { useSelector } from 'react-redux';
 import { useGetAdminStatsQuery } from '../../../../src/redux/features/stats/statsApi';
+import AdminStats from './AdminStates';
 import AdminStatsChart from './AdminStatesChart';
 
 const AdminDMain = () => {
     const { user } = useSelector((state) => state.auth);
     const { data: stats, error, isLoading } = useGetAdminStatsQuery();
-    console.log(stats);
 
     if (isLoading) {
         return <p className="text-center text-gray-500">Loading admin stats...</p>;
     }
 
-
-    if (!stats) {
-        return <p className="text-center text-gray-500">No stats available.</p>;
+    if (error || !stats) {
+        return <p className="text-center text-red-500">Could not load dashboard stats.</p>;
     }
 
     return (
-        <div className="p-6">
+        <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-semibold mb-4">Admin Dashboard</h1>
-                <p className="text-gray-500">Hi, {user?.username}! Welcome to the admin dashboard.</p>
+                <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+                <p className="text-gray-500 mt-1">Hi, {user?.username}! Welcome back.</p>
             </div>
             <AdminStats stats={stats} />
             <AdminStatsChart stats={stats} />

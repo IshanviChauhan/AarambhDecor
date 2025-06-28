@@ -95,116 +95,110 @@ const AddProduct = () => {
           author: user?._id, // Ensure author is included
         };
       
-        console.log("Submitting Product Data:", newProduct); // Debug payload
-      
         try {
-          const response = await addProduct(newProduct).unwrap();
+          await addProduct(newProduct).unwrap();
           alert("Product added successfully!");
-          navigate("/shop");
+          navigate("/dashboard/manage-products");
         } catch (err) {
           console.error("Failed to add product:", err); // Log error details
+          alert("Failed to add product.");
         }
       };
       
-      
-    
-    
-
     return (
-        <div className="container mx-auto mt-8">
-            <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Product</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <TextInput
                     label="Product Name"
                     name="name"
-                    placeholder="Ex: Diamond Earrings"
+                    placeholder="Ex: Golden Sunburst Mirror"
                     value={product.name}
                     onChange={handleChange}
                 />
-                <SelectInput
-                    label="Category"
-                    name="category"
-                    value={product.category}
-                    onChange={handleChange}
-                    options={categories}
-                />
-    <div>
-  <label htmlFor="colors" className="block text-sm font-medium text-gray-700">
-    Colors
-  </label>
-  <Select
-    isMulti
-    options={colorOptions}
-    value={product.colors.map((color) =>
-      colorOptions.find((option) => option.value === color.value)
-    )}
-    onChange={handleColorsChange}
-    className="basic-multi-select"
-    classNamePrefix="select"
-  />
-</div>
-
-
-
-<SelectInput
-                    label="Metal"  // Update label for clarity
-                    name="metal"
-                    value={product.metal}  // Updated to reflect state change
-                    onChange={handleChange}  // Event handler remains
-                    options={metals}  // Ensure metals options are passed
-                />
-
-<SelectInput
-    label="Gender"
-    name="gender"
-    value={product.gender}
-    onChange={handleChange}
-    options={genders}
-/>
-
-
-
-<label htmlFor="size">Size </label>
-        <input
-          type="text"
-          id="size"
-          name="size"
-          value={product.size}
-          onChange={handleChange}
-          placeholder="E.g., 'Small, Medium, Large' or 'Custom Size Description'"
-          className="add-product-InputCSS"
-        />
-
-                <TextInput
-                    label="Price"
-                    name="price"
-                    type="number"
-                    placeholder="50"
-                    value={product.price}
-                    onChange={handleChange}
-                />
-                 <TextInput
-                    label="Old Price"
-                    name="oldPrice"
-                    type="number"
-                    placeholder="100"
-                    value={product.oldPrice}
-                    onChange={handleChange}
-                />
                 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <SelectInput
+                        label="Category"
+                        name="category"
+                        value={product.category}
+                        onChange={handleChange}
+                        options={categories}
+                    />
+                     <SelectInput
+                        label="Gender"
+                        name="gender"
+                        value={product.gender}
+                        onChange={handleChange}
+                        options={genders}
+                    />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <TextInput
+                        label="Price"
+                        name="price"
+                        type="number"
+                        placeholder="50"
+                        value={product.price}
+                        onChange={handleChange}
+                    />
+                    <TextInput
+                        label="Old Price (Optional)"
+                        name="oldPrice"
+                        type="number"
+                        placeholder="100"
+                        value={product.oldPrice}
+                        onChange={handleChange}
+                    />
+                </div>
 
-                {/* Main Image Upload */}
-                <UploadImage
-                    name="mainImage"
-                    setImage={(url) => setMainImage(url)}
-                />
+                <div>
+                    <label htmlFor="colors" className="block text-sm font-medium text-gray-700 mb-1">
+                        Colors
+                    </label>
+                    <Select
+                        isMulti
+                        options={colorOptions}
+                        value={product.colors.map((color) =>
+                        colorOptions.find((option) => option.value === color.value)
+                        )}
+                        onChange={handleColorsChange}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                    />
+                </div>
 
-                {/* Additional Images Upload */}
-                <UploadImage
-                    name="additionalImages"
-                    setImage={(urls) => setAdditionalImages(urls)}
-                    multiple // Allow multiple image selection
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <SelectInput
+                        label="Metal"
+                        name="metal"
+                        value={product.metal}
+                        onChange={handleChange}
+                        options={metals}
+                    />
+                    <TextInput
+                        label="Size"
+                        name="size"
+                        value={product.size}
+                        onChange={handleChange}
+                        placeholder="E.g., '12 inch' or 'Small'"
+                    />
+                </div>
+
+                <div className="space-y-4">
+                    <UploadImage
+                        label="Main Product Image"
+                        name="mainImage"
+                        setImage={(url) => setMainImage(url)}
+                    />
+                    <UploadImage
+                        label="Additional Images (Optional)"
+                        name="additionalImages"
+                        setImage={(urls) => setAdditionalImages(urls)}
+                        multiple
+                    />
+                </div>
 
                 <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700">
@@ -215,9 +209,9 @@ const AddProduct = () => {
                         name="description"
                         id="description"
                         value={product.description}
-                        placeholder="Write a product description"
+                        placeholder="Write a detailed product description..."
                         onChange={handleChange}
-                        className="add-product-InputCSS"
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                     />
                 </div>
 
@@ -228,24 +222,24 @@ const AddProduct = () => {
                         id="isTrending"
                         checked={product.isTrending}
                         onChange={handleChange}
-                        className="mr-2"
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                     />
-                    <label htmlFor="isTrending" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="isTrending" className="ml-2 block text-sm text-gray-900">
                         Mark as Trending Product
                     </label>
                 </div>
 
-                <div>
+                <div className="flex justify-end">
                     <button
                         type="submit"
-                        className="add-product-btn"
+                        className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Adding...' : 'Add Product'}
                     </button>
                 </div>
             </form>
-            {error && <p className="text-red-500 mt-4">Error adding product: {error.message}</p>}
+            {error && <p className="text-red-500 mt-4">Error adding product: {error.data?.message || 'An error occurred'}</p>}
         </div>
     );
 };

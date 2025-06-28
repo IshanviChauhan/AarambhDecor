@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useFetchDealQuery, useUpdateDealMutation } from "./../../../redux/features/deals/dealsApi";
 import axios from "axios";
 import { getBaseUrl } from "../../../utils/baseURL";
+import UploadImage from "../AddProduct/UploadImage";
 
 const Deals = () => {
   const { data: deal, isLoading, error } = useFetchDealQuery();
-  const [updateDeal] = useUpdateDealMutation();
+  const [updateDeal, { isLoading: isUpdating }] = useUpdateDealMutation();
   
   const [dealData, setDealData] = useState({
     title: "",
@@ -14,18 +15,16 @@ const Deals = () => {
     image: "",
     endDate: ""
   });
-  const [imageFile, setImageFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [newImage, setNewImage] = useState('');
 
-  // Use the useEffect hook to update the dealData state when deal data is available
   useEffect(() => {
     if (deal && deal.endDate) {
       setDealData({
-        title: deal.title,
-        description: deal.description,
-        discount: deal.discount,
-        image: deal.imageUrl,
-        endDate: new Date(deal.endDate).toISOString().substring(0, 16), // Format the date
+        title: deal.title || "",
+        description: deal.description || "",
+        discount: deal.discount || 0,
+        image: deal.imageUrl || "",
+        endDate: deal.endDate ? new Date(deal.endDate).toISOString().substring(0, 16) : "",
       });
     }
   }, [deal]);
@@ -35,32 +34,23 @@ const Deals = () => {
     setDealData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = async (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-  
-    reader.onloadend = async () => {
-      try {
-        const response = await axios.post(`${getBaseUrl()}/api/uploadImage`, {
-          image: reader.result, // Send base64-encoded image
-        });
-        setDealData((prev) => ({ ...prev, image: response.data })); // Save image URL
-        alert("Image uploaded successfully");
-      } catch (error) {
-        console.error("Image upload failed:", error);
-        alert("Failed to upload image");
-      }
-    };
+  const handleImageUpload = (url) => {
+    setNewImage(url);
   };
   
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      ...dealData,
+      image: newImage || dealData.image, // Use new image if uploaded, otherwise keep existing
+    };
+
     try {
-      await updateDeal(dealData).unwrap();
+      await updateDeal(payload).unwrap();
       alert("Deal updated successfully!");
     } catch (err) {
       console.error("Failed to update deal:", err);
+      alert("Failed to update deal.");
     }
   };
 
@@ -68,70 +58,75 @@ const Deals = () => {
   if (error) return <p>Error loading deal: {error.message}</p>;
 
   return (
-    <div className="deals-admin container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6">Manage Deals</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="deals-admin">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Manage Deals & Banners</h2>
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
         <div>
-          <label className="block text-sm font-medium">Title</label>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
           <input
             type="text"
+            id="title"
             name="title"
             value={dealData.title}
             onChange={handleChange}
-            className="input-field w-[29rem]"
-            placeholder="Deal Title"
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            placeholder="e.g., Summer Sale"
           />
         </div>
-        {/* <div>
-          <label className="block text-sm font-medium">Description</label>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
           <textarea
+            id="description"
             name="description"
             value={dealData.description}
             onChange={handleChange}
-            className="input-field"
-            placeholder="Deal Description"
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            placeholder="Briefly describe the deal"
+            rows="3"
           />
-        </div> */}
-        {/* <div>
-          <label className="block text-sm font-medium">Discount (%)</label>
+        </div>
+        <div>
+          <label htmlFor="discount" className="block text-sm font-medium text-gray-700">Discount (%)</label>
           <input
             type="number"
+            id="discount"
             name="discount"
             value={dealData.discount}
             onChange={handleChange}
-            className="input-field"
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
           />
-        </div> */}
+        </div>
         <div>
-          <label className="block text-sm font-medium">End Date</label>
+          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
           <input
             type="datetime-local"
+            id="endDate"
             name="endDate"
             value={dealData.endDate}
             onChange={handleChange}
-            className="input-field"
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
           />
         </div>
+        
         <div>
-          <label className="block text-sm font-medium">Image</label>
-          {dealData.image && (
-            <img
-              src={dealData.image}
-              alt="Deal"
-              className="w-32 h-32 object-cover mb-2"
+            <UploadImage
+                label="Deal Banner Image"
+                name="dealImage"
+                setImage={handleImageUpload}
             />
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleImageUpload(e.target.files[0])}
-            className="input-field"
-          />
-          {uploading && <p>Uploading image...</p>}
+            {dealData.image && !newImage && (
+                <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700">Current Image:</p>
+                    <img src={dealData.image} alt="Current Deal Banner" className="mt-2 w-48 h-auto rounded-md shadow-md" />
+                </div>
+            )}
         </div>
-        <button type="submit" className="btn" disabled={uploading}>
-          {uploading ? "Updating..." : "Update Deal"}
-        </button>
+
+        <div className="flex justify-end">
+          <button type="submit" className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark" disabled={isUpdating}>
+            {isUpdating ? "Updating..." : "Update Deal"}
+          </button>
+        </div>
       </form>
     </div>
   );

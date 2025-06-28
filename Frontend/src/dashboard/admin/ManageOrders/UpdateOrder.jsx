@@ -2,47 +2,45 @@ import React, { useState } from "react";
 import { useUpdateOrderStatusMutation } from "./../../../redux/features/order/orderApi";
 
 const UpdateOrderModal = ({ order, onClose, isOpen, onUpdated }) => {
-  if (!isOpen || !order) return null; // Avoid rendering if modal is not open or order is missing
+  if (!isOpen || !order) return null;
 
   const [status, setStatus] = useState(order.status);
   const [updateOrderStatus, { isLoading, error }] = useUpdateOrderStatusMutation();
 
   const handleUpdate = async () => {
-    if (window.confirm("Are you sure you want to update the order status?")) {
-      try {
-        await updateOrderStatus({ id: order._id, status }).unwrap();
-        onUpdated(); // Trigger a refresh after updating
-        onClose(); // Close the modal
-      } catch (err) {
-        console.error("Failed to update order status:", err);
-      }
+    try {
+      await updateOrderStatus({ id: order._id, status }).unwrap();
+      onUpdated();
+      onClose();
+    } catch (err) {
+      console.error("Failed to update order status:", err);
+      alert("Failed to update status.");
     }
   };
 
   return (
-    <div
-      role="dialog"
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80"
-    >
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-        <h2 id="modal-title" className="text-xl font-semibold mb-4">
-          Update Order Status
-        </h2>
-        <p id="modal-description" className="mb-4">
-          Please select a new status for the order.
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">Update Order Status</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <i className="ri-close-line text-2xl"></i>
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-600 mb-4">
+          Select a new status for order <span className="font-mono text-primary">{order._id}</span>.
         </p>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="status">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="status">
             Status
           </label>
           <select
             id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="border border-gray-300 p-2 rounded w-full"
+            className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
             disabled={isLoading}
           >
             <option value="pending">Pending</option>
@@ -53,22 +51,22 @@ const UpdateOrderModal = ({ order, onClose, isOpen, onUpdated }) => {
         </div>
 
         {error && (
-          <p className="text-red-500 mb-4">
+          <p className="text-red-500 text-sm mb-4">
             {error.data?.message || "Failed to update status. Please try again."}
           </p>
         )}
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none"
           >
             Cancel
           </button>
           <button
             onClick={handleUpdate}
             disabled={isLoading}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="px-6 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none"
           >
             {isLoading ? "Updating..." : "Update"}
           </button>

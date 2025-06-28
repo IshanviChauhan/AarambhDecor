@@ -25,6 +25,7 @@ const colorOptions = [
 ];
 
 const metals = [
+  { label: "Select Metal", value: "" },
   { label: "18K Gold", value: "18K Gold" },
   { label: "22K Gold", value: "22K Gold" },
   { label: "925 Silver", value: "925 Silver" },
@@ -41,6 +42,9 @@ const UpdateProduct = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
+  const { data: productData, isLoading: isProductLoading, error: fetchError } = useFetchProductByIdQuery(id);
+  const [updateProduct, { isLoading: isUpdating, error: updateError }] = useUpdateProductMutation();
+  
   const [product, setProduct] = useState({
     name: "",
     category: "",
@@ -55,77 +59,42 @@ const UpdateProduct = () => {
     image: "",
     additionalImages: [],
   });
-
-  const [newMainImage, setNewMainImage] = useState(null);
+  
+  const [newMainImage, setNewMainImage] = useState('');
   const [newAdditionalImages, setNewAdditionalImages] = useState([]);
 
-  const { data: productData, isLoading: isProductLoading, error: fetchError } = useFetchProductByIdQuery(id);
-  const [updateProduct, { isLoading: isUpdating, error: updateError }] = useUpdateProductMutation();
-
   useEffect(() => {
-    if (productData) {
-      const {
-        name,
-        category,
-        colors,
-        price,
-        oldPrice,
-        description,
-        isTrending,
-        size,
-        metal,
-        gender,
-        image,
-        additionalImages,
-      } = productData.product;
-
+    if (productData?.product) {
+      const p = productData.product;
       setProduct({
-        name: name || "",
-        category: category || "",
-        colors: colors || [],
-        price: price || "",
-        oldPrice: oldPrice || "",
-        description: description || "",
-        isTrending: isTrending || false,
-        size: size || "",
-        metal: metal || "",
-        gender: gender || "",
-        image: image || "",
-        additionalImages: additionalImages || [],
+        name: p.name || "",
+        category: p.category || "",
+        colors: p.colors || [],
+        price: p.price || "",
+        oldPrice: p.oldPrice || "",
+        description: p.description || "",
+        isTrending: p.isTrending || false,
+        size: p.size || "",
+        metal: p.metal || "",
+        gender: p.gender || "",
+        image: p.image || "",
+        additionalImages: p.additionalImages || [],
       });
     }
   }, [productData]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setProduct({
-      ...product,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setProduct({ ...product, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleColorsChange = (selectedOptions) => {
-    setProduct({
-      ...product,
-      colors: selectedOptions.map((option) => ({
-        value: option.value,
-        code: option.code,
-      })),
-    });
-  };
-
-  const handleMainImageChange = (image) => {
-    setNewMainImage(image);
-  };
-
-  const handleAdditionalImagesChange = (images) => {
-    setNewAdditionalImages(images);
+    setProduct({ ...product, colors: selectedOptions.map(opt => ({ value: opt.value, code: opt.code })) });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const updatedProduct = {
+    const updatedProductPayload = {
       ...product,
       image: newMainImage || product.image,
       additionalImages: newAdditionalImages.length > 0 ? newAdditionalImages : product.additionalImages,
@@ -133,11 +102,12 @@ const UpdateProduct = () => {
     };
 
     try {
-      await updateProduct({ id, ...updatedProduct }).unwrap();
+      await updateProduct({ id, ...updatedProductPayload }).unwrap();
       alert("Product updated successfully!");
       navigate("/dashboard/manage-products");
     } catch (err) {
       console.error("Failed to update product:", err);
+      alert("Failed to update product.");
     }
   };
 
@@ -145,110 +115,83 @@ const UpdateProduct = () => {
   if (fetchError) return <p className="text-red-500">Error fetching product: {fetchError.message}</p>;
 
   return (
-    <div className="container mx-auto mt-8">
-      <h2 className="text-2xl font-bold mb-6">Update Product</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Update Product</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <TextInput
           label="Product Name"
           name="name"
           value={product.name}
           onChange={handleChange}
         />
-        <SelectInput
-          label="Category"
-          name="category"
-          value={product.category}
-          onChange={handleChange}
-          options={categories}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SelectInput
+                label="Category"
+                name="category"
+                value={product.category}
+                onChange={handleChange}
+                options={categories}
+            />
+            <SelectInput label="Gender" name="gender" value={product.gender} onChange={handleChange} options={genders} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TextInput label="Price" name="price" type="number" value={product.price} onChange={handleChange} />
+            <TextInput label="Old Price" name="oldPrice" type="number" value={product.oldPrice} onChange={handleChange}/>
+        </div>
         <div>
-          <label htmlFor="colors" className="block text-sm font-medium text-gray-700">Colors</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Colors</label>
           <Select
             isMulti
             options={colorOptions}
-            value={colorOptions.filter((option) => product.colors.includes(option.value))}
+            value={product.colors.map(c => colorOptions.find(opt => opt.value === c.value)).filter(Boolean)}
             onChange={handleColorsChange}
           />
         </div>
-        <SelectInput
-          label="Metal"
-          name="metal"
-          value={product.metal}
-          onChange={handleChange}
-          options={metals}
-        />
-        <SelectInput label="Gender" name="gender" value={product.gender} onChange={handleChange} options={genders} />
-        <TextInput
-          label="Size"
-          name="size"
-          value={product.size}
-          onChange={handleChange}
-          placeholder="E.g., 'Small, Medium, Large'"
-        />
-        <TextInput
-          label="Price"
-          name="price"
-          type="number"
-          value={product.price}
-          onChange={handleChange}
-        />
-        <TextInput
-          label="Old Price"
-          name="oldPrice"
-          type="number"
-          value={product.oldPrice}
-          onChange={handleChange}
-        />
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Main Image</label>
-          {product.image && <img src={product.image} alt="Main" className="w-40 h-40 object-cover rounded mb-4" />}
-          <UploadImage name="mainImage" setImage={handleMainImageChange} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SelectInput label="Metal" name="metal" value={product.metal} onChange={handleChange} options={metals}/>
+            <TextInput label="Size" name="size" value={product.size} onChange={handleChange} />
         </div>
-
         <div>
-          <label className="block text-sm font-medium text-gray-700">Additional Images</label>
-          <div className="flex gap-2 mb-4">
-            {product.additionalImages.map((img, index) => (
-              <img key={index} src={img} alt={`Additional ${index}`} className="w-20 h-20 object-cover rounded" />
-            ))}
-          </div>
-          <UploadImage name="additionalImages" setImage={handleAdditionalImagesChange} multiple />
+            <UploadImage label="Update Main Image" name="mainImage" setImage={(url) => setNewMainImage(url)} />
+            {product.image && !newMainImage && <img src={product.image} alt="Current Main" className="w-32 h-32 object-cover rounded mt-2 shadow-md" />}
         </div>
-
+        <div>
+            <UploadImage label="Update Additional Images" name="additionalImages" setImage={(urls) => setNewAdditionalImages(urls)} multiple />
+            {product.additionalImages.length > 0 && newAdditionalImages.length === 0 && (
+                <div className="flex gap-2 mt-2">
+                    {product.additionalImages.map((img, index) => <img key={index} src={img} alt={`Current Additional ${index}`} className="w-20 h-20 object-cover rounded shadow-md" />)}
+                </div>
+            )}
+        </div>
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
           <textarea
             rows={6}
             name="description"
+            id="description"
             value={product.description}
             onChange={handleChange}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
           />
         </div>
-
         <div className="flex items-center">
           <input
             type="checkbox"
             name="isTrending"
+            id="isTrending"
             checked={product.isTrending}
             onChange={handleChange}
-            className="mr-2"
+            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
           />
-          <label htmlFor="isTrending" className="text-sm font-medium text-gray-700">Mark as Trending Product</label>
+          <label htmlFor="isTrending" className="ml-2 block text-sm text-gray-900">Mark as Trending</label>
         </div>
-
-        <div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
-            disabled={isUpdating}
-          >
+        <div className="flex justify-end">
+          <button type="submit" className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark" disabled={isUpdating}>
             {isUpdating ? "Updating..." : "Update Product"}
           </button>
         </div>
       </form>
-      {updateError && <p className="text-red-500 mt-4">Error updating product: {updateError.message}</p>}
+      {updateError && <p className="text-red-500 mt-4">Error: {updateError.data?.message || "An error occurred"}</p>}
     </div>
   );
 };

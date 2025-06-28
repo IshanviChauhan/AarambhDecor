@@ -2,6 +2,13 @@ import React from 'react';
 import { Pie, Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 
+const ChartContainer = ({ title, children }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
+    <div className="h-80">{children}</div>
+  </div>
+);
+
 const AdminStatsChart = ({ stats }) => {
   // Data for Pie Chart
   const pieData = {
@@ -16,76 +23,71 @@ const AdminStatsChart = ({ stats }) => {
           stats.totalUsers,
         ],
         backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF',
+          '#3b82f6', // blue-500
+          '#14b8a6', // teal-500
+          '#f97316', // orange-500
+          '#8b5cf6', // violet-500
         ],
-        hoverBackgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF',
-        ],
+        hoverOffset: 4,
+        borderWidth: 0,
       },
     ],
   };
 
-  // Initialize the data array with 12 zeros
   const data = new Array(12).fill(0);
-
-  // Map earnings to the correct month
   stats?.monthlyEarnings.forEach(entry => {
-    data[entry.month - 1] = entry.earnings; // Subtract 1 because months are 0-indexed in the data array
+    data[entry.month - 1] = entry.earnings;
   });
 
   const lineData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     datasets: [
       {
         label: 'Monthly Earnings',
-        data, 
-        fill: false,
-        backgroundColor: '#36A2EB',
-        borderColor: '#36A2EB',
-        tension: 0.1, // Optional: Add some tension to smooth the line
+        data,
+        fill: true,
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        borderColor: '#3b82f6', // blue-500
+        tension: 0.4,
+        pointBackgroundColor: '#3b82f6',
       },
     ],
   };
 
- 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+        x: {
+            grid: {
+                display: false
+            }
+        },
+        y: {
+            beginAtZero: true
+        }
+    }
   };
 
   return (
-    <div className="mt-12 space-y-8">
-      <h2 className="text-xl font-semibold mb-4">Admin Stats Overview</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Pie Chart */}
-        <div className="max-h-96 w-full">
-          <Pie data={pieData} options={options} />
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Analytics Overview</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-3">
+          <ChartContainer title="Monthly Earnings">
+            <Line data={lineData} options={options} />
+          </ChartContainer>
         </div>
-
-        {/* Line Chart */}
-        <div className="max-h-96 md:h-96 w-full">
-          <Line data={lineData} options={options} />
+        <div className="lg:col-span-2">
+          <ChartContainer title="Statistics Breakdown">
+            <Pie data={pieData} options={{ ...options, plugins: { legend: { position: 'right' }}}} />
+          </ChartContainer>
         </div>
-      </div>
-
-      <div>
-      <div className="relative pt-8 pb-6">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-wrap items-center md:justify-between justify-center">
-                        <div className="w-full md:w-6/12 px-4 mx-auto text-center">
-                          
-                        </div>
-                    </div>
-                </div>
-            </div>
       </div>
     </div>
   );
