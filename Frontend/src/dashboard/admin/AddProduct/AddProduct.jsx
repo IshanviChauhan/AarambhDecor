@@ -5,6 +5,7 @@ import TextInput from './TextInput';
 import SelectInput from './SelectInput';
 import UploadImage from './UploadImage';
 import { useNavigate } from 'react-router-dom';
+import Select from "react-select";
 
 const categories = [
     { label: 'Select Category', value: '' },
@@ -34,12 +35,20 @@ const AddProduct = () => {
     const [addProduct, { isLoading, error }] = useAddProductMutation();
     const navigate = useNavigate();
 
+    // const handleChange = (e) => {
+    //     const { name, value, type, checked } = e.target;
+    //     setProduct(prevProduct => ({
+    //         ...prevProduct,
+    //         [name]: type === 'checkbox' ? checked : value
+    //     }));
+    // };
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setProduct(prevProduct => ({
-            ...prevProduct,
+        setProduct({
+            ...product,
             [name]: type === 'checkbox' ? checked : value
-        }));
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -57,10 +66,12 @@ const AddProduct = () => {
           author: user?._id, // Ensure author is included
         };
       
+        console.log("Submitting Product Data:", newProduct); // Debug payload
+
         try {
           await addProduct(newProduct).unwrap();
           alert("Product added successfully!");
-          navigate("/dashboard/manage-products");
+          navigate("/shop");
         } catch (err) {
           console.error("Failed to add product:", err); // Log error details
           alert("Failed to add product.");

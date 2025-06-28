@@ -45,10 +45,6 @@ export const productsApi = createApi({
       providesTags: ["Products"],
     }),
 
-  
-
-
-
     addProduct: builder.mutation({
       query: (newProduct) => ({
         url: "/create-product",
