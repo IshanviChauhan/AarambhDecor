@@ -6,7 +6,7 @@ const MobileNavLinks = ({ isMobileMenuOpen, handleMobileMenuToggle }) => {
     <>
       {isMobileMenuOpen && (
         <div className="md:hidden">
-          <ul className="bg-[#d8f4f2] space-y-4 p-4 text-left">
+          <ul className="bg-extra-light space-y-4 p-4 text-left">
             <li className="link">
               <Link onClick={handleMobileMenuToggle} to="/">
                 FOR HER

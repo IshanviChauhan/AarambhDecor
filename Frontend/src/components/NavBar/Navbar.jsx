@@ -26,7 +26,7 @@ const Navbar = () => {
   const userId = user?._id;
 
   // Fetch Cart Items
-  const { data: products = [] } = useFetchCartQuery(userId, { skip: !userId });
+  const { data: products = [] } = useFetchCartQuery(userId);
 
   // Logout
   const [logoutUser] = useLogoutUserMutation();
@@ -98,60 +98,77 @@ const Navbar = () => {
 
   return (
     <>
+      {/* Top Bar with Promotion */}
       <TopPromotionBar />
 
-      <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-sm shadow-sm">
-        <nav className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
+      <header className="fixed-nav-bar w-full">
+        {/* Main Navbar Container */}
+        <nav className="mx-auto px-4 flex items-center justify-between py-6 relative">
           {/* Left Side: Hamburger (Mobile) + Logo */}
           <div className="flex items-center space-x-4">
+            {/* Mobile menu toggle */}
             <div className="md:hidden">
-              <button onClick={handleMobileMenuToggle} className="text-2xl text-stone-700">
+              <button onClick={handleMobileMenuToggle} className="text-2xl">
                 <i className={isMobileMenuOpen ? "ri-close-line" : "ri-menu-line"}></i>
               </button>
             </div>
-            <Link to="/" className="text-2xl font-bold font-header text-stone-800">Aarambh Decor</Link>
+
+            {/* Logo */}
+            <Link to="/">
+              <img
+                src="/nav_logo.png"
+                alt="Logo"
+                className="h-12 w-auto object-contain"
+              />
+            </Link>
           </div>
 
-          {/* Center: Desktop Navigation Links */}
-          <div className="hidden md:flex">
+          {/* Center: Desktop Navigation Links (hidden on mobile) */}
+          <div className="hidden md:block">
             <DesktopNavLinks
               forHerCategories={forHerCategories}
               forHimCategories={forHimCategories}
             />
           </div>
 
-          {/* Right Side: Search + Cart + User */}
+          {/* Right Side: Desktop Search + Cart + User Profile */}
           <div className="flex items-center space-x-4">
-            <div className="hidden md:block">
+            {/* Desktop Search (hidden on mobile) */}
+            <span className="hidden md:inline">
               <Search />
-            </div>
-            <button onClick={openCart} className="relative text-stone-700 hover:text-primary transition-colors">
-              <i className="ri-shopping-bag-4-line text-xl"></i>
+            </span>
+
+            {/* Cart Icon */}
+            <button
+              onClick={openCart}
+              className="hover:text-primary relative text-xl"
+            >
+              <i className="ri-shopping-bag-4-line"></i>
               {products.length > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
+                <sup className="text-xs px-1 text-white rounded-full bg-primary text-center absolute -top-2 -right-2">
                   {products.length}
-                </span>
+                </sup>
               )}
             </button>
 
+            {/* User Profile / Avatar */}
             {user ? (
               <div className="relative">
-                <button onClick={handleDropDownToggle}>
-                  <img
-                    src={user?.profileImage || avatarImg}
-                    alt="User Avatar"
-                    className="w-8 h-8 rounded-full cursor-pointer object-cover"
-                  />
-                </button>
+                <img
+                  onClick={handleDropDownToggle}
+                  src={user?.profileImage || avatarImg}
+                  alt="User Avatar"
+                  className="w-8 h-8 rounded-full cursor-pointer"
+                />
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-stone-200">
-                    <ul className="py-1">
+                  <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <ul className="font-medium space-y-2 p-2">
                       {dropdownMenus.map((menu, index) => (
                         <li key={index}>
                           <Link
                             onClick={() => setIsDropdownOpen(false)}
                             to={menu.path}
-                            className="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
+                            className="block px-3 py-1 hover:bg-gray-100"
                           >
                             {menu.label}
                           </Link>
@@ -160,7 +177,7 @@ const Navbar = () => {
                       <li>
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
+                          className="w-full text-left px-3 py-1 hover:bg-gray-100"
                         >
                           Logout
                         </button>
@@ -170,27 +187,29 @@ const Navbar = () => {
                 )}
               </div>
             ) : (
-              <Link to="/login" className="text-stone-700 hover:text-primary transition-colors">
-                <i className="ri-user-line text-xl"></i>
+              <Link to="/login" className="text-xl">
+                <i className="ri-user-line"></i>
               </Link>
             )}
           </div>
         </nav>
 
+        {/* Mobile Navigation Links (shown when isMobileMenuOpen = true) */}
         <MobileNavLinks
           isMobileMenuOpen={isMobileMenuOpen}
           handleMobileMenuToggle={() => setIsMobileMenuOpen(false)}
         />
+
+        {/* Cart Modal */}
+        {isCartOpen && (
+          <CartModal
+            products={products}
+            isOpen={isCartOpen}
+            onClose={closeCart}
+            userId={userId}
+          />
+        )}
       </header>
-      
-      {isCartOpen && (
-        <CartModal
-          products={products}
-          isOpen={isCartOpen}
-          onClose={closeCart}
-          userId={userId}
-        />
-      )}
     </>
   );
 };

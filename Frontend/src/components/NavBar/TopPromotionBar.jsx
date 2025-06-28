@@ -2,11 +2,14 @@ import React from "react";
 
 const TopPromotionBar = () => {
   return (
-    <div className="bg-primary py-2 text-center">
-      <p className="text-sm font-medium text-white tracking-wider animate-pulse">
+    <nav className="bg-extra-light py-2 flex items-center justify-center">
+      <div>
+        <h2 className="text-text-dark text-[0.9rem] font-semibold animate-fade-in-out">
         GET EXTRA 2.5% OFF ON PREPAID ORDERS
-      </p>
-    </div>
+
+        </h2>
+      </div>
+    </nav>
   );
 };
 

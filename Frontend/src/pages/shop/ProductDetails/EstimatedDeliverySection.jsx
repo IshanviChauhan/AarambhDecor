@@ -38,7 +38,7 @@ const EstimatedDeliverySection = () => {
         </button>
       </div>
       <p className="mt-2 text-gray-700 flex items-center">
-        <span className="mr-2 text-pink-500">🔒</span>
+        <span className="mr-2 text-primary">🔒</span>
         {deliveryMessage}
       </p>
     </div>

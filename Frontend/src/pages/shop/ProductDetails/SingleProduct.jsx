@@ -152,7 +152,7 @@ const SingleProduct = ({ refetchCart }) => {
       <img
         src={currentImage || "/path/to/placeholder.jpg"}
         alt={singleProduct.name || "Product image"}
-        className="rounded-lg w-3/4  h-7rem object-cover border-red-500" // Ensure the main image uses object-cover
+        className="rounded-lg w-3/4  h-7rem object-cover" // Ensure the main image uses object-cover
       />
     </div>
 

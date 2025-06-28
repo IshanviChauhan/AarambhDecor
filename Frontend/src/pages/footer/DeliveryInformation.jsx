@@ -16,7 +16,7 @@ const DeliveryInformation = () => {
                   order and the order number. Registered users can sign in and track
                   their orders from the order history section on the account page.
                 </p>
-                <button className="mt-6 px-6 py-3 bg-[#d8f4f2] text-black font-semibold rounded-lg shadow hover:bg-red-600 transition">
+                <button className="mt-6 px-6 py-3 bg-primary-light text-black font-semibold rounded-lg shadow hover:bg-primary-dark transition">
                   Track Order
                 </button>
               </div>

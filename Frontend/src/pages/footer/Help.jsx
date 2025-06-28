@@ -73,7 +73,7 @@ const HelpFAQ = () => {
   <div className="flex justify-center items-center space-x-4">
     <a
       href="tel:+919773690444"
-      className="flex items-center space-x-2 bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-800 transition"
+      className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary-dark transition"
     >
       <img
         src="https://cdn-icons-png.flaticon.com/512/724/724664.png"
@@ -84,7 +84,7 @@ const HelpFAQ = () => {
     </a>
     <a
       href="mailto:info@aarambhdecor.com"
-      className="flex items-center space-x-2 bg-gray-200 text-blue-800 px-4 py-2 rounded-lg shadow-md hover:bg-gray-300 transition"
+      className="flex items-center space-x-2 bg-primary-light text-primary-dark px-4 py-2 rounded-lg shadow-md hover:bg-primary-light/80 transition"
     >
       <img
         src="https://cdn-icons-png.flaticon.com/512/732/732200.png"
