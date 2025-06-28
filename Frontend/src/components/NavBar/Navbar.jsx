@@ -94,7 +94,7 @@ const Navbar = () => {
           <div className="flex items-center gap-8">
             <div className="flex items-center space-x-4">
                 <div className="md:hidden">
-                <button onClick={handleMobileMenuToggle} className="text-2xl text-gray-700 hover:text-primary">
+                <button onClick={handleMobileMenuToggle} className="text-2xl text-gray-700 hover:text-primary p-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors">
                     <i className={isMobileMenuOpen ? "ri-close-line" : "ri-menu-line"}></i>
                 </button>
                 </div>
