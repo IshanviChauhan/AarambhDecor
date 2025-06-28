@@ -10,7 +10,7 @@ const ProductSchema = new mongoose.Schema({
   image: { type: String, required: true },
   additionalImages: [{ type: String }],
   size: { type: String },
-  metal: { type: String },
+  material: { type: String },
 
   rating: { type: Number, default: 0 },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

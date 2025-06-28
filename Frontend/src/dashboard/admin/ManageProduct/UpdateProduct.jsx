@@ -16,8 +16,8 @@ const categories = [
   { label: "Wall Shelves", value: "Wall Shelves" },
 ];
 
-const metals = [
-  { label: "Select Metal", value: "" },
+const materials = [
+  { label: "Select Material", value: "" },
   { label: "18K Gold", value: "18K Gold" },
   { label: "22K Gold", value: "22K Gold" },
   { label: "925 Silver", value: "925 Silver" },
@@ -41,7 +41,7 @@ const UpdateProduct = () => {
     description: "",
     isTrending: false,
     size: "",
-    metal: "",
+    material: "",
     image: "",
     additionalImages: [],
   });
@@ -60,7 +60,7 @@ const UpdateProduct = () => {
         description: p.description || "",
         isTrending: p.isTrending || false,
         size: p.size || "",
-        metal: p.metal || "",
+        material: p.material || "",
         image: p.image || "",
         additionalImages: p.additionalImages || [],
       });
@@ -118,7 +118,7 @@ const UpdateProduct = () => {
             <TextInput label="Old Price" name="oldPrice" type="number" value={product.oldPrice} onChange={handleChange}/>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SelectInput label="Metal" name="metal" value={product.metal} onChange={handleChange} options={metals}/>
+            <SelectInput label="Material" name="material" value={product.material} onChange={handleChange} options={materials}/>
             <TextInput label="Size" name="size" value={product.size} onChange={handleChange} />
         </div>
         <div>

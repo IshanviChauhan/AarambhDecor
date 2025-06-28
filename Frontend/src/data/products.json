@@ -2,7 +2,7 @@
     {
       "id": 1,
       "name": "Elegant Silver Earrings",
-      "metal":"gold",
+      "material":"gold",
       "category": "Earrings",
       "description": "A pair of elegant silver earrings perfect for any occasion.",
       "price": 79.99,
@@ -22,7 +22,7 @@
       "image": "images/products/gold-toe-ring.jpg",
       "rating": 4.2,
       "author": "admin",
-       "metal":"gold"
+       "material":"gold"
     },
     {
       "id": 3,
@@ -80,7 +80,7 @@
       "size":8,
       "image": "images/products/leather-bracelet-men.jpg",
       "rating": 4.3,
-      "metal":"red",
+      "material":"red",
       "author": "admin"
     },
     {
@@ -206,8 +206,9 @@
       "image": "images/products/gemstone-pendant-necklace.jpg",
       "rating": 4.8,
       "author": "admin",
-      "metal":"gold"
+      "material":"gold"
     }
   ]
+
 
 

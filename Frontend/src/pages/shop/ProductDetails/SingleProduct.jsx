@@ -67,7 +67,7 @@ const SingleProduct = ({ refetchCart }) => {
       price: singleProduct.price,
       image: singleProduct.image,
       quantity: 1,
-      metal:singleProduct.metal,
+      material:singleProduct.material,
       userId,
     };
 
@@ -210,7 +210,7 @@ const SingleProduct = ({ refetchCart }) => {
 
 
         <div className="mt-4 space-y-2">
-  <p><strong>Metal:</strong> {singleProduct.metal}</p>
+  <p><strong>Material:</strong> {singleProduct.material}</p>
 
   {/* Display Size */}
   {singleProduct.size && <p><strong>Available Size:</strong> {singleProduct.size}</p>}

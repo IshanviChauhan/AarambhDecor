@@ -16,8 +16,8 @@ const categories = [
     { label: 'Wall Shelves', value: 'Wall Shelves' }
 ];
 
-const metals= [
-    { label: 'Select Metal', value: '' },
+const materials= [
+    { label: 'Select Material', value: '' },
     { label: '18K Gold', value: '18K Gold' },
     { label: '22K Gold', value: '22K Gold' },
     { label: '925 Silver', value: '925 Silver' },
@@ -37,7 +37,7 @@ const AddProduct = () => {
         description: '',
         isTrending: false,
         size: '',
-        metal: '' 
+        material: '' 
     });
     const [mainImage, setMainImage] = useState('');
     const [additionalImages, setAdditionalImages] = useState([]);
@@ -116,11 +116,11 @@ const AddProduct = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <SelectInput
-                        label="Metal"
-                        name="metal"
-                        value={product.metal}
+                        label="Material"
+                        name="material"
+                        value={product.material}
                         onChange={handleChange}
-                        options={metals}
+                        options={materials}
                     />
                     <TextInput
                         label="Size"
