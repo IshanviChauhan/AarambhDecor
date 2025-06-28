@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Prompt"', 'sans-serif'],
+        sans: ['"Inconsolata"', 'monospace'],
       },
       maxWidth: {
         'screen-2xl': '1600px', 
