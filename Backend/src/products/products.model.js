@@ -11,7 +11,6 @@ const ProductSchema = new mongoose.Schema({
   additionalImages: [{ type: String }],
   size: { type: String },
   material: { type: String },
-
   rating: { type: Number, default: 0 },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   isTrending: { type: Boolean, default: false },

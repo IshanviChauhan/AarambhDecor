@@ -2,14 +2,14 @@ import React from "react";
 
 const LegalPolicy = () => {
   return (
-    <div className="min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
       <div >
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center py-16 px-6">
           <div className="md:w-1/2">
             <h1 className="text-4xl font-bold ">Privacy Notice</h1>
             <p className="mt-4">
-              Aarambh Decor is committed to protecting your privacy and ensuring the security of your personal information. 
+              Himtaj Jewelry is committed to protecting your privacy and ensuring the security of your personal information. 
               This notice outlines how we handle your data to ensure transparency.
             </p>
           </div>
@@ -104,8 +104,8 @@ const LegalPolicy = () => {
         <div className="mt-16 text-center">
           <p className="text-gray-600">
             For more information, contact us at{" "}
-            <a href="mailto:info@aarambhdecor.com" className=" underline">
-              info@aarambhdecor.com
+            <a href="mailto:info@himtajjewelry.com" className=" underline">
+              info@himtajjewelry.com
             </a>
           </p>
         </div>

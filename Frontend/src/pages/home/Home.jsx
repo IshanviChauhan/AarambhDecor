@@ -1,3 +1,4 @@
+import React from 'react';
 
 import { Blogs } from "../blogs/Blogs";
 import Trending from "../shop/Trending";
@@ -8,24 +9,19 @@ import Hero from "./Hero";
 
 import PromoBanner from "./PromoBanner";
 
-
-
 const Home = () => {
   return (
     <>
+      <Banner />
+      <Categories />
+      <Hero />
+      <Trending />
+      <DealsSection />
+      <PromoBanner />
 
-    <Banner/>
-    <Categories/>
-    <Hero/>
-    <Trending/>
- <DealsSection/>
-    <PromoBanner/>
-  
-    <Blogs/>
-
-
+      <Blogs />
     </>
-  )
-}
+  );
+};
 
 export default Home;

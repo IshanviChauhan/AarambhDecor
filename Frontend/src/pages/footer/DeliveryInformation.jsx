@@ -2,7 +2,7 @@ import React from 'react';
 
 const DeliveryInformation = () => {
     return (
-        <div className="min-h-screen">
+        <div className="bg-gray-50 min-h-screen">
           {/* Hero Section */}
           <div className="bg-white">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center py-16 px-6">
@@ -16,7 +16,7 @@ const DeliveryInformation = () => {
                   order and the order number. Registered users can sign in and track
                   their orders from the order history section on the account page.
                 </p>
-                <button className="mt-6 px-6 py-3 bg-primary-light text-black font-semibold rounded-lg shadow hover:bg-primary-dark transition">
+                <button className="mt-6 px-6 py-3 bg-[#d8f4f2] text-black font-semibold rounded-lg shadow hover:bg-red-600 transition">
                   Track Order
                 </button>
               </div>

@@ -2,7 +2,7 @@ import React from "react";
 
 const ReturnExchange = () => {
   return (
-    <div className="min-h-screen p-10">
+    <div className="bg-gray-50 min-h-screen p-10">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="text-left mb-12">

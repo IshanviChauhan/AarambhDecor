@@ -5,9 +5,9 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const redis = require("redis");
-const client = redis.createClient({
-  url: 'redis://localhost:6379'
-});
+const client = redis.createClient();
+
+
 
 client.on('connect', () => {
   console.log('Redis client connected');
@@ -16,6 +16,13 @@ client.on('connect', () => {
 client.on('error', (err) => {
   console.error('Redis client error:', err);
 })
+
+
+
+
+
+
+
 
 const validateObjectId = (req, res, next) => {
   const { id } = req.params;
@@ -64,7 +71,9 @@ router.get("/search", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const {
+      gender,
       category,
+      color,
       minPrice,
       maxPrice,
       page = 1,
@@ -75,12 +84,28 @@ router.get("/", async (req, res) => {
 
     const filter = {};
 
-    // 1. Category filter
+    // 1. Gender filter
+    if (gender) {
+      const validGenders = ["male", "female"];
+      if (!validGenders.includes(gender.toLowerCase())) {
+        return res.status(400).json({
+          message: "Invalid gender. Use 'male' or 'female'.",
+        });
+      }
+      filter.gender = gender.toLowerCase();
+    }
+
+    // 2. Category filter
     if (category) {
       filter.category = category;
     }
 
-    // 2. Price range filter
+    // 3. Color filter
+    if (color) {
+      filter["colors.value"] = color;
+    }
+
+    // 4. Price range filter
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);

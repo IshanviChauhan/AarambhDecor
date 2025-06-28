@@ -67,7 +67,7 @@ const DealsSection = () => {
       </div>
 
       {/* Content Section */}
-      <div className="flex flex-col md:flex-row justify-between items-center bg-primary-dark bg-opacity-60 text-white p-6 md:p-10  shadow-lg">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-teal-600 bg-opacity-60 text-white p-6 md:p-10  shadow-lg">
         {/* Text Section */}
         <div className="text-center md:text-left flex flex-col md:w-1/2">
           <h4 className="text-2xl md:text-4xl font-bold mb-4">{deal.title}</h4>
@@ -76,19 +76,19 @@ const DealsSection = () => {
 
         {/* Countdown Section */}
         <div className="grid grid-cols-4 gap-4 mt-6 md:mt-0 md:w-auto">
-          <div className="flex flex-col items-center justify-center bg-white text-primary-dark p-4 md:p-6 rounded-lg shadow-md">
+          <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
             <h4 className="text-lg md:text-2xl font-bold">{countdown.days || "0"}</h4>
             <p className="text-xs md:text-sm">Days</p>
           </div>
-          <div className="flex flex-col items-center justify-center bg-white text-primary-dark p-4 md:p-6 rounded-lg shadow-md">
+          <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
             <h4 className="text-lg md:text-2xl font-bold">{countdown.hours || "0"}</h4>
             <p className="text-xs md:text-sm">Hours</p>
           </div>
-          <div className="flex flex-col items-center justify-center bg-white text-primary-dark p-4 md:p-6 rounded-lg shadow-md">
+          <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
             <h4 className="text-lg md:text-2xl font-bold">{countdown.minutes || "0"}</h4>
             <p className="text-xs md:text-sm">Minutes</p>
           </div>
-          <div className="flex flex-col items-center justify-center bg-white text-primary-dark p-4 md:p-6 rounded-lg shadow-md">
+          <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
             <h4 className="text-lg md:text-2xl font-bold">{countdown.seconds || "0"}</h4>
             <p className="text-xs md:text-sm">Seconds</p>
           </div>
