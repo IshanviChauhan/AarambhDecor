@@ -41,7 +41,7 @@ const Footer = () => {
       </footer>
 
       {/* Bottom Footer */}
-      <footer className="section__container3 text-black text-center p-4 lg:flex lg:justify-between flex-col lg:flex-row">
+      <footer className="section__container3 bg-extra-light text-black text-center p-4 lg:flex lg:justify-between flex-col lg:flex-row">
         <p className="text-sm">©2025 Copyright Aarambh Decor. All Rights Reserved.</p>
         {/* <p className="text-sm">By Ishanvi Chauhan</p> */}
       </footer>

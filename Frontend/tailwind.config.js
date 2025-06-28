@@ -26,8 +26,8 @@ export default {
         'primary-light': '#FFB4A2',
         'text-dark': '#0f172a', 
         'text-light': '#B5828C', 
-        'extra-light': '#FFCDB2',
-        'primary-light-light': '#FFCDB2',
+        'extra-light': '#F5E1D7',
+        'primary-light-light': '#F5E1D7',
       }
       
     },
