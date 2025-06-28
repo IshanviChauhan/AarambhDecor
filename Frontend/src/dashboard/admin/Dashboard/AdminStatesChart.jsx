@@ -89,6 +89,14 @@ const AdminStatsChart = ({ stats }) => {
           </ChartContainer>
         </div>
       </div>
+      <div className="mt-6 flex justify-end">
+        <button
+          className="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark"
+        >
+          <i className="ri-download-2-line -ml-1 mr-2"></i>
+          Download Yearly Report
+        </button>
+      </div>
     </div>
   );
 };
