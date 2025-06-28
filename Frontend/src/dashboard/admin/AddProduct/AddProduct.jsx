@@ -36,10 +36,10 @@ const AddProduct = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setProduct({
-            ...product,
+        setProduct(prevProduct => ({
+            ...prevProduct,
             [name]: type === 'checkbox' ? checked : value
-        });
+        }));
     };
 
     const handleSubmit = async (e) => {
