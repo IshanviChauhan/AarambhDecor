@@ -1,25 +1,41 @@
-import React from 'react'
+import React from 'react';
 
 const PromoBanner = () => {
-  return (
-    <section className='section__container banner__container'>
-<div className='banner__card'>
-    <span> <i className="ri-vip-diamond-line"></i></span>
-<h4>Premium Products</h4>
-<p>Top-notch quality for all your needs.</p>
-</div>
-<div className='banner__card'>
-    <span> <i className="ri-truck-fill"></i></span>
-<h4>Free Delivery</h4>
-<p>Fast and free delivery, always on time!</p>
-</div>
-<div className='banner__card'>
-    <span> <i className="ri-money-rupee-circle-fill"></i></span>
-<h4>Best Value</h4>
-<p>Unbeatable deals that fit your budget.</p>
-</div>
-    </section>
-  )
-}
+  const features = [
+    {
+      icon: <i className="ri-vip-diamond-line text-primary text-3xl"></i>,
+      title: "Premium Products",
+      description: "Top-notch quality for all your needs."
+    },
+    {
+      icon: <i className="ri-truck-line text-primary text-3xl"></i>,
+      title: "Free Delivery",
+      description: "Fast and free delivery, always on time!"
+    },
+    {
+      icon: <i className="ri-money-rupee-circle-line text-primary text-3xl"></i>,
+      title: "Best Value",
+      description: "Unbeatable deals that fit your budget."
+    }
+  ];
 
-export default PromoBanner
+  return (
+    <section className='bg-stone-50'>
+      <div className='max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-8 text-center'>
+          {features.map((feature, index) => (
+            <div key={index} className='flex flex-col items-center'>
+              <div className='mb-4'>
+                {feature.icon}
+              </div>
+              <h4 className='text-xl font-semibold font-header text-stone-800'>{feature.title}</h4>
+              <p className='mt-2 text-stone-600'>{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default PromoBanner;

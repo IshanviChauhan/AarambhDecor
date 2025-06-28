@@ -29,67 +29,32 @@ const Categories = () => {
   ];
 
   return (
-    <div className="mx-auto mt-16 max-w-[1200px]">
-      {/* Desktop View */}
-      <div className="hidden grid-cols-6 gap-8 md:grid">
-        {categories.map((category, index) => (
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold text-stone-800 font-header">Shop by Category</h2>
+        <p className="mt-2 text-stone-600">Explore our curated collections.</p>
+      </div>
+
+      {/* Desktop & Mobile Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+        {categories.map((category) => (
           <Link
-            key={index}
+            key={category.name}
             to={`/shop/category/${category.path}`}
-            className="text-center transition-transform duration-500 hover:scale-105 hover:shadow-lg"
+            className="group text-center"
           >
-            <img
-              src={category.image}
-              alt={category.name}
-              className="mx-auto mb-4 max-w-[100px] rounded-lg border-4 border-primary-light shadow-md transition-transform duration-300 hover:scale-110 hover:shadow-xl"
-            />
-            <h4 className="font-header text-lg font-semibold text-dark">
+            <div className="w-full aspect-square bg-stone-100 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+              <img
+                src={category.image}
+                alt={category.name}
+                className="w-3/4 h-3/4 object-contain transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
+            <h4 className="mt-4 font-semibold text-stone-700 tracking-wide transition-colors group-hover:text-primary">
               {category.name}
             </h4>
           </Link>
         ))}
-      </div>
-
-      {/* Mobile View - Two Horizontal Rows */}
-      <div className="overflow-x-auto space-y-4 md:hidden scrollbar-hide  px-5">
-        <div className="flex space-x-6 ">
-          {categories.slice(0, 6).map((category, index) => (
-           <Link
-           key={index}
-           to={`/shop/category/${category.path}`}
-           className="flex-shrink-0 text-center transition-transform duration-500 hover:scale-105 hover:shadow-lg w-[100px]" // Ensures all cards have the same width
-         >
-           <img
-             src={category.image}
-             alt={category.name}
-             className="mx-auto mb-2 w-full rounded-lg border-2 border-primary-light"
-           />
-           <h4 className="text-xs font-semibold w-full text-center truncate">
-             {category.name}
-           </h4>
-         </Link>
-         
-          ))}
-        </div>
-        <div className="flex space-x-6 ">
-          {categories.slice(6).map((category, index) => (
-           <Link
-           key={index}
-           to={`/shop/category/${category.path}`}
-           className="flex-shrink-0 text-center transition-transform duration-500 hover:scale-105 hover:shadow-lg w-[100px]" // Ensures all cards have the same width
-         >
-           <img
-             src={category.image}
-             alt={category.name}
-             className="mx-auto mb-2 w-full rounded-lg border-2 border-primary-light"
-           />
-           <h4 className="text-xs font-semibold w-full text-center truncate">
-             {category.name}
-           </h4>
-         </Link>
-         
-          ))}
-        </div>
       </div>
     </div>
   );
