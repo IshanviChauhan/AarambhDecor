@@ -8,7 +8,7 @@ const CategoryPage = () => {
 
   // Use the fetchAllProducts query, passing the category name
   const { data, error, isLoading } = useFetchAllProductsQuery({
-    category: categoryName !== 'all' ? categoryName : '', // Filter by category, or get all if 'all'
+    category: categoryName !== 'all' ? categoryName.replace(/\+/g, ' ') : '', // Filter by category, or get all if 'all'
   });
 
   // Scroll to top when page loads
@@ -18,24 +18,19 @@ const CategoryPage = () => {
 
   // Category images mapping
   const categoryImages = {
-    "Earrings": '/1.png',
-    "Necklaces": '/2.png',
-    "Studs": '/3.png',
-    "Bracelets": '/4.png',
-    "Rings": '/5.png',
-    "Anklets": '/6.png',
-    "Idols & Coins": '/7,png',
-    "Men's Jewellery": '/8.png',
-    "Kid's Jewellery": '/9.png',
-    "Bridal Jewellery": '/10.png',
-    "Fashion Jewellery": '/11.png',
-    "Gold Jewellery": '/12.png',
-    "all": '/defau' // Default image for 'all' or unspecified categories
+    "Mirrors": '/1.png',
+    "Table Decor": '/2.png',
+    "Tables": '/3.png',
+    "Wall Accents": '/4.png',
+    "Wall Art": '/5.png',
+    "Wall Shelves": '/6.png',
+    "all": '/default.jpg' // Default image for 'all' or unspecified categories
   };
 
   // Get image URL based on categoryName
+  const decodedCategoryName = categoryName.replace(/\+/g, ' ');
   const categoryImage =
-    categoryImages[categoryName] || '/images/default.jpg'; // Fallback to default
+    categoryImages[decodedCategoryName] || '/images/default.jpg'; // Fallback to default
 
   return (
     <>
@@ -43,7 +38,7 @@ const CategoryPage = () => {
         <div className="relative">
           <img
             src={categoryImage}
-            alt={`${categoryName} banner`}
+            alt={`${decodedCategoryName} banner`}
             className="w-full h-full  rounded-lg"
           />
        

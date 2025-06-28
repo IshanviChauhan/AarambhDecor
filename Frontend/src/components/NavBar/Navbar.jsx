@@ -74,27 +74,18 @@ const Navbar = () => {
 
   const dropdownMenus = user?.role === "admin" ? adminDropdownMenus : userDropdownMenus;
 
-  // For Her Categories
+  // Updated Categories
   const forHerCategories = [
-    { label: "Earrings", path: "/gender/female/category/Earrings" },
-    { label: "Necklaces", path: "/gender/female/category/Necklaces" },
-    { label: "Bracelets", path: "/gender/female/category/Bracelets" },
-    { label: "Rings", path: "/gender/female/category/Rings" },
-    { label: "Studs", path: "/gender/female/category/Studs" },
-    { label: "Ankles", path: "/gender/female/category/Ankles" },
-    { label: "Fashion Jewelry", path: "/gender/female/category/Fashion+Jewelry" },
-    { label: "Gold Jewelry", path: "/gender/female/category/Gold+Jewelry" },
+    { label: "Mirrors", path: "/shop/category/Mirrors" },
+    { label: "Table Decor", path: "/shop/category/Table+Decor" },
+    { label: "Tables", path: "/shop/category/Tables" },
+    { label: "Wall Accents", path: "/shop/category/Wall+Accents" },
+    { label: "Wall Art", path: "/shop/category/Wall+Art" },
+    { label: "Wall Shelves", path: "/shop/category/Wall+Shelves" },
   ];
-  
-  const forHimCategories = [
-    { label: "Bracelets", path: "/gender/male/category/Bracelets" },
-    { label: "Studs", path: "/gender/male/category/Studs" },
-    { label: "Chain", path: "/gender/male/category/Chain" },
-    { label: "Rings", path: "/gender/male/category/Rings" },
-    { label: "Gold Jewelry", path: "/gender/male/category/Gold+Jewelry" },
-    { label: "Fashion Jewelry", path: "/gender/male/category/Fashion+Jewelry" },
-  ];
-  
+
+  const forHimCategories = [];
+
 
   return (
     <>

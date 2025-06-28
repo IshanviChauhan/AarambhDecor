@@ -9,19 +9,12 @@ import Select from "react-select";
 
 const categories = [
     { label: 'Select Category', value: '' },
-    { label: 'Earrings', value: 'Earrings' },
-    { label: 'Necklaces', value: 'Necklaces' },
-    { label: 'Studs', value: 'Studs' },
-    { label: 'Bracelets', value: 'Bracelets' },
-    { label: 'Rings', value: 'Rings' },
-    { label: 'Anklets', value: 'Anklets' },
-    { label: 'Idols & Coins', value: 'Idols & Coins' },
-    { label: "Men's Jewellery", value: "Men's Jewellery" },
-    { label: 'Kid\'s Jewellery', value: 'Kid\'s Jewellery' },
-    { label: 'Bridal Jewellery', value: 'Bridal Jewellery' },
-    { label: 'Fashion Jewellery', value: 'Fashion Jewellery' },
-    { label: 'Gold Jewellery', value: 'Gold Jewellery' },
-    { label: 'Chain', value: 'Chain' }
+    { label: 'Mirrors', value: 'Mirrors' },
+    { label: 'Table Decor', value: 'Table Decor' },
+    { label: 'Tables', value: 'Tables' },
+    { label: 'Wall Accents', value: 'Wall Accents' },
+    { label: 'Wall Art', value: 'Wall Art' },
+    { label: 'Wall Shelves', value: 'Wall Shelves' }
 ];
 
 const colorOptions = [

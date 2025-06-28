@@ -18,12 +18,6 @@ client.on('error', (err) => {
 })
 
 
-
-
-
-
-
-
 const validateObjectId = (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {

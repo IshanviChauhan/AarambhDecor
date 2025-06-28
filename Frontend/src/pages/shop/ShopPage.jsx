@@ -5,8 +5,7 @@ import { useFetchAllProductsQuery } from '../../redux/features/products/products
 
 const filters = {
   categories: [
-    "All", "Earrings", "Necklaces", "Studs", "Bracelets", "Chain","Rings", "Anklets",
-    "Idols & Coins", "Men's Jewellery", "Kid's Jewellery", "Bridal Jewellery", "Fashion Jewellery", "Gold Jewellery ",
+    "All", "Mirrors", "Table Decor", "Tables", "Wall Accents", "Wall Art", "Wall Shelves",
   ],
   colors: ["All", "Silver", "Gold", "Rose Gold"],
   priceRanges: [

@@ -9,10 +9,12 @@ import Select from "react-select";
 
 const categories = [
   { label: "Select Category", value: "" },
-  { label: "Earrings", value: "Earrings" },
-  { label: "Necklaces", value: "Necklaces" },
-  { label: "Bracelets", value: "Bracelets" },
-  { label: "Rings", value: "Rings" },
+  { label: "Mirrors", value: "Mirrors" },
+  { label: "Table Decor", value: "Table Decor" },
+  { label: "Tables", value: "Tables" },
+  { label: "Wall Accents", value: "Wall Accents" },
+  { label: "Wall Art", value: "Wall Art" },
+  { label: "Wall Shelves", value: "Wall Shelves" },
 ];
 
 const colorOptions = [

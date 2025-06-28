@@ -166,7 +166,7 @@ const ManageProducts = () => {
                                         className="text-blueGray-500 hover:text-blueGray-800"
                                     >
                                         {" "}
-                                       Maurya
+                                        Maurya
                                     </a>
 
                                     .
