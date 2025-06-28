@@ -88,15 +88,18 @@ const ShopPage = () => {
       <section className='section__container'>
         <div className='flex flex-col md:flex-row md:gap-12 gap-8'>
           {/* Left Side (Filters) */}
-          <ShopFiltering
-            filters={filters}
-            filtersState={filtersState}
-            setFiltersState={setFiltersState}
-            clearFilters={clearFilters}
-          />
+          <div className="md:w-1/4 lg:w-1/5">
+            <ShopFiltering
+              filters={filters}
+              filtersState={filtersState}
+              setFiltersState={setFiltersState}
+              clearFilters={clearFilters}
+            />
+          </div>
+
 
           {/* Right Side (Product Display) */}
-          <div>
+          <div className="flex-1">
             <h3 className='text-xl font-medium mb-4'>
               Showing {products.length > 0 ? startProduct : 0} to {products.length > 0 ? endProduct : 0} of {totalProducts} products
             </h3>
