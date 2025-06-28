@@ -21,17 +21,16 @@ export default {
         },
       },
       colors: {
-        'primary': '#78a8a6', 
-'primary-dark': '#4d6c6a', 
-'primary-light': '#9bccca', 
-'text-dark': '#0f172a', 
-'text-light': '#64748b', 
-'extra-light': '#faf3dd', 
-'primary-light-light': '#B3E3DF',
+        'primary': '#E5989B',
+        'primary-dark': '#B5838D',
+        'primary-light': '#FFCDB2',
+        'text-dark': '#0f172a',
+        'text-light': '#6D6875',
+        'extra-light': '#FFF1E6',
+        'primary-light-light': '#FFB4A2',
       }
       
     },
   },
   plugins: [],
 }
-

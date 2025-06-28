@@ -31,7 +31,7 @@ const ContactUs = () => {
             <p className="text-gray-600 mt-2">
               Have questions? Give us a call, and we’ll be happy to assist you.
             </p>
-            <p className="text-blue-600 font-bold mt-4 text-lg">+91 9773690444</p>
+            <p className="text-blue-600 font-bold mt-4 text-lg">+91 9870232231</p>
           </div>
 
           {/* Email Card */}
@@ -49,7 +49,7 @@ const ContactUs = () => {
               you as soon as possible.
             </p>
             <p className="text-blue-600 font-bold mt-4 text-lg">
-              <a href="mailto:info@aarambhdecor.com">info@aarambhdecor.com</a>
+              <a href="mailto:info@aarambhdecor.com">aarambhdecor.delhi@gmail.com</a>
             </p>
           </div>
         </div>

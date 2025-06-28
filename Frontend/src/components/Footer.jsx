@@ -33,16 +33,17 @@ const Footer = () => {
         {/* Contact Us */}
         <div className="footer__col text-center lg:text-left mt-4 lg:mt-0">
           <h4 className="text-lg font-semibold mb-2">Contact Us</h4>
-          <p className="text-black text-sm">+91 9773690444</p>
+          <p className="text-black text-sm">+91 9870232231</p>
           <Link to="/contact-us" className="block text-sm">Chat With Us</Link>
-          <Link to="/" className="block text-sm">WhatsApp Chat With Us</Link>
+          <Link to="https://chat.whatsapp.com/F7s9qoIos56HiZBbN1H2O3" className="block text-sm">Join our WhatsApp Community</Link>
+          <Link to="https://www.instagram.com/_aarambh_decor/" className="block text-sm">Join us on Instagram</Link>
         </div>
       </footer>
 
       {/* Bottom Footer */}
       <footer className="section__container3 text-black text-center p-4 lg:flex lg:justify-between flex-col lg:flex-row">
         <p className="text-sm">©2025 Copyright Aarambh Decor. All Rights Reserved.</p>
-        <p className="text-sm">Powered by RBSH Studio</p>
+        {/* <p className="text-sm">By Ishanvi Chauhan</p> */}
       </footer>
     </>
   );

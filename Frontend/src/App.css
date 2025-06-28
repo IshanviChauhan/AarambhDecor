@@ -3,12 +3,12 @@
 
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 :root {
-  --primary-color: #4d6c6a;
-  --primary-color-dark: #78a8a6;
-  --primary-color-light: #9bccca;
+  --primary-color: #E5989B;
+  --primary-color-dark: #B5838D;
+  --primary-color-light: #FFCDB2;
   --text-dark: #0f172a;
-  --text-light: #aadfdb;
-  --extra-light: #f8fafc;
+  --text-light: #6D6875;
+  --extra-light: #FFF1E6;
   --white: #ffffff;
   --max-width-1600: 1600px;
   --max-width-1400: 1400px;
