@@ -78,8 +78,12 @@ router.get("/:userId", async (req, res) => {
   try {
     const reviews = await Reviews.find({ userId: userId }).sort({ createdAt: -1 });
 
-    // Instead of returning 404, return 200 with an empty array
-    // This is better practice as "no reviews" is not a server error.
+    if (reviews.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No reviews found for this user" });
+    }
+
     res.status(200).json(reviews);
   } catch (error) {
     console.error("Error fetching reviews by user:", error);

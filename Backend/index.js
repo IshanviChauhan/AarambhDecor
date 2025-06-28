@@ -1,4 +1,3 @@
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -12,14 +11,14 @@ require("dotenv").config();
 const uploadImage = require("./utils/uploadimage");
 
 const app = express();
-const port = process.env.PORT || 4001;
+const port = process.env.PORT || 4000;
 
 app.use(helmet());
 
 // CORS Configuration
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL || "http://localhost:5174" ],
+    origin: [process.env.FRONTEND_URL || "http://localhost:5173" ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -65,6 +64,23 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/coupon", couponRoutes);
 
 // =======================
+// Database Connection
+// =======================
+async function connectToDatabase() {
+    try {
+      await mongoose.connect(process.env.DB_URL, {
+        maxPoolSize: 10, // Connection pooling for better performance
+      });
+      console.log("MongoDB connected successfully!");
+    } catch (error) {
+      console.error("Error connecting to MongoDB:", error.message);
+      process.exit(1); // Exit process if connection fails
+    }
+  }
+  
+connectToDatabase();
+
+// =======================
 // Utility Route (Image Upload)
 // =======================
 app.post("/api/uploadImage", async (req, res) => {
@@ -101,28 +117,8 @@ app.use((err, req, res, next) => {
 });
 
 // =======================
-// Start Server and Database Connection
+// Start Server
 // =======================
-const startServer = async () => {
-  try {
-    await mongoose.connect(process.env.DB_URL, {
-      maxPoolSize: 10, // Connection pooling for better performance
-    });
-    console.log("MongoDB connected successfully!");
-
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  } catch (error) {
-    console.error("Failed to connect to MongoDB. Server will not start.");
-    console.error("Error:", error.message);
-    if (error.code === 'ENOTFOUND' || error.name === 'MongoServerSelectionError' || error.name === 'MongooseServerSelectionError') {
-      console.error(
-        "\nHint: This is often a DNS or network issue. " +
-        "Please check your DB_URL in the .env file and ensure your database service is running and accessible from your network.\n"
-      );
-    }
-  }
-};
-
-startServer();
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

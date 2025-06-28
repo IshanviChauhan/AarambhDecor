@@ -5,35 +5,40 @@ import heroimg3 from "../../assets/background3.png"
 import heroimg4 from "../../assets/background4.png"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules'; // Import necessary modules
-import 'swiper/swiper-bundle.css';
+import 'swiper/swiper-bundle.css'; 
 
-const cards = [
+const cards =[
+
   {
     id: 1,
     image: heroimg1,
-    title: 'Living Room Inspiration'
+    title:'papple'
+
   },
   {
-    id: 2,
+    id: 1,
     image: heroimg2,
-    title: 'Modern Kitchen Decor'
+    title:'papple'
+
   },
   {
-    id: 3,
+    id: 1,
     image: heroimg3,
-    title: 'Cozy Bedroom Finds'
+    title:'papple'
+
   },
   {
-    id: 4,
+    id: 1,
     image: heroimg4,
-    title: 'Outdoor & Patio'
+    title:'papple'
+
   },
 ]
 
 const Hero = () => {
   return (
     <section className='section__container'>
-      <Swiper
+      <Swiper 
         modules={[Autoplay, Pagination, Navigation]}
         spaceBetween={30}
         slidesPerView={1}
@@ -49,7 +54,7 @@ const Hero = () => {
         {cards.map((card) => (
           <SwiperSlide key={card.id}>
             <div className='hero__card'>
-              <img src={card.image} alt={card.title} className='w-full h-auto rounded-lg' />
+              <img src={card.image} alt={card.title} className='w-full h-auto' />
             </div>
           </SwiperSlide>
         ))}

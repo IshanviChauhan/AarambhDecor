@@ -6,20 +6,19 @@ import { useFetchAllProductsQuery } from '../../redux/features/products/products
 const filters = {
   categories: [
     "All", "Earrings", "Necklaces", "Studs", "Bracelets", "Chain","Rings", "Anklets",
-    "Idols & Coins", "Men's Jewellery", "Kid's Jewellery", "Bridal Jewellery", "Fashion Jewellery", "Gold Jewellery",
+    "Idols & Coins", "Men's Jewellery", "Kid's Jewellery", "Bridal Jewellery", "Fashion Jewellery", "Gold Jewellery ",
   ],
-  colors: ["All", "Silver", "Gold", "Rose Gold", "Platinum"],
+  colors: ["All", "Silver", "Gold", "Rose Gold"],
   priceRanges: [
     { label: "All", min: '', max: '' },
     { label: "Under RS 1500", min: 0, max: 1500 },
-    { label: "RS 1500 - RS 3000", min: 1500, max: 3000 },
-    { label: "RS 3000 - RS 5000", min: 3000, max: 5000 },
+    { label: "Under RS 3000", min: 1500, max: 3000 },
+    { label: "Under RS 5000", min: 3000, max: 5000 },
     { label: "Over RS 5000", min: 5000, max: '' },
   ],
 };
 
 const ShopPage = () => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filtersState, setFiltersState] = useState({
     category: 'All',
     color: 'All',
@@ -27,26 +26,32 @@ const ShopPage = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(12);
+  const [productsPerPage] = useState(20);
 
   const { category, color, priceRange } = filtersState;
 
+  // Determine filters for the query
   const categoryFilter = category !== 'All' ? category : '';
   const colorFilter = color !== 'All' ? color : '';
 
   let minPrice = '';
   let maxPrice = '';
   if (priceRange) {
-    const [min, max] = priceRange.split('-').map(val => val.trim());
-    minPrice = min || '';
-    maxPrice = max || '';
+    const [min, max] = priceRange.split('-').map(Number);
+    if (!isNaN(min)) {
+      minPrice = min;
+    }
+    // max might be empty for "Over RS 5000"
+    if (!isNaN(max)) {
+      maxPrice = max;
+    }
   }
-  
+
   const { data: { products = [], totalPages = 1, totalProducts = 0 } = {}, error, isLoading } = useFetchAllProductsQuery({
     category: categoryFilter || undefined,
     color: colorFilter || undefined,
-    minPrice: minPrice !== '' ? Number(minPrice) : undefined,
-    maxPrice: maxPrice !== '' ? Number(maxPrice) : undefined,
+    minPrice: minPrice !== '' ? minPrice : undefined,
+    maxPrice: maxPrice !== '' ? maxPrice : undefined,
     page: currentPage,
     limit: productsPerPage
   });
@@ -66,81 +71,64 @@ const ShopPage = () => {
     setCurrentPage(1);
   };
 
-  const startProduct = totalProducts > 0 ? (currentPage - 1) * productsPerPage + 1 : 0;
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading products.</p>;
+
+  const startProduct = (currentPage - 1) * productsPerPage + 1;
   const endProduct = startProduct + products.length - 1;
 
   return (
     <>
       <section className="section__container3">
         <img 
-          src="/shoppage.png" 
-          alt="Shop All Collections" 
-          className="w-full h-auto object-cover" 
+          src="shoppage.png" 
+          alt="Shop Page GIF" 
+          className="w-full rounded" 
         />
       </section>
       <section className='section__container'>
-        <div className='flex flex-col lg:flex-row lg:gap-8'>
-          {/* Filter Toggle for Mobile */}
-          <div className="lg:hidden mb-4 flex justify-between items-center">
-            <button 
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="btn flex items-center gap-2"
-            >
-              <i className="ri-filter-3-line"></i>
-              {isFilterOpen ? 'Hide' : 'Show'} Filters
-            </button>
-            <p className="text-sm text-gray-600">
-                Showing {startProduct}-{endProduct} of {totalProducts}
-            </p>
-          </div>
-
+        <div className='flex flex-col md:flex-row md:gap-12 gap-8'>
           {/* Left Side (Filters) */}
-          <div className={`lg:w-1/4 lg:block ${isFilterOpen ? 'block' : 'hidden'}`}>
-            <ShopFiltering
-              filters={filters}
-              filtersState={filtersState}
-              setFiltersState={setFiltersState}
-              clearFilters={clearFilters}
-            />
-          </div>
+          <ShopFiltering
+            filters={filters}
+            filtersState={filtersState}
+            setFiltersState={setFiltersState}
+            clearFilters={clearFilters}
+          />
 
           {/* Right Side (Product Display) */}
-          <div className="lg:w-3/4">
-             <div className="hidden lg:flex justify-between items-center mb-4">
-                <h3 className='text-md font-medium'>
-                  Showing {startProduct} to {endProduct} of {totalProducts} products
-                </h3>
-                {/* Sorting dropdown can be added here */}
-             </div>
-            
-            {isLoading && <p>Loading products...</p>}
-            {error && <p className="text-red-500">Error loading products.</p>}
-            {!isLoading && products.length === 0 && <p>No products found matching your criteria.</p>}
-            
+          <div>
+            <h3 className='text-xl font-medium mb-4'>
+              Showing {products.length > 0 ? startProduct : 0} to {products.length > 0 ? endProduct : 0} of {totalProducts} products
+            </h3>
             <ProductCards products={products} />
 
             {/* Pagination controls */}
-            {totalPages > 1 && (
-                <div className="mt-8 flex justify-center items-center gap-2">
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md mr-2"
+              >
+                Previous
+              </button>
+              {[...Array(totalPages)].map((_, index) => (
                 <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'} rounded-md mx-1`}
                 >
-                    Previous
+                  {index + 1}
                 </button>
-                <span className="text-gray-600">
-                    Page {currentPage} of {totalPages}
-                </span>
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
-                >
-                    Next
-                </button>
-                </div>
-            )}
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </section>

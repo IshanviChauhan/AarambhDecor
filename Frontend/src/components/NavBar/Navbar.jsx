@@ -26,9 +26,7 @@ const Navbar = () => {
   const userId = user?._id;
 
   // Fetch Cart Items
-  const { data: products = [] } = useFetchCartQuery(userId, {
-    skip: !userId,
-  });
+  const { data: products = [] } = useFetchCartQuery(userId);
 
   // Logout
   const [logoutUser] = useLogoutUserMutation();

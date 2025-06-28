@@ -9,7 +9,7 @@ const ContactUs = () => {
           <h1 className="text-4xl font-bold w-full text-gray-800">Get in touch</h1>
           <p className="text-gray-600 mt-4 w-3/4">
             For any queries regarding cancellations, feel free to contact our
-            customer support team. At Himtaj Jewelry, we are committed to
+            customer support team. At Aarambh Decor, we are committed to
             providing a transparent and hassle-free shopping experience. If you
             have further questions, please reach out, and we’ll be happy to
             assist you.
@@ -49,7 +49,7 @@ const ContactUs = () => {
               you as soon as possible.
             </p>
             <p className="text-blue-600 font-bold mt-4 text-lg">
-              <a href="mailto:info@himtajjewelry.com">info@himtajjewelry.com</a>
+              <a href="mailto:info@aarambhdecor.com">info@aarambhdecor.com</a>
             </p>
           </div>
         </div>

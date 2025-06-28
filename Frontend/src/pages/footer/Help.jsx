@@ -4,7 +4,7 @@ const faqs = [
   {
     icon: "https://cdn-icons-png.flaticon.com/512/1087/1087815.png",
     title: "What are the payment options available?",
-    description: `Payments can be made through credit cards, debit cards, international cards, net banking, or cash on delivery. Payments on www.himtajjewelry.com will only be accepted in INR for domestic orders. For international credit cards, the transaction amount will be converted to INR before the payment is accepted. Currency conversion charges may apply based on your credit card policy.`,
+    description: `Payments can be made through credit cards, debit cards, international cards, net banking, or cash on delivery. Payments on www.aarambhdecor.com will only be accepted in INR for domestic orders. For international credit cards, the transaction amount will be converted to INR before the payment is accepted. Currency conversion charges may apply based on your credit card policy.`,
   },
   {
     icon: "https://cdn-icons-png.flaticon.com/512/1424/1424453.png",
@@ -15,7 +15,7 @@ const faqs = [
   {
     icon: "https://cdn-icons-png.flaticon.com/512/1170/1170576.png",
     title: "Is Cash on Delivery available?",
-    description: `If you are not comfortable making an online payment on www.himtajjewelry.com, you can opt for the Cash on Delivery (COD) payment method instead. With COD, you can pay in cash at the time of delivery. The maximum order value for COD is INR 5,000. Please note, this is strictly a cash-only payment method.`,
+    description: `If you are not comfortable making an online payment on www.aarambhdecor.com, you can opt for the Cash on Delivery (COD) payment method instead. With COD, you can pay in cash at the time of delivery. The maximum order value for COD is INR 5,000. Please note, this is strictly a cash-only payment method.`,
   },
 ];
 
@@ -29,7 +29,7 @@ const HelpFAQ = () => {
             <h1 className="text-4xl font-bold ">Help & FAQ</h1>
             <p className="mt-4 0">
               Find answers to the most frequently asked questions about payments
-              and delivery options at Himtaj Jewelry.
+              and delivery options at Aarambh Decor.
             </p>
           </div>
           <div className="md:w-1/2 mt-8 md:mt-0">
@@ -83,7 +83,7 @@ const HelpFAQ = () => {
       <span>Call Us</span>
     </a>
     <a
-      href="mailto:info@himtajjewelry.com"
+      href="mailto:info@aarambhdecor.com"
       className="flex items-center space-x-2 bg-gray-200 text-blue-800 px-4 py-2 rounded-lg shadow-md hover:bg-gray-300 transition"
     >
       <img
