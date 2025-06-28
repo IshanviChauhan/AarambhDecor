@@ -77,13 +77,13 @@ const AdminStatsChart = ({ stats }) => {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Analytics Overview</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
+      <div className="space-y-6">
+        <div>
           <ChartContainer title="Monthly Earnings">
             <Line data={lineData} options={options} />
           </ChartContainer>
         </div>
-        <div className="lg:col-span-2">
+        <div>
           <ChartContainer title="Statistics Breakdown">
             <Pie data={pieData} options={{ ...options, plugins: { legend: { position: 'right' }}}} />
           </ChartContainer>
