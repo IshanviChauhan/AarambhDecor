@@ -72,6 +72,11 @@ const UpdateProduct = () => {
       author: user?._id,
     };
 
+    if (!updatedProductPayload.name || !updatedProductPayload.category || !updatedProductPayload.price || !updatedProductPayload.image) {
+        alert("Please ensure all required fields are filled: Name, Category, Price, and Main Image.");
+        return;
+    }
+
     try {
       await updateProduct({ id, ...updatedProductPayload }).unwrap();
       alert("Product updated successfully!");

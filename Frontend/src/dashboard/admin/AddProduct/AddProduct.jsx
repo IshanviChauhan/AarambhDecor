@@ -44,6 +44,11 @@ const AddProduct = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!product.name || !product.category || !product.price || !mainImage) {
+            alert("Please fill in all required fields: Name, Category, Price, and Main Image.");
+            return;
+        }
       
         const newProduct = {
           ...product,
