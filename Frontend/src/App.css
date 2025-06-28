@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 
 @import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -15,7 +15,7 @@
   --max-width-1400: 1400px;
   --max-width-1200: 1200px;
   --max-width-900: 900px;
-  --header-font: "Inconsolata", monospace;
+  --header-font: "Prompt", sans-serif;
 }
 
 
@@ -86,7 +86,7 @@ a {
 }
 
 body {
-  font-family: "Inconsolata", monospace;
+  font-family: "Prompt", sans-serif;
   background-color: #FDF8F4;
 }
 

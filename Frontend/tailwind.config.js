@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Prompt"', 'sans-serif'],
+      },
       maxWidth: {
         'screen-2xl': '1600px', 
         'custom-1200': '1200px', 
