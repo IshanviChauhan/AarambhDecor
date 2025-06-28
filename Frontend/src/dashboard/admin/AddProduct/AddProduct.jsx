@@ -69,7 +69,7 @@ const AddProduct = () => {
                 <TextInput
                     label="Product Name"
                     name="name"
-                    placeholder="Ex: Golden Sunburst Mirror"
+                    placeholder="E.g., 'Timeless Round Mirror'"
                     value={product.name}
                     onChange={handleChange}
                 />
@@ -109,7 +109,7 @@ const AddProduct = () => {
                         name="material"
                         value={product.material}
                         onChange={handleChange}
-                        placeholder="E.g., 'Gold Plated' or 'Sterling Silver'"
+                        placeholder="E.g., 'Metal'"
                     />
                     <TextInput
                         label="Size"
