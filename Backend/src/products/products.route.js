@@ -18,12 +18,6 @@ client.on('error', (err) => {
 })
 
 
-
-
-
-
-
-
 const validateObjectId = (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -71,7 +65,6 @@ router.get("/search", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const {
-      gender,
       category,
       color,
       minPrice,
@@ -85,15 +78,15 @@ router.get("/", async (req, res) => {
     const filter = {};
 
     // 1. Gender filter
-    if (gender) {
-      const validGenders = ["male", "female"];
-      if (!validGenders.includes(gender.toLowerCase())) {
-        return res.status(400).json({
-          message: "Invalid gender. Use 'male' or 'female'.",
-        });
-      }
-      filter.gender = gender.toLowerCase();
-    }
+    // if (gender) {
+    //   const validGenders = ["male", "female"];
+    //   if (!validGenders.includes(gender.toLowerCase())) {
+    //     return res.status(400).json({
+    //       message: "Invalid gender. Use 'male' or 'female'.",
+    //     });
+    //   }
+    //   filter.gender = gender.toLowerCase();
+    // }
 
     // 2. Category filter
     if (category) {
@@ -101,9 +94,9 @@ router.get("/", async (req, res) => {
     }
 
     // 3. Color filter
-    if (color) {
-      filter["colors.value"] = color;
-    }
+    // if (color) {
+    //   filter["colors.value"] = color;
+    // }
 
     // 4. Price range filter
     if (minPrice || maxPrice) {

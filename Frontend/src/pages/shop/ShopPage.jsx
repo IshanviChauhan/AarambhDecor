@@ -9,10 +9,10 @@ const filters = {
   ],
   priceRanges: [
     { label: "All", min: '', max: '' },
-    { label: "Under RS 1500", min: 0, max: 1500 },
-    { label: "Under RS 3000", min: 1500, max: 3000 },
-    { label: "Under RS 5000", min: 3000, max: 5000 },
-    { label: "Over RS 5000", min: 5000, max: '' },
+    { label: "Under ₹1500", min: '', max: 1500 },
+    { label: "₹1500 - ₹3000", min: 1500, max: 3000 },
+    { label: "₹3000 - ₹5000", min: 3000, max: 5000 },
+    { label: "Over ₹5000", min: 5000, max: '' },
   ],
 };
 
@@ -33,15 +33,17 @@ const ShopPage = () => {
   let minPrice = '';
   let maxPrice = '';
   if (priceRange) {
-    const [min, max] = priceRange.split('-').map(Number);
-    if (!isNaN(min)) {
-      minPrice = min;
+    const [min, max] = priceRange.split('-');
+    if (min && min !== '') {
+      minPrice = parseFloat(min);
     }
-    // max might be empty for "Over RS 5000"
-    if (!isNaN(max)) {
-      maxPrice = max;
+    if (max && max !== '') {
+      maxPrice = parseFloat(max);
     }
   }
+
+  // Debug logging
+  console.log('Filters:', { category, priceRange, minPrice, maxPrice, categoryFilter });
 
   const { data: { products = [], totalPages = 1, totalProducts = 0 } = {}, error, isLoading } = useFetchAllProductsQuery({
     category: categoryFilter || undefined,
@@ -57,6 +59,11 @@ const ShopPage = () => {
     }
   };
 
+  const handleFilterChange = (newFilters) => {
+    setFiltersState(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
   const clearFilters = () => {
     setFiltersState({
       category: 'All',
@@ -65,8 +72,17 @@ const ShopPage = () => {
     setCurrentPage(1);
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading products.</p>;
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="text-lg">Loading products...</div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="text-lg text-red-500">Error loading products: {error.message}</div>
+    </div>
+  );
 
   const startProduct = (currentPage - 1) * productsPerPage + 1;
   const endProduct = startProduct + products.length - 1;
@@ -87,7 +103,7 @@ const ShopPage = () => {
             <ShopFiltering
               filters={filters}
               filtersState={filtersState}
-              setFiltersState={setFiltersState}
+              setFiltersState={handleFilterChange}
               clearFilters={clearFilters}
             />
           </div>

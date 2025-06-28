@@ -12,20 +12,20 @@ export const productsApi = createApi({
     fetchAllProducts: builder.query({
       query: ({
         category,
-        color,
+        // color,
         minPrice,
         maxPrice,
         page = 1,
         limit = 10,
         // Add these fields if your server supports them
-        gender,
+        // gender,
         sortBy = "createdAt",
         sortOrder = "desc",
       }) => {
         const queryParams = new URLSearchParams({
-          ...(gender ? { gender } : {}), // Only include gender if defined
+          // ...(gender ? { gender } : {}), // Only include gender if defined
           ...(category ? { category } : {}),
-          ...(color ? { color } : {}),
+          // ...(color ? { color } : {}),
           ...(minPrice !== undefined ? { minPrice: minPrice.toString() } : {}),
           ...(maxPrice !== undefined ? { maxPrice: maxPrice.toString() } : {}),
           page: page.toString(),
@@ -49,10 +49,6 @@ export const productsApi = createApi({
       query: () => `/trending`,
       providesTags: ["Products"],
     }),
-
-  
-
-
 
     addProduct: builder.mutation({
       query: (newProduct) => ({

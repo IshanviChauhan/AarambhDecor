@@ -27,12 +27,21 @@ import CODSuccess from "../components/CodSucess";
 import PaymentSuccess from "../components/PaymentSucess";
 import UserOrders from "../dashboard/user/UserOrders";
 import ManageOrders from "../dashboard/admin/ManageOrders/ManageOrder";
+import GenderPage from "../pages/category/GenderCategory";
 import DeliveryInformation from "../pages/footer/DeliveryInformation";
 import CancellationPolicy from "../pages/footer/CancellationPolicy";
 import LegalPolicy from "../pages/footer/LegalPolicies";
 import ContactUs from "../pages/footer/ContactUs";
 import HelpFAQ from "../pages/footer/Help";
 import ReturnExchange from "../pages/footer/ReturnAndExchange";
+import GenderCategoryPage from "../pages/category/GenderCategorypage";
+
+
+
+
+
+
+
 
 const router = createBrowserRouter([
   {
@@ -61,6 +70,19 @@ const router = createBrowserRouter([
       {
        path:"/shop/category/:categoryName", element:<CategoryPage />
       },
+
+      {
+        path:"/gender/:gender", element:<GenderPage/>
+       },
+
+       {
+        path:"/gender/:gender/category/:categoryName",
+         element:<GenderCategoryPage/>
+       },
+
+
+
+
       {
         path:"/collection", element:<Collection/>
        },

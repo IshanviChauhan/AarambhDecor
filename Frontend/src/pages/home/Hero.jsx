@@ -16,19 +16,19 @@ const cards =[
 
   },
   {
-    id: 1,
+    id: 2,
     image: heroimg2,
     title:'papple'
 
   },
   {
-    id: 1,
+    id: 3,
     image: heroimg3,
     title:'papple'
 
   },
   {
-    id: 1,
+    id: 4,
     image: heroimg4,
     title:'papple'
 

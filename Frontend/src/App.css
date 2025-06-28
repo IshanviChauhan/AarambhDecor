@@ -28,7 +28,7 @@
 .section__container {
   max-width: var(--max-width-1600);
   margin: auto;
-  padding: 5rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .section__container2 {

@@ -21,8 +21,14 @@ const DealsSection = () => {
   const fetchDeal = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/deal`);
+      if (!response.data) {
+        console.warn("No deal data received");
+        return;
+      }
       setDeal(response.data);
-      startCountdown(response.data.endDate);
+      if (response.data.endDate) {
+        startCountdown(response.data.endDate);
+      }
     } catch (error) {
       console.error("Error fetching deal:", error);
     }
@@ -77,19 +83,27 @@ const DealsSection = () => {
         {/* Countdown Section */}
         <div className="grid grid-cols-4 gap-4 mt-6 md:mt-0 md:w-auto">
           <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
-            <h4 className="text-lg md:text-2xl font-bold">{countdown.days || "0"}</h4>
+            <h4 className="text-lg md:text-2xl font-bold">
+              {countdown.days || "0"}
+            </h4>
             <p className="text-xs md:text-sm">Days</p>
           </div>
           <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
-            <h4 className="text-lg md:text-2xl font-bold">{countdown.hours || "0"}</h4>
+            <h4 className="text-lg md:text-2xl font-bold">
+              {countdown.hours || "0"}
+            </h4>
             <p className="text-xs md:text-sm">Hours</p>
           </div>
           <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
-            <h4 className="text-lg md:text-2xl font-bold">{countdown.minutes || "0"}</h4>
+            <h4 className="text-lg md:text-2xl font-bold">
+              {countdown.minutes || "0"}
+            </h4>
             <p className="text-xs md:text-sm">Minutes</p>
           </div>
           <div className="flex flex-col items-center justify-center bg-white text-teal-700 p-4 md:p-6 rounded-lg shadow-md">
-            <h4 className="text-lg md:text-2xl font-bold">{countdown.seconds || "0"}</h4>
+            <h4 className="text-lg md:text-2xl font-bold">
+              {countdown.seconds || "0"}
+            </h4>
             <p className="text-xs md:text-sm">Seconds</p>
           </div>
         </div>

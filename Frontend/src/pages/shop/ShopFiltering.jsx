@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters }) => {
-    const { category, color, priceRange } = filtersState;
+    const { category, priceRange } = filtersState;
 
     return (
         <div className="space-y-5 flex-shrink-0">
@@ -11,7 +12,7 @@ const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters })
             <div className="flex flex-col space-y-2">
                 <h4 className='font-medium text-lg'>Category</h4>
                 <hr />
-                {filters.categories.map(cat => (
+                {filters?.categories.map(cat => (
                     <label key={cat} className='capitalize cursor-pointer'>
                         <input
                             type="radio"
@@ -26,7 +27,7 @@ const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters })
             </div>
 
             {/* Color Filter */}
-            <div className="flex flex-col space-y-2">
+            {/* <div className="flex flex-col space-y-2">
                 <h4 className='font-medium text-lg'>Color</h4>
                 <hr />
                 {filters.colors.map(col => (
@@ -41,14 +42,24 @@ const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters })
                         <span className='ml-1'>{col}</span>
                     </label>
                 ))}
-            </div>
+            </div> */}
 
             {/* Price Range Filter */}
             <div className="flex flex-col space-y-2">
                 <h4 className='font-medium text-lg'>Price Range</h4>
                 <hr />
-                {filters.priceRanges.map(range => {
-                    const value = (range.min !== '' || range.max !== '') ? `${range.min}-${range.max}` : '';
+                {filters?.priceRanges.map(range => {
+                    let value = '';
+                    if (range.label === 'All') {
+                        value = '';
+                    } else if (range.min !== '' && range.max !== '') {
+                        value = `${range.min}-${range.max}`;
+                    } else if (range.min !== '' && range.max === '') {
+                        value = `${range.min}-`;
+                    } else if (range.min === '' && range.max !== '') {
+                        value = `-${range.max}`;
+                    }
+                    
                     return (
                         <label key={range.label} className='capitalize cursor-pointer'>
                             <input
@@ -70,6 +81,12 @@ const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters })
             </button>
         </div>
     );
+};
+ShopFiltering.propTypes = {
+    filters: PropTypes.object.isRequired,
+    filtersState: PropTypes.object.isRequired,
+    setFiltersState: PropTypes.func.isRequired,
+    clearFilters: PropTypes.func.isRequired,
 };
 
 export default ShopFiltering;

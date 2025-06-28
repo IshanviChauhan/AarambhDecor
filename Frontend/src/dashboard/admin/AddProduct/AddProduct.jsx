@@ -29,7 +29,7 @@ const AddProduct = () => {
         size: '',
         material: '' 
     });
-    const [mainImage, setMainImage] = useState('');
+    const [newImage, setNewImage] = useState('');
     const [additionalImages, setAdditionalImages] = useState([]);
 
     const [addProduct, { isLoading, error }] = useAddProductMutation();
@@ -50,7 +50,9 @@ const AddProduct = () => {
             [name]: type === 'checkbox' ? checked : value
         });
     };
-
+ const handleImageUpload = (url) => {
+    setNewImage(url);
+  };
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -61,7 +63,7 @@ const AddProduct = () => {
       
         const newProduct = {
           ...product,
-          image: mainImage,
+          image: newImage || product.image,
           additionalImages,
           author: user?._id, // Ensure author is included
         };
@@ -69,7 +71,8 @@ const AddProduct = () => {
         console.log("Submitting Product Data:", newProduct); // Debug payload
 
         try {
-          const response = await addProduct(newProduct).unwrap();
+        //   const response = await addProduct(newProduct).unwrap();
+          await addProduct(newProduct).unwrap();
           alert("Product added successfully!");
           navigate("/shop");
         } catch (err) {
@@ -140,7 +143,7 @@ const AddProduct = () => {
                     <UploadImage
                         label="Main Product Image"
                         name="mainImage"
-                        setImage={(url) => setMainImage(url)}
+                        setImage={handleImageUpload}
                     />
                     <UploadImage
                         label="Additional Images (Optional)"
