@@ -75,7 +75,7 @@ const Navbar = () => {
 
   const dropdownMenus = user?.role === "admin" ? adminDropdownMenus : userDropdownMenus;
 
-  const forHerCategories = [
+  const categories = [
     { label: "Mirrors", path: "/shop/category/Mirrors" },
     { label: "Table Decor", path: "/shop/category/Table+Decor" },
     { label: "Tables", path: "/shop/category/Tables" },
@@ -84,8 +84,6 @@ const Navbar = () => {
     { label: "Wall Shelves", path: "/shop/category/Wall+Shelves" },
   ];
   
-  const forHimCategories = [];
-
 
   return (
     <>
@@ -109,7 +107,7 @@ const Navbar = () => {
                 </Link>
             </div>
             <div className="hidden md:flex">
-                <DesktopNavLinks forHerCategories={forHerCategories} />
+                <DesktopNavLinks categories={categories} />
             </div>
           </div>
 
@@ -182,7 +180,7 @@ const Navbar = () => {
         <MobileNavLinks
           isMobileMenuOpen={isMobileMenuOpen}
           handleMobileMenuToggle={handleMobileMenuToggle}
-          forHerCategories={forHerCategories}
+          categories={categories}
         />
 
       </header>

@@ -27,15 +27,6 @@ const metals= [
 
 ];
 
-
-
-const genders = [
-    { label: 'Select Gender', value: '' },
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-];
-
-
 const AddProduct = () => {
     const { user } = useSelector((state) => state.auth);
     const [product, setProduct] = useState({
@@ -46,7 +37,6 @@ const AddProduct = () => {
         description: '',
         isTrending: false,
         size: '',
-        gender: '',
         metal: '' 
     });
     const [mainImage, setMainImage] = useState('');
@@ -102,13 +92,6 @@ const AddProduct = () => {
                         value={product.category}
                         onChange={handleChange}
                         options={categories}
-                    />
-                     <SelectInput
-                        label="Gender"
-                        name="gender"
-                        value={product.gender}
-                        onChange={handleChange}
-                        options={genders}
                     />
                 </div>
                 

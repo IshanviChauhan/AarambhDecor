@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const DesktopNavLinks = ({ forHerCategories }) => {
+const DesktopNavLinks = ({ categories }) => {
   return (
     <ul className="flex items-center space-x-8">
       <li>
@@ -17,7 +17,7 @@ const DesktopNavLinks = ({ forHerCategories }) => {
         </button>
         <ul className="absolute left-0 mt-2 w-56 origin-top-left bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
           <div className="py-1">
-            {forHerCategories.map((item, index) => (
+            {categories.map((item, index) => (
               <li key={index}>
                 <Link
                   to={item.path}

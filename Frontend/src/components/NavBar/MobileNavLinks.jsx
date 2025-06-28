@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const MobileNavLinks = ({ isMobileMenuOpen, handleMobileMenuToggle, forHerCategories }) => {
+const MobileNavLinks = ({ isMobileMenuOpen, handleMobileMenuToggle, categories }) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
   const toggleCategory = () => {
@@ -47,7 +47,7 @@ const MobileNavLinks = ({ isMobileMenuOpen, handleMobileMenuToggle, forHerCatego
             </button>
             {isCategoryOpen && (
               <ul className="pl-4 mt-1 border-l-2 border-primary-light">
-                {forHerCategories.map((item, index) => (
+                {categories.map((item, index) => (
                    <li key={index}>
                     <Link
                       onClick={closeMenu}

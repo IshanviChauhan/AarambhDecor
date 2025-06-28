@@ -10,7 +10,6 @@ const ProductSchema = new mongoose.Schema({
   image: { type: String, required: true },
   additionalImages: [{ type: String }],
   size: { type: String },
-  gender: { type: String },
   metal: { type: String },
 
   rating: { type: Number, default: 0 },

@@ -65,7 +65,6 @@ router.get("/search", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const {
-      gender,
       category,
       minPrice,
       maxPrice,
@@ -77,23 +76,12 @@ router.get("/", async (req, res) => {
 
     const filter = {};
 
-    // 1. Gender filter
-    if (gender) {
-      const validGenders = ["male", "female"];
-      if (!validGenders.includes(gender.toLowerCase())) {
-        return res.status(400).json({
-          message: "Invalid gender. Use 'male' or 'female'.",
-        });
-      }
-      filter.gender = gender.toLowerCase();
-    }
-
-    // 2. Category filter
+    // 1. Category filter
     if (category) {
       filter.category = category;
     }
 
-    // 3. Price range filter
+    // 2. Price range filter
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);

@@ -16,13 +16,10 @@ export const productsApi = createApi({
         maxPrice,
         page = 1,
         limit = 10,
-        // Add these fields if your server supports them
-        gender,
         sortBy = "createdAt",
         sortOrder = "desc",
       }) => {
         const queryParams = new URLSearchParams({
-          ...(gender ? { gender } : {}), // Only include gender if defined
           ...(category ? { category } : {}),
           ...(minPrice !== undefined ? { minPrice: minPrice.toString() } : {}),
           ...(maxPrice !== undefined ? { maxPrice: maxPrice.toString() } : {}),

@@ -24,11 +24,7 @@ const metals = [
   { label: "Basic Silver", value: "Basic Silver" },
   { label: "Imitate Jewelry", value: "Imitate Jewelry" },
 ];
-const genders = [
-  { label: "Select Gender", value: "" },
-  { label: "Male", value: "male" },
-  { label: "Female", value: "female" },
-];
+
 const UpdateProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -46,7 +42,6 @@ const UpdateProduct = () => {
     isTrending: false,
     size: "",
     metal: "",
-    gender: "",
     image: "",
     additionalImages: [],
   });
@@ -66,7 +61,6 @@ const UpdateProduct = () => {
         isTrending: p.isTrending || false,
         size: p.size || "",
         metal: p.metal || "",
-        gender: p.gender || "",
         image: p.image || "",
         additionalImages: p.additionalImages || [],
       });
@@ -118,7 +112,6 @@ const UpdateProduct = () => {
                 onChange={handleChange}
                 options={categories}
             />
-            <SelectInput label="Gender" name="gender" value={product.gender} onChange={handleChange} options={genders} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TextInput label="Price" name="price" type="number" value={product.price} onChange={handleChange} />
