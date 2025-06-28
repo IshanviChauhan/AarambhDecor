@@ -7,18 +7,13 @@ const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Query products based on search query
   const { data: filteredProducts = [], error, isLoading } = useSearchProductsQuery(
     searchQuery,
-    { skip: !searchQuery } // Skip query if search query is empty
+    { skip: !searchQuery }
   );
 
   const handleProductClick = (productId) => {
     navigate(`/shop/${productId}`);
-    setIsSearchOpen(false);
-  };
-
-  const handleSearchClose = () => {
     setIsSearchOpen(false);
     setSearchQuery("");
   };
@@ -29,49 +24,45 @@ const Search = () => {
         <input
           type="text"
           value={searchQuery}
+          onFocus={() => setIsSearchOpen(!!searchQuery)}
+          onBlur={() => setTimeout(() => setIsSearchOpen(false), 200)}
           onChange={(e) => {
             setSearchQuery(e.target.value);
             setIsSearchOpen(!!e.target.value);
           }}
-          className="w-80 p-2 pl-10 border rounded-full text-gray-800 border-gray-300 focus:outline-none focus:border-primary"
-          placeholder="Search product..."
+          className="w-64 lg:w-80 p-2 pl-10 pr-4 text-sm bg-gray-100 rounded-full text-gray-800 border-2 border-transparent focus:outline-none focus:border-primary focus:bg-white transition-all"
+          placeholder="Search for decor..."
         />
-        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-          <i className="fas fa-search"></i>
+        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+          <i className="ri-search-line"></i>
         </span>
       </div>
       {isSearchOpen && (
-        <div className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg p-4 z-50">
-          <button
-            onClick={handleSearchClose}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-          >
-            ✕
-          </button>
-          {isLoading && <p>Loading...</p>}
-          {error && <p>Error loading products. Please try again later.</p>}
+        <div className="absolute top-full mt-2 left-0 w-full bg-white shadow-xl rounded-lg p-2 z-50 max-h-96 overflow-y-auto">
+          {isLoading && <p className="p-2 text-center text-gray-500">Loading...</p>}
+          {error && <p className="p-2 text-center text-red-500">Error loading products.</p>}
           {!isLoading && !error && filteredProducts.length === 0 && (
-            <p>No products found.</p>
+            <p className="p-2 text-center text-gray-500">No products found for "{searchQuery}".</p>
           )}
-          <div className="max-h-96  overflow-y-auto">
+          <ul className="divide-y divide-gray-100">
             {filteredProducts.map((product) => (
-              <div
+              <li
                 key={product._id}
-                className="flex items-center gap-4 mb-4 cursor-pointer hover:bg-gray-100 p-2 rounded"
+                className="flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-100 rounded-md transition-colors"
                 onClick={() => handleProductClick(product._id)}
               >
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-12 h-12 object-cover rounded"
+                  className="w-12 h-12 object-cover rounded-md flex-shrink-0"
                 />
-                <div>
-                  <p className="font-bold">{product.name}</p>
-                  <p className="text-sm text-gray-500">Rs {product.price}</p>
+                <div className="flex-grow">
+                  <p className="font-semibold text-sm text-gray-800">{product.name}</p>
+                  <p className="text-sm text-primary">Rs {product.price}</p>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </div>

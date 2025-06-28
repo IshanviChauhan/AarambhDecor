@@ -3,41 +3,32 @@ import { Link } from "react-router-dom";
 
 const DesktopNavLinks = ({ forHerCategories }) => {
   return (
-    <ul className="nav__links hidden md:flex flex-1 justify-center space-x-6">
-      {/* All Collection */}
+    <ul className="flex items-center space-x-8">
       <li>
-        <Link to="/shop" className="text-gray-800 hover:text-primary font-medium">
+        <Link to="/shop" className="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
           ALL COLLECTION
         </Link>
       </li>
 
-      {/* CATEGORIES */}
       <li className="relative group">
-        <Link
-          to="/shop"
-          className="text-gray-800 hover:text-primary font-medium"
-        >
+        <button className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 flex items-center">
           CATEGORIES
-        </Link>
-        <ul className="absolute left-0 hidden group-hover:flex flex-col bg-white border border-gray-200 rounded-lg shadow-lg w-44 z-50">
-          {forHerCategories.map((item, index) => (
-            <li key={index} className="px-4 py-1">
-              <Link
-                to={item.path}
-                className="text-sm text-gray-700 hover:text-primary hover:underline"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
+          <i className="ri-arrow-down-s-line ml-1"></i>
+        </button>
+        <ul className="absolute left-0 mt-2 w-56 origin-top-left bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div className="py-1">
+            {forHerCategories.map((item, index) => (
+              <li key={index}>
+                <Link
+                  to={item.path}
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </div>
         </ul>
-      </li>
-
-      {/* Gifting */}
-      <li>
-        <Link to="/gifts" className="text-gray-800 hover:text-primary font-medium">
-          GIFTING
-        </Link>
       </li>
     </ul>
   );

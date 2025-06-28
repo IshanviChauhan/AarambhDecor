@@ -62,7 +62,7 @@ const Navbar = () => {
     { label: "Dashboard", path: "/dashboard/admin" },
     { label: "Manage Items", path: "/dashboard/manage-products" },
     { label: "All Orders", path: "/dashboard/manage-orders" },
-    { label: "Add New Post", path: "/dashboard/add-new-post" },
+    { label: "Add New Product", path: "/dashboard/add-new-post" },
   ];
 
   const userDropdownMenus = [
@@ -74,7 +74,6 @@ const Navbar = () => {
 
   const dropdownMenus = user?.role === "admin" ? adminDropdownMenus : userDropdownMenus;
 
-  // Updated Categories
   const forHerCategories = [
     { label: "Mirrors", path: "/shop/category/Mirrors" },
     { label: "Table Decor", path: "/shop/category/Table+Decor" },
@@ -83,115 +82,108 @@ const Navbar = () => {
     { label: "Wall Art", path: "/shop/category/Wall+Art" },
     { label: "Wall Shelves", path: "/shop/category/Wall+Shelves" },
   ];
-
+  
   const forHimCategories = [];
 
 
   return (
     <>
-      {/* Top Bar with Promotion */}
       <TopPromotionBar />
-
-      <header className="fixed-nav-bar w-full">
-        {/* Main Navbar Container */}
-        <nav className="mx-auto px-4 flex items-center justify-between py-6 relative">
+      <header className="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 w-full transition-all duration-300">
+        <nav className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
           {/* Left Side: Hamburger (Mobile) + Logo */}
           <div className="flex items-center space-x-4">
-            {/* Mobile menu toggle */}
             <div className="md:hidden">
-              <button onClick={handleMobileMenuToggle} className="text-2xl">
+              <button onClick={handleMobileMenuToggle} className="text-2xl text-gray-700 hover:text-primary">
                 <i className={isMobileMenuOpen ? "ri-close-line" : "ri-menu-line"}></i>
               </button>
             </div>
-
-            {/* Logo */}
             <Link to="/">
               <img
                 src="/nav_logo.png"
                 alt="Logo"
-                className="h-12 w-auto object-contain"
+                className="h-14 w-auto object-contain"
               />
             </Link>
           </div>
 
-          {/* Center: Desktop Navigation Links (hidden on mobile) */}
-          <div className="hidden md:block">
-            <DesktopNavLinks
-              forHerCategories={forHerCategories}
-              forHimCategories={forHimCategories}
-            />
+          {/* Center: Desktop Navigation Links */}
+          <div className="hidden md:flex md:items-center md:justify-center">
+            <DesktopNavLinks forHerCategories={forHerCategories} />
           </div>
 
-          {/* Right Side: Desktop Search + Cart + User Profile */}
+          {/* Right Side: Search, Cart, User Profile */}
           <div className="flex items-center space-x-4">
-            {/* Desktop Search (hidden on mobile) */}
-            <span className="hidden md:inline">
+            <div className="hidden md:block">
               <Search />
-            </span>
-
-            {/* Cart Icon */}
+            </div>
             <button
               onClick={openCart}
-              className="hover:text-primary relative text-xl"
+              className="hover:text-primary relative text-2xl text-gray-700 transition-colors"
             >
               <i className="ri-shopping-bag-4-line"></i>
               {products.length > 0 && (
-                <sup className="text-xs px-1 text-white rounded-full bg-primary text-center absolute -top-2 -right-2">
+                <span className="absolute -top-1 -right-2 flex items-center justify-center h-5 w-5 text-xs font-bold text-white bg-primary rounded-full">
                   {products.length}
-                </sup>
+                </span>
               )}
             </button>
-
-            {/* User Profile / Avatar */}
             {user ? (
               <div className="relative">
-                <img
-                  onClick={handleDropDownToggle}
-                  src={user?.profileImage || avatarImg}
-                  alt="User Avatar"
-                  className="w-8 h-8 rounded-full cursor-pointer"
-                />
+                <button onClick={handleDropDownToggle} className="focus:outline-none">
+                  <img
+                    src={user?.profileImage || avatarImg}
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-primary transition"
+                  />
+                </button>
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                    <ul className="font-medium space-y-2 p-2">
-                      {dropdownMenus.map((menu, index) => (
-                        <li key={index}>
-                          <Link
-                            onClick={() => setIsDropdownOpen(false)}
-                            to={menu.path}
-                            className="block px-3 py-1 hover:bg-gray-100"
-                          >
-                            {menu.label}
-                          </Link>
-                        </li>
-                      ))}
-                      <li>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl z-50 origin-top-right ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="py-1">
+                      <div className="px-4 py-2 border-b">
+                          <p className="text-sm font-semibold text-gray-800">{user.username}</p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                      <ul className="py-1">
+                        {dropdownMenus.map((menu, index) => (
+                          <li key={index}>
+                            <Link
+                              onClick={() => setIsDropdownOpen(false)}
+                              to={menu.path}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary"
+                            >
+                              {menu.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="border-t">
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-3 py-1 hover:bg-gray-100"
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-800"
                         >
                           Logout
                         </button>
-                      </li>
-                    </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Link to="/login" className="text-xl">
+              <Link to="/login" className="text-2xl text-gray-700 hover:text-primary transition-colors">
                 <i className="ri-user-line"></i>
               </Link>
             )}
           </div>
         </nav>
-
-        {/* Mobile Navigation Links (shown when isMobileMenuOpen = true) */}
+        
         <MobileNavLinks
           isMobileMenuOpen={isMobileMenuOpen}
-          handleMobileMenuToggle={() => setIsMobileMenuOpen(false)}
+          handleMobileMenuToggle={handleMobileMenuToggle}
+          forHerCategories={forHerCategories}
         />
 
-        {/* Cart Modal */}
+      </header>
         {isCartOpen && (
           <CartModal
             products={products}
@@ -200,7 +192,6 @@ const Navbar = () => {
             userId={userId}
           />
         )}
-      </header>
     </>
   );
 };
