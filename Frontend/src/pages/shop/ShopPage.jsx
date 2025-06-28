@@ -7,7 +7,6 @@ const filters = {
   categories: [
     "All", "Mirrors", "Table Decor", "Tables", "Wall Accents", "Wall Art", "Wall Shelves",
   ],
-  colors: ["All", "Silver", "Gold", "Rose Gold"],
   priceRanges: [
     { label: "All", min: '', max: '' },
     { label: "Under RS 1500", min: 0, max: 1500 },
@@ -20,19 +19,17 @@ const filters = {
 const ShopPage = () => {
   const [filtersState, setFiltersState] = useState({
     category: 'All',
-    color: 'All',
     priceRange: ''
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(20);
 
-  const { category, color, priceRange } = filtersState;
+  const { category, priceRange } = filtersState;
 
   // Determine filters for the query
   const categoryFilter = category !== 'All' ? category : '';
-  const colorFilter = color !== 'All' ? color : '';
-
+  
   let minPrice = '';
   let maxPrice = '';
   if (priceRange) {
@@ -48,7 +45,6 @@ const ShopPage = () => {
 
   const { data: { products = [], totalPages = 1, totalProducts = 0 } = {}, error, isLoading } = useFetchAllProductsQuery({
     category: categoryFilter || undefined,
-    color: colorFilter || undefined,
     minPrice: minPrice !== '' ? minPrice : undefined,
     maxPrice: maxPrice !== '' ? maxPrice : undefined,
     page: currentPage,
@@ -64,7 +60,6 @@ const ShopPage = () => {
   const clearFilters = () => {
     setFiltersState({
       category: 'All',
-      color: 'All',
       priceRange: ''
     });
     setCurrentPage(1);

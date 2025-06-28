@@ -8,7 +8,6 @@
       "price": 79.99,
       "oldPrice": 99.99,
       "image": "images/products/elegant-silver-earrings.jpg",
-      "color": "red",
       "rating": 4.5,
       "author": "admin",
       "weight":"55"
@@ -21,7 +20,6 @@
       "price": 49.99,
       "oldPrice": 59.99,
       "image": "images/products/gold-toe-ring.jpg",
-      "color": "Gold",
       "rating": 4.2,
       "author": "admin",
        "metal":"gold"
@@ -34,7 +32,6 @@
       "price": 499.99,
       "oldPrice": 599.99,
       "image": "images/products/diamond-engagement-ring.jpg",
-      "color": "White Gold",
       "rating": 4.9,
       "author": "admin",
       "size":"5 to 15"
@@ -47,7 +44,6 @@
       "price": 89.99,
       "oldPrice": 99.99,
       "image": "images/products/silver-anklet-charms.jpg",
-      "color": "Silver",
       "rating": 4.6,
       "author": "admin"
     },
@@ -59,7 +55,6 @@
       "price": 149.99,
       "oldPrice": 179.99,
       "image": "images/products/pearl-necklace.jpg",
-      "color": "White",
       "rating": 4.7,
       "author": "admin"
 
@@ -72,7 +67,6 @@
       "price": 999.99,
       "oldPrice": 1299.99,
       "image": "images/products/bridal-jewellery-set.jpg",
-      "color": "Gold",
       "rating": 5.0,
       "author": "admin"
     },
@@ -85,7 +79,6 @@
       "oldPrice": 49.99,
       "size":8,
       "image": "images/products/leather-bracelet-men.jpg",
-      "color": "Brown",
       "rating": 4.3,
       "metal":"red",
       "author": "admin"
@@ -98,7 +91,6 @@
       "price": 199.99,
       "oldPrice": 249.99,
       "image": "images/products/stainless-steel-watch.jpg",
-      "color": "Silver",
       "rating": 4.6,
       "author": "admin"
     },
@@ -110,7 +102,6 @@
       "price": 59.99,
       "oldPrice": 69.99,
       "image": "images/products/heart-pendant-charm.jpg",
-      "color": "Rose Gold",
       "rating": 4.8,
       "author": "admin"
     },
@@ -123,7 +114,6 @@
       "price": 299.99,
       "oldPrice": 349.99,
       "image": "images/products/gold-bangles-set.jpg",
-      "color": "Gold",
       "rating": 4.7,
       "author": "admin"
     },
@@ -135,7 +125,6 @@
       "price": 109.99,
       "oldPrice": 129.99,
       "image": "images/products/silver-coin-lakshmi.jpg",
-      "color": "Silver",
       "rating": 4.5,
       "author": "admin"
       
@@ -148,7 +137,6 @@
       "price": 79.99,
       "oldPrice": 99.99,
       "image": "images/products/diamond-nose-pin.jpg",
-      "color": "White Gold",
       "rating": 4.3,
       "author": "admin"
     },
@@ -161,7 +149,6 @@
       "price": 69.99,
       "oldPrice": 89.99,
       "image": "images/products/crystal-drop-earrings.jpg",
-      "color": "Clear",
       "rating": 4.6,
       "author": "admin"
     },
@@ -173,7 +160,6 @@
       "price": 59.99,
       "oldPrice": 69.99,
       "image": "images/products/toe-ring-set.jpg",
-      "color": "Silver",
       "rating": 4.4,
       "author": "admin"
     },
@@ -185,7 +171,6 @@
       "price": 89.99,
       "oldPrice": 99.99,
       "image": "images/products/mens-cufflinks.jpg",
-      "color": "Silver",
       "rating": 4.5,
       "author": "admin"
     },
@@ -197,7 +182,6 @@
       "price": 49.99,
       "oldPrice": 59.99,
       "image": "images/products/anklet-with-bells.jpg",
-      "color": "Silver",
       "rating": 4.7,
       "author": "admin"
     },
@@ -209,7 +193,6 @@
       "price": 99.99,
       "oldPrice": 119.99,
       "image": "images/products/charm-bracelet.jpg",
-      "color": "Silver",
       "rating": 4.6,
       "author": "admin"
     },
@@ -221,10 +204,10 @@
       "price": 129.99,
       "oldPrice": 149.99,
       "image": "images/products/gemstone-pendant-necklace.jpg",
-      "color": "Various",
       "rating": 4.8,
       "author": "admin",
       "metal":"gold"
     }
   ]
+
 

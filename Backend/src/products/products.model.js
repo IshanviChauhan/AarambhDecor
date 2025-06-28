@@ -9,12 +9,6 @@ const ProductSchema = new mongoose.Schema({
   oldPrice: { type: Number },
   image: { type: String, required: true },
   additionalImages: [{ type: String }],
-  colors: [
-    {
-      value: String,
-      code: String, // Save color code here
-    },
-  ],
   size: { type: String },
   gender: { type: String },
   metal: { type: String },

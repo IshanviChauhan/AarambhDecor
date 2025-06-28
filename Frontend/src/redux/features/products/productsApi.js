@@ -12,7 +12,6 @@ export const productsApi = createApi({
     fetchAllProducts: builder.query({
       query: ({
         category,
-        color,
         minPrice,
         maxPrice,
         page = 1,
@@ -25,7 +24,6 @@ export const productsApi = createApi({
         const queryParams = new URLSearchParams({
           ...(gender ? { gender } : {}), // Only include gender if defined
           ...(category ? { category } : {}),
-          ...(color ? { color } : {}),
           ...(minPrice !== undefined ? { minPrice: minPrice.toString() } : {}),
           ...(maxPrice !== undefined ? { maxPrice: maxPrice.toString() } : {}),
           page: page.toString(),

@@ -67,7 +67,6 @@ router.get("/", async (req, res) => {
     const {
       gender,
       category,
-      color,
       minPrice,
       maxPrice,
       page = 1,
@@ -94,12 +93,7 @@ router.get("/", async (req, res) => {
       filter.category = category;
     }
 
-    // 3. Color filter
-    if (color) {
-      filter["colors.value"] = color;
-    }
-
-    // 4. Price range filter
+    // 3. Price range filter
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);

@@ -5,7 +5,6 @@ import TextInput from './TextInput';
 import SelectInput from './SelectInput';
 import UploadImage from './UploadImage';
 import { useNavigate } from 'react-router-dom';
-import Select from "react-select";
 
 const categories = [
     { label: 'Select Category', value: '' },
@@ -16,14 +15,6 @@ const categories = [
     { label: 'Wall Art', value: 'Wall Art' },
     { label: 'Wall Shelves', value: 'Wall Shelves' }
 ];
-
-const colorOptions = [
-    { label: "Silver", value: "Silver", code: "#C4C4C4" },
-    { label: "Rose Gold", value: "Rose Gold", code: "#DEA193" },
-    { label: "Gold", value: "Gold", code: "#EOEAA3E" },
-    { label: "Platinum", value: "Platinum", code: "#E5E4E2" },
-  ];
-  
 
 const metals= [
     { label: 'Select Metal', value: '' },
@@ -50,7 +41,6 @@ const AddProduct = () => {
     const [product, setProduct] = useState({
         name: '',
         category: '',
-        colors: [],
         price: '',
         oldPrice: '',
         description: '',
@@ -64,18 +54,6 @@ const AddProduct = () => {
 
     const [addProduct, { isLoading, error }] = useAddProductMutation();
     const navigate = useNavigate();
-
- 
-    const handleColorsChange = (selectedOptions) => {
-        setProduct({
-          ...product,
-          colors: selectedOptions.map((option) => ({
-            value: option.value,
-            code: option.code,
-          })),
-        });
-      };
-      
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -150,22 +128,6 @@ const AddProduct = () => {
                         placeholder="100"
                         value={product.oldPrice}
                         onChange={handleChange}
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="colors" className="block text-sm font-medium text-gray-700 mb-1">
-                        Colors
-                    </label>
-                    <Select
-                        isMulti
-                        options={colorOptions}
-                        value={product.colors.map((color) =>
-                        colorOptions.find((option) => option.value === color.value)
-                        )}
-                        onChange={handleColorsChange}
-                        className="basic-multi-select"
-                        classNamePrefix="select"
                     />
                 </div>
 

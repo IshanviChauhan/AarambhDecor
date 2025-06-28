@@ -5,7 +5,6 @@ import TextInput from "../AddProduct/TextInput";
 import SelectInput from "../AddProduct/SelectInput";
 import UploadImage from "../AddProduct/UploadImage";
 import { useFetchProductByIdQuery, useUpdateProductMutation } from "../../../../src/redux/features/products/productsApi";
-import Select from "react-select";
 
 const categories = [
   { label: "Select Category", value: "" },
@@ -15,13 +14,6 @@ const categories = [
   { label: "Wall Accents", value: "Wall Accents" },
   { label: "Wall Art", value: "Wall Art" },
   { label: "Wall Shelves", value: "Wall Shelves" },
-];
-
-const colorOptions = [
-  { label: "Silver", value: "Silver", code: "#C4C4C4" },
-  { label: "Rose Gold", value: "Rose Gold", code: "#DEA193" },
-  { label: "Gold", value: "Gold", code: "#EOEAA3E" },
-  { label: "Platinum", value: "Platinum", code: "#E5E4E2" },
 ];
 
 const metals = [
@@ -48,7 +40,6 @@ const UpdateProduct = () => {
   const [product, setProduct] = useState({
     name: "",
     category: "",
-    colors: [],
     price: "",
     oldPrice: "",
     description: "",
@@ -69,7 +60,6 @@ const UpdateProduct = () => {
       setProduct({
         name: p.name || "",
         category: p.category || "",
-        colors: p.colors || [],
         price: p.price || "",
         oldPrice: p.oldPrice || "",
         description: p.description || "",
@@ -86,10 +76,6 @@ const UpdateProduct = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setProduct({ ...product, [name]: type === "checkbox" ? checked : value });
-  };
-
-  const handleColorsChange = (selectedOptions) => {
-    setProduct({ ...product, colors: selectedOptions.map(opt => ({ value: opt.value, code: opt.code })) });
   };
 
   const handleSubmit = async (e) => {
@@ -137,15 +123,6 @@ const UpdateProduct = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TextInput label="Price" name="price" type="number" value={product.price} onChange={handleChange} />
             <TextInput label="Old Price" name="oldPrice" type="number" value={product.oldPrice} onChange={handleChange}/>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Colors</label>
-          <Select
-            isMulti
-            options={colorOptions}
-            value={product.colors.map(c => colorOptions.find(opt => opt.value === c.value)).filter(Boolean)}
-            onChange={handleColorsChange}
-          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SelectInput label="Metal" name="metal" value={product.metal} onChange={handleChange} options={metals}/>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters }) => {
-    const { category, color, priceRange } = filtersState;
+    const { category, priceRange } = filtersState;
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
     return (
@@ -47,26 +47,6 @@ const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters })
                             </ul>
                         </div>
                     )}
-                </div>
-            </div>
-
-            {/* Color Filter */}
-            <div className="py-4 border-t border-gray-200">
-                <h4 className='font-semibold text-gray-700 mb-3'>Color</h4>
-                <div className="space-y-2">
-                    {filters.colors.map(col => (
-                        <label key={col} className='capitalize cursor-pointer flex items-center text-gray-600 p-2 rounded-md hover:bg-gray-100 transition'>
-                            <input
-                                type="radio"
-                                name="color"
-                                value={col}
-                                checked={color === col}
-                                onChange={e => setFiltersState({ ...filtersState, color: e.target.value })}
-                                className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
-                            />
-                            <span className='ml-3 text-sm font-medium'>{col}</span>
-                        </label>
-                    ))}
                 </div>
             </div>
 
