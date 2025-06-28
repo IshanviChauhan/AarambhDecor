@@ -16,17 +16,6 @@ const categories = [
     { label: 'Wall Shelves', value: 'Wall Shelves' }
 ];
 
-const materials= [
-    { label: 'Select Material', value: '' },
-    { label: '18K Gold', value: '18K Gold' },
-    { label: '22K Gold', value: '22K Gold' },
-    { label: '925 Silver', value: '925 Silver' },
-    { label: 'Basic Silver', value: 'Basic Silver' },
-    { label: 'Imitate Jewelry', value: 'Imitate Jewelry' },
-
-
-];
-
 const AddProduct = () => {
     const { user } = useSelector((state) => state.auth);
     const [product, setProduct] = useState({
@@ -115,12 +104,12 @@ const AddProduct = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <SelectInput
+                    <TextInput
                         label="Material"
                         name="material"
                         value={product.material}
                         onChange={handleChange}
-                        options={materials}
+                        placeholder="E.g., 'Gold Plated' or 'Sterling Silver'"
                     />
                     <TextInput
                         label="Size"

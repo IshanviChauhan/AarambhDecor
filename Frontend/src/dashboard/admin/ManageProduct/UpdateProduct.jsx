@@ -16,15 +16,6 @@ const categories = [
   { label: "Wall Shelves", value: "Wall Shelves" },
 ];
 
-const materials = [
-  { label: "Select Material", value: "" },
-  { label: "18K Gold", value: "18K Gold" },
-  { label: "22K Gold", value: "22K Gold" },
-  { label: "925 Silver", value: "925 Silver" },
-  { label: "Basic Silver", value: "Basic Silver" },
-  { label: "Imitate Jewelry", value: "Imitate Jewelry" },
-];
-
 const UpdateProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -118,7 +109,7 @@ const UpdateProduct = () => {
             <TextInput label="Old Price" name="oldPrice" type="number" value={product.oldPrice} onChange={handleChange}/>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SelectInput label="Material" name="material" value={product.material} onChange={handleChange} options={materials}/>
+            <TextInput label="Material" name="material" placeholder="E.g., 'Gold Plated' or 'Sterling Silver'" value={product.material} onChange={handleChange}/>
             <TextInput label="Size" name="size" value={product.size} onChange={handleChange} />
         </div>
         <div>
