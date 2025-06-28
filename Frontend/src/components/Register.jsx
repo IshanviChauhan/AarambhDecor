@@ -55,7 +55,7 @@ const Register = () => {
     };
 
     return (
-        <section className="h-screen flex items-center justify-center bg-gray-100">
+        <section className="h-screen flex items-center justify-center">
             <div className="max-w-sm mx-auto bg-white border shadow p-8 rounded-lg">
                 <h2 className="text-2xl font-semibold mb-5">Please Register</h2>
                 <form onSubmit={handleRegister} className="space-y-5">

@@ -2,7 +2,7 @@ import React from 'react';
 
 const DeliveryInformation = () => {
     return (
-        <div className="bg-gray-50 min-h-screen">
+        <div className="min-h-screen">
           {/* Hero Section */}
           <div className="bg-white">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center py-16 px-6">

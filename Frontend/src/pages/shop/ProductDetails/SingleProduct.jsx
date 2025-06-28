@@ -129,7 +129,7 @@ const SingleProduct = ({ refetchCart }) => {
 
   return (
     <>
-      <section className="section__container rounded bg-primary-light">
+      <section className="section__container rounded">
         <h2 className="section__header">Single Product Page</h2>
         <div className="section__subheader space-x-2">
           <span className="hover:text-primary">

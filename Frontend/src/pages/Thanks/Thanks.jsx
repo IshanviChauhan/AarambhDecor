@@ -18,7 +18,7 @@ function Thanks() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-[80vh] bg-white px-4">
+    <div className="flex flex-col items-center justify-center h-[80vh] px-4">
       <FaCheckCircle
         className="text-green-500 w-24 h-24 animate-bounce"
         aria-hidden="true"

@@ -3,7 +3,7 @@ import gift from "./../../assets/1.png"
 const Gift = () => {
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <div className="flex items-center gap-20 p-8 bg-white  max-w-5xl">
+      <div className="flex items-center gap-20 p-8  max-w-5xl">
         <div className="flex flex-col items-start">
           <p className="text-2xl font-semibold text-primary mb-3">Let’s find the</p>
           <h1 className="text-7xl font-bold text-primary-dark mb-4">Perfect Gift</h1>

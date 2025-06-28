@@ -2,7 +2,7 @@ import React from "react";
 
 const ContactUs = () => {
   return (
-    <div className="bg-gray-50 py-20 p-1 flex items-center justify-center">
+    <div className="py-20 p-1 flex items-center justify-center">
       <div className="max-w-6xl w-full">
         {/* Header Section */}
         <div className="text-left mb-12">
