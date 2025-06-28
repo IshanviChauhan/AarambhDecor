@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -90,27 +91,28 @@ const Navbar = () => {
     <>
       <TopPromotionBar />
       <header className="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 w-full transition-all duration-300">
-        <nav className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-          {/* Left Side: Hamburger (Mobile) + Logo */}
-          <div className="flex items-center space-x-4">
-            <div className="md:hidden">
-              <button onClick={handleMobileMenuToggle} className="text-2xl text-gray-700 hover:text-primary">
-                <i className={isMobileMenuOpen ? "ri-close-line" : "ri-menu-line"}></i>
-              </button>
+        <nav className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          {/* Left Side: Hamburger, Logo & Desktop Nav Links */}
+          <div className="flex items-center gap-8">
+            <div className="flex items-center space-x-4">
+                <div className="md:hidden">
+                <button onClick={handleMobileMenuToggle} className="text-2xl text-gray-700 hover:text-primary">
+                    <i className={isMobileMenuOpen ? "ri-close-line" : "ri-menu-line"}></i>
+                </button>
+                </div>
+                <Link to="/">
+                <img
+                    src="/nav_logo.png"
+                    alt="Logo"
+                    className="h-12 w-auto object-contain"
+                />
+                </Link>
             </div>
-            <Link to="/">
-              <img
-                src="/nav_logo.png"
-                alt="Logo"
-                className="h-14 w-auto object-contain"
-              />
-            </Link>
+            <div className="hidden md:flex">
+                <DesktopNavLinks forHerCategories={forHerCategories} />
+            </div>
           </div>
 
-          {/* Center: Desktop Navigation Links */}
-          <div className="hidden md:flex md:items-center md:justify-center">
-            <DesktopNavLinks forHerCategories={forHerCategories} />
-          </div>
 
           {/* Right Side: Search, Cart, User Profile */}
           <div className="flex items-center space-x-4">
