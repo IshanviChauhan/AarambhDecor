@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import { useFetchProductByIdQuery } from "../../../redux/features/products/productsApi";
 import { useAddItemToCartMutation } from "../../../redux/features/cart/cartApi";
 import RatingStar from "../../../components/RatingStar";
@@ -218,19 +219,37 @@ const SingleProduct = ({ refetchCart }) => {
             </div>
 
             {/* Price Section */}
-            <div className="flex items-baseline space-x-4">
-              <span className="text-4xl font-bold text-primary">
-                ₹{singleProduct.price?.toLocaleString()}
-              </span>
-              {singleProduct.oldPrice && singleProduct.oldPrice !== singleProduct.price && (
-                <span className="text-xl text-gray-400 line-through">
-                  ₹{singleProduct.oldPrice?.toLocaleString()}
+            <div className="space-y-3">
+              <div className="flex items-baseline space-x-4">
+                <span className="text-4xl font-bold text-primary">
+                  Rs. {singleProduct.price?.toLocaleString()}
                 </span>
-              )}
-              {singleProduct.oldPrice && singleProduct.oldPrice !== singleProduct.price && (
-                <span className="px-3 py-1 bg-red-100 text-red-600 text-sm font-semibold rounded-full">
-                  {Math.round(((singleProduct.oldPrice - singleProduct.price) / singleProduct.oldPrice) * 100)}% OFF
-                </span>
+                {singleProduct.oldPrice && singleProduct.oldPrice !== singleProduct.price && (
+                  <span className="text-xl text-gray-400 line-through">
+                    Rs.{singleProduct.oldPrice?.toLocaleString()}
+                  </span>
+                )}
+                {singleProduct.oldPrice && singleProduct.oldPrice !== singleProduct.price && (
+                  <span className="px-3 py-1 bg-red-100 text-red-600 text-sm font-semibold rounded-full">
+                    {Math.round(((singleProduct.oldPrice - singleProduct.price) / singleProduct.oldPrice) * 100)}% OFF
+                  </span>
+                )}
+              </div>
+
+              {/* Deal Information */}
+              {singleProduct.dealTitle && (
+                <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-green-800 font-semibold text-sm">🎉 Active Deal</span>
+                  </div>
+                  <p className="text-green-700 font-medium mt-1">{singleProduct.dealTitle}</p>
+                  {singleProduct.dealDiscount && (
+                    <p className="text-green-600 text-sm mt-1">
+                      Save {singleProduct.dealDiscount}% on this product!
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 
@@ -344,7 +363,7 @@ const SingleProduct = ({ refetchCart }) => {
                   </div>
                   <div className="flex items-center space-x-3 text-blue-700">
                     <i className="ri-gift-line text-lg"></i>
-                    <span>Free shipping on orders above ₹1,500</span>
+                    <span>Free shipping on orders above Rs. 1,500</span>
                   </div>
                 </div>
               )}
@@ -378,20 +397,24 @@ const SingleProduct = ({ refetchCart }) => {
 
       {/* Reviews Section */}
       <section className="py-12">
-        <div className="section__container">
+        <div className="section__container bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 p-6">
           <div className="mb-6 text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Customer Reviews</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               See what our customers are saying about this product
             </p>
           </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 p-6">
+          <div>
             <ReviewsCard productReviews={productReviews} />
           </div>
         </div>
       </section>
     </div>
   );
+};
+
+SingleProduct.propTypes = {
+  refetchCart: PropTypes.func,
 };
 
 export default SingleProduct;

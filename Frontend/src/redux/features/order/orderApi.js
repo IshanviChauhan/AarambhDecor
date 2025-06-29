@@ -44,6 +44,31 @@ export const orderApi = createApi({
         method: 'GET',
       }),
       providesTags: ['Order'],
+      // Transform the response to handle both old and new format
+      transformResponse: (response) => {
+        // Handle new enhanced response format
+        if (response && typeof response === 'object' && response.orders) {
+          return {
+            orders: response.orders,
+            count: response.count,
+            lastUpdated: response.lastUpdated
+          };
+        }
+        // Handle legacy response format (direct array)
+        if (Array.isArray(response)) {
+          return {
+            orders: response,
+            count: response.length,
+            lastUpdated: new Date().toISOString()
+          };
+        }
+        // Fallback
+        return {
+          orders: [],
+          count: 0,
+          lastUpdated: new Date().toISOString()
+        };
+      },
     }),
 
     updateOrderStatus: builder.mutation({

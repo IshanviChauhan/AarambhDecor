@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import './App.css'
 
 import Footer from './components/Footer';
-import WhatsAppButton from './components/Whatsapp';
+// import WhatsAppButton from './components/Whatsapp';
 import Navbar from './components/NavBar/Navbar';
 
 
@@ -16,7 +16,7 @@ function App() {
       <Navbar/>
         <Outlet/>
         <Footer/>
-      <WhatsAppButton/>
+      {/* <WhatsAppButton/> */}
       </>
         
     

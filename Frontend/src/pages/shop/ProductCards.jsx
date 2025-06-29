@@ -3,9 +3,10 @@ import RatingStar from "../../components/RatingStar";
 import { useAddItemToCartMutation } from "../../redux/features/cart/cartApi";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const ProductCards = ({ products }) => {
-  const [addItemToCart, { isLoading, isSuccess }] = useAddItemToCartMutation();
+  const [addItemToCart, { isLoading }] = useAddItemToCartMutation();
   const userId = useSelector((state) => state.auth.user?._id); // Get user ID from Redux
   const [addedProductId, setAddedProductId] = useState(null);
 
@@ -35,7 +36,7 @@ const ProductCards = ({ products }) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {products.map((product) => (
-        <div key={product._id}>
+        <div key={product._id} className="bg-white/30 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="relative">
             <Link to={`/shop/${product._id}`}>
               <img
@@ -64,18 +65,43 @@ const ProductCards = ({ products }) => {
             </button>
           </div>
           <div className="product__card__content">
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl">
-              Rs {product.price} {product.oldPrice && <s>${product.oldPrice}</s>}
-            </p>
-            <h4 className="text-base sm:text-lg md:text-xl lg:text-2xl">
+            <h4 className="text-base sm:text-lg md:text-xl lg:text-2xl font-heading">
               {product.name}
             </h4>
+            <div className="price-section">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm sm:text-base md:text-lg lg:text-xl font-numeric font-bold text-primary">
+                  Rs. {product.price?.toLocaleString()}
+                </span>
+                {product.oldPrice && product.oldPrice !== product.price && (
+                  <>
+                    <span className="text-xs sm:text-sm md:text-base text-gray-500 line-through">
+                      Rs. {product.oldPrice?.toLocaleString()}
+                    </span>
+                    {product.dealDiscount && (
+                      <span className="text-xs sm:text-sm bg-red-100 text-red-600 px-2 py-1 rounded-full font-semibold">
+                        {product.dealDiscount}% OFF
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+              {product.dealTitle && (
+                <p className="text-xs text-green-600 font-medium mt-1">
+                  🎉 {product.dealTitle}
+                </p>
+              )}
+            </div>
             <RatingStar rating={product.rating} />
           </div>
         </div>
       ))}
     </div>
   );
+};
+
+ProductCards.propTypes = {
+  products: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default ProductCards;

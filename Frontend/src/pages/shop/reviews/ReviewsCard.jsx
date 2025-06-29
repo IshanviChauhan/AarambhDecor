@@ -18,9 +18,9 @@ const ReviewsCard = ({ productReviews }) => {
     const reviews = productReviews || [];
 
     return (
-        <div className="bg-white p-8 rounded-lg my-6">
+        <div>
             {/* Header */}
-            <h3 className="text-2xl font-semibold mb-4">Customer Reviews</h3>
+            {/* <h3 className="text-2xl font-semibold mb-4">Customer Reviews</h3> */}
 
             {/* Reviews */}
             <div>

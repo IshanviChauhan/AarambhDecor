@@ -88,6 +88,30 @@ export const productsApi = createApi({
       }),
       providesTags: ["Products"],
     }),
+
+    fetchProductsWithDeals: builder.query({
+      query: (params = {}) => {
+        const searchParams = new URLSearchParams({
+          applyDeals: 'true',
+          ...params,
+          ...(params.category ? { category: params.category } : {}),
+          ...(params.minPrice !== undefined ? { minPrice: params.minPrice.toString() } : {}),
+          ...(params.maxPrice !== undefined ? { maxPrice: params.maxPrice.toString() } : {}),
+          page: (params.page || 1).toString(),
+          limit: (params.limit || 20).toString(),
+          sortBy: params.sortBy || 'createdAt',
+          sortOrder: params.sortOrder || 'desc',
+        }).toString();
+        
+        return `/?${searchParams}`;
+      },
+      providesTags: ["Products"],
+    }),
+
+    fetchApplicableDeals: builder.query({
+      query: () => `/deals/applicable`,
+      providesTags: ["Products"],
+    }),
   }),
 });
 
@@ -101,6 +125,8 @@ export const {
   useDeleteProductMutation,
   useFetchRelatedBlogsQuery,
   useSearchProductsQuery,
+  useFetchProductsWithDealsQuery,
+  useFetchApplicableDealsQuery,
 } = productsApi;
 
 export default productsApi;

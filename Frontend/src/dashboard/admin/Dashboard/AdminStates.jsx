@@ -1,14 +1,15 @@
 import React from 'react';
 
 const StatCard = ({ title, value, icon, color }) => (
-  <div className={`p-6 rounded-xl shadow-lg flex items-center gap-4 bg-gradient-to-br ${color}`}>
-    <div className="p-3 bg-white bg-opacity-30 rounded-full">
-      <i className={`${icon} text-2xl text-white`}></i>
+  <div className={`bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-xl hover:shadow-2xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 group`}>
+    <div className="flex items-center justify-between mb-4">
+      <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${color}`}>
+        <i className={`${icon} text-xl text-white`}></i>
+      </div>
+      <div className="w-2 h-2 bg-primary/50 group-hover:bg-primary rounded-full transition-colors"></div>
     </div>
-    <div>
-      <h3 className="text-sm font-medium text-white opacity-90">{title}</h3>
-      <p className="text-2xl font-bold text-white">{value}</p>
-    </div>
+    <h3 className="text-sm font-body font-medium text-gray-600 mb-1">{title}</h3>
+    <p className="text-2xl font-numeric font-bold text-gray-900">{value}</p>
   </div>
 );
 
@@ -21,7 +22,7 @@ const AdminStats = ({ stats }) => {
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {statCards.map((card, index) => (
         <StatCard key={index} {...card} />
       ))}

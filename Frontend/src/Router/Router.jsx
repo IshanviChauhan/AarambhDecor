@@ -26,6 +26,7 @@ import AddCoupon from "../dashboard/admin/AddCoupon/AddCoupon";
 import CODSuccess from "../components/CodSucess";
 import PaymentSuccess from "../components/PaymentSucess";
 import UserOrders from "../dashboard/user/UserOrders";
+import UserPayments from "../dashboard/user/UserPayments";
 import ManageOrders from "../dashboard/admin/ManageOrders/ManageOrder";
 import GenderPage from "../pages/category/GenderCategory";
 import DeliveryInformation from "../pages/footer/DeliveryInformation";
@@ -133,7 +134,7 @@ const router = createBrowserRouter([
           { path: '', element: <UserDMain /> },
           { path: 'orders', element: <UserOrders /> },
           { path: "orders/:orderId", element: <OrderDetails /> },
-          { path: 'payments', element: <div>User Payments</div> },
+          { path: 'payments', element: <UserPayments /> },
           { path: 'profile', element: <div><UserProfile /></div> },
           { path: 'reviews', element: <UserReviews /> },
       

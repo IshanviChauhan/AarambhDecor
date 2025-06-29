@@ -1,6 +1,7 @@
 // orders.routes.js
 
 const express = require("express");
+const mongoose = require("mongoose");
 const Order = require("./orders.model");
 const router = express.Router();
 
@@ -37,7 +38,7 @@ router.post("/create-order", async (req, res) => {
 
 
 // Update Order Status
-const validStatuses = ["pending", "processing", "completed"];
+const validStatuses = ["pending", "processing", "shipped", "completed"];
 
 router.patch("/update-order-status/:id", async (req, res) => {
   const { id } = req.params;
@@ -114,19 +115,44 @@ router.get("/order/:id", async (req, res) => {
 
 
 
-// Get All Orders (Admin)
+// Get All Orders (Admin) - Enhanced for real-time updates
 router.get("/", async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find()
+      .sort({ createdAt: -1 }) // Most recent first
+      .lean(); // Use lean() for better performance
+    
     if (orders.length === 0) {
       console.log("No orders found");
-      return res.status(200).json({ message: "No orders found", orders: [] });
+      return res.status(200).json({ 
+        message: "No orders found", 
+        orders: [],
+        count: 0,
+        lastUpdated: new Date().toISOString()
+      });
     }
 
-    res.status(200).json(orders);
+    // Add computed fields for better frontend experience
+    const enhancedOrders = orders.map(order => ({
+      ...order,
+      itemCount: order.products ? order.products.length : 0,
+      formattedAmount: Number(order.amount).toFixed(2),
+      timeSinceCreated: Math.floor((Date.now() - new Date(order.createdAt).getTime()) / (1000 * 60 * 60)), // hours
+    }));
+
+    res.status(200).json({
+      success: true,
+      orders: enhancedOrders,
+      count: enhancedOrders.length,
+      lastUpdated: new Date().toISOString()
+    });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      success: false,
+      message: "Server error",
+      error: error.message 
+    });
   }
 });
 

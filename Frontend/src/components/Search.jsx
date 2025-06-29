@@ -58,7 +58,7 @@ const Search = () => {
                 />
                 <div className="flex-grow">
                   <p className="font-semibold text-sm text-gray-800">{product.name}</p>
-                  <p className="text-sm text-primary">Rs {product.price}</p>
+                  <p className="text-sm text-primary font-numeric">Rs. {product.price}</p>
                 </div>
               </li>
             ))}

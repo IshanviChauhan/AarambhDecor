@@ -14,9 +14,13 @@ const ProductSchema = new mongoose.Schema({
   rating: { type: Number, default: 0 },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   isTrending: { type: Boolean, default: false },
+  
+  // Deal related fields
+  dealId: { type: mongoose.Schema.Types.ObjectId, ref: "Deal" },
+  dealDiscount: { type: Number },
+  dealTitle: { type: String }
 }, { timestamps: true });
 
 const Products = mongoose.model("Product", ProductSchema);
-
 
 module.exports = Products;

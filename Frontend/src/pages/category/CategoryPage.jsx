@@ -24,6 +24,7 @@ const CategoryPage = () => {
     "Wall Accents": '/4.png',
     "Wall Art": '/5.png',
     "Wall Shelves": '/6.png',
+    "Table Top": '/7.png',
     "all": '/default.jpg' // Default image for 'all' or unspecified categories
   };
 

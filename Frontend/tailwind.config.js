@@ -6,8 +6,13 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '475px',
+      },
       fontFamily: {
-        sans: ['"Inconsolata"', 'monospace'],
+        sans: ['"PT Sans"', 'sans-serif'],
+        heading: ['"Playfair Display"', 'serif'],
+        numeric: ['"PT Sans"', 'sans-serif'], // Specific font for numeric content
       },
       maxWidth: {
         'screen-2xl': '1600px', 

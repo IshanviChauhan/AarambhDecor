@@ -82,13 +82,14 @@ const Navbar = () => {
     { label: "Wall Accents", path: "/shop/category/Wall+Accents" },
     { label: "Wall Art", path: "/shop/category/Wall+Art" },
     { label: "Wall Shelves", path: "/shop/category/Wall+Shelves" },
+    { label: "Table Top", path: "/shop/category/Table+Top" },
   ];
   
 
   return (
     <>
       <TopPromotionBar />
-      <header className="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 w-full transition-all duration-300">
+      <header className="bg-white/40 backdrop-blur-lg shadow-sm sticky top-0 z-50 w-full transition-all duration-300">
         <nav className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           {/* Left Side: Hamburger, Logo & Desktop Nav Links */}
           <div className="flex items-center gap-8">

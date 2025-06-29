@@ -35,7 +35,19 @@ router.post("/send-otp", async (req, res) => {
       const { email } = req.body;
       const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
       await OTP.create({ email, otp, expiresAt: Date.now() + 10 * 60 * 1000 });
-      await sendEmail(email, "Your OTP", `Your OTP is ${otp}`);
+      await sendEmail(email, "Aarambh Decor - Email Verification Code", 
+`Hello
+Thank you for choosing Aarambh Decor!
+To complete your verification process, please use the following OTP:
+
+Your Verification Code: ${otp}
+        
+The code is valid for 10 minutes only. Please do not share this code with anyone for security purposes.
+        
+If you didn't request this verification, please ignore this email.
+
+Best regards,
+Aarambh Decor Team`);
       res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
       console.error(error);

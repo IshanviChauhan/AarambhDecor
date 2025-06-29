@@ -9,6 +9,7 @@ import orderApi from "./features/order/orderApi";
 import cartApi from "./features/cart/cartApi"; // Ensure it matches the exact file name
 import couponApi from "./features/coupon/couponApi";
 import dealsApi from "./features/deals/dealsApi";
+import { paymentApi } from "./features/payments/paymentApi";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     [cartApi.reducerPath]: cartApi.reducer, 
     [dealsApi.reducerPath]: dealsApi.reducer,
     [couponApi.reducerPath]: couponApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -32,7 +34,8 @@ export const store = configureStore({
       orderApi.middleware,
       cartApi.middleware ,
       dealsApi.middleware,
-      couponApi.middleware // Add cartApi middleware
+      couponApi.middleware, // Add cartApi middleware
+      paymentApi.middleware
     ),
 });
 

@@ -73,6 +73,7 @@ router.get("/", async (req, res) => {
       limit = 10,
       sortBy = "createdAt",
       sortOrder = "desc",
+      applyDeals = false // New parameter to apply deals
     } = req.query;
 
     const filter = {};
@@ -111,10 +112,32 @@ router.get("/", async (req, res) => {
     const sortDirection = sortOrder.toLowerCase() === "asc" ? 1 : -1;
     const sortObj = { [sortBy]: sortDirection };
 
-    const [products, totalProducts] = await Promise.all([
+    let [products, totalProducts] = await Promise.all([
       Products.find(filter).sort(sortObj).skip(skip).limit(limitNum).lean(), // Use .lean() for faster queries
       Products.countDocuments(filter),
     ]);
+
+    // Apply deals if requested
+    if (applyDeals === 'true') {
+      const Deal = require("../deals/deals.model");
+      const activeDeal = await Deal.findOne({ isActive: true });
+      
+      if (activeDeal && activeDeal.categories && activeDeal.categories.length > 0 && new Date() <= new Date(activeDeal.endDate)) {
+        products = products.map(product => {
+          if (activeDeal.categories.includes(product.category)) {
+            return {
+              ...product,
+              originalPrice: product.price,
+              price: Math.round(product.price * (1 - activeDeal.discount / 100)),
+              dealDiscount: activeDeal.discount,
+              dealTitle: activeDeal.title,
+              hasActiveDeal: true
+            };
+          }
+          return product;
+        });
+      }
+    }
 
     res.status(200).json({
       products,
@@ -241,6 +264,48 @@ router.get("/related/:id", validateObjectId, async (req, res) => {
   } catch (error) {
     console.error("Error fetching related products:", error);
     res.status(500).json({ message: "Failed to fetch related products" });
+  }
+});
+
+// Get products with deal discounts applied
+router.get("/deals/applicable", async (req, res) => {
+  try {
+    const Deal = require("../deals/deals.model");
+    
+    // Get active deal
+    const activeDeal = await Deal.findOne({ isActive: true });
+    
+    if (!activeDeal || !activeDeal.categories || activeDeal.categories.length === 0) {
+      return res.json({ products: [], deal: null });
+    }
+
+    // Check if deal is still valid (not expired)
+    if (new Date() > new Date(activeDeal.endDate)) {
+      return res.json({ products: [], deal: null });
+    }
+
+    // Get products in the deal categories
+    const applicableProducts = await Products.find({
+      category: { $in: activeDeal.categories }
+    }).lean();
+
+    // Apply discount to products
+    const productsWithDiscount = applicableProducts.map(product => ({
+      ...product,
+      originalPrice: product.price,
+      price: Math.round(product.price * (1 - activeDeal.discount / 100)),
+      dealDiscount: activeDeal.discount,
+      dealTitle: activeDeal.title
+    }));
+
+    res.status(200).json({
+      products: productsWithDiscount,
+      deal: activeDeal,
+      totalProducts: productsWithDiscount.length
+    });
+  } catch (error) {
+    console.error("Error fetching products with deals:", error);
+    res.status(500).json({ message: "Error fetching products with deals" });
   }
 });
 

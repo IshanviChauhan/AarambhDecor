@@ -7,7 +7,7 @@ export const Blogs = () => {
 
   return (
     <section className="section__container blog__container px-4 py-8">
-      <h2 className="section__header text-center font-bold text-xl md:text-2xl md:mb-10">Testimonials</h2>
+      <h2 className="section__header text-center font-bold text-xl md:text-2xl md:mb-20">Testimonials</h2>
       
       <div className="scroll-container flex space-x-4 md:space-x-8 lg:space-x-20 overflow-x-auto p-4">
         {blogData.map((blog) => (

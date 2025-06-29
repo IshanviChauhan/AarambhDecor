@@ -50,6 +50,7 @@ const cartRoutes = require("./src/cart/cart.route");
 const dealRoutes = require("./src/deals/deals.route");
 const couponRoutes = require("./src/coupon/coupon.route");
 const orderRoutes = require("./src/orders/order.route");
+const paymentRoutes = require("./src/payments/payments.route");
 
 // =======================
 // API Routes
@@ -62,6 +63,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/deal", dealRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/coupon", couponRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // =======================
 // Database Connection

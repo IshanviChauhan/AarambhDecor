@@ -5,14 +5,14 @@ import { useFetchAllProductsQuery } from '../../redux/features/products/products
 
 const filters = {
   categories: [
-    "All", "Mirrors", "Table Decor", "Tables", "Wall Accents", "Wall Art", "Wall Shelves",
+    "All", "Mirrors", "Table Decor", "Tables", "Wall Accents", "Wall Art", "Wall Shelves", "Table Top",
   ],
   priceRanges: [
     { label: "All", min: '', max: '' },
-    { label: "Under ₹1500", min: '', max: 1500 },
-    { label: "₹1500 - ₹3000", min: 1500, max: 3000 },
-    { label: "₹3000 - ₹5000", min: 3000, max: 5000 },
-    { label: "Over ₹5000", min: 5000, max: '' },
+    { label: "Under Rs. 1500", min: '', max: 1500 },
+    { label: "Rs. 1500 - Rs. 3000", min: 1500, max: 3000 },
+    { label: "Rs. 3000 - Rs. 5000", min: 3000, max: 5000 },
+    { label: "Over Rs. 5000", min: 5000, max: '' },
   ],
 };
 
@@ -96,7 +96,7 @@ const ShopPage = () => {
           className="w-full rounded" 
         />
       </section>
-      <section className='section__container'>
+      <section className='section__container min-h-screen bg-gradient-to-r from-primary-light-light via-white to-primary-light-light'>
         <div className='flex flex-col md:flex-row md:gap-12 gap-8'>
           {/* Left Side (Filters) */}
           <div className="md:w-1/4 lg:w-1/5">
@@ -121,7 +121,7 @@ const ShopPage = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md mr-2"
+                className="px-4 py-2 bg-primary text-white rounded-md mr-2"
               >
                 Previous
               </button>
@@ -129,7 +129,7 @@ const ShopPage = () => {
                 <button
                   key={index}
                   onClick={() => handlePageChange(index + 1)}
-                  className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'} rounded-md mx-1`}
+                  className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-primary-dark text-white' : 'bg-gray-300 text-gray-700'} rounded-md mx-1`}
                 >
                   {index + 1}
                 </button>
@@ -137,7 +137,7 @@ const ShopPage = () => {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2"
+                className="px-4 py-2 bg-primary text-white rounded-md ml-2"
               >
                 Next
               </button>

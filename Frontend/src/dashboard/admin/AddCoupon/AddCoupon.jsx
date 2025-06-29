@@ -49,66 +49,115 @@ const AddCoupon = () => {
   };
 
   return (
-    <div className="add-coupon-admin">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Coupon</h2>
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
-        <div>
-          <label htmlFor="code" className="block text-sm font-medium text-gray-700">Coupon Code</label>
-          <input
-            type="text"
-            id="code"
-            name="code"
-            value={couponData.code}
-            onChange={handleChange}
-            className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.code ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
-            placeholder="E.g., SUMMER25"
-          />
-          {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
+    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-6 shadow-xl">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Add New Coupon
+          </h2>
+          <p className="text-gray-600 mt-2">Create promotional discount coupons for customers</p>
         </div>
 
-        <div>
-          <label htmlFor="discountPercentage" className="block text-sm font-medium text-gray-700">Discount (%)</label>
-          <input
-            type="number"
-            id="discountPercentage"
-            name="discountPercentage"
-            value={couponData.discountPercentage}
-            onChange={handleChange}
-            className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.discountPercentage ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
-            placeholder="Enter discount percentage"
-          />
-          {errors.discountPercentage && <p className="text-red-500 text-xs mt-1">{errors.discountPercentage}</p>}
-        </div>
+        {/* Coupon Form */}
+        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-8 shadow-xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="code" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Coupon Code
+                </label>
+                <input
+                  type="text"
+                  id="code"
+                  name="code"
+                  value={couponData.code}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 backdrop-blur-sm bg-white/70 border ${errors.code ? 'border-red-400/70' : 'border-gray-200/50'} rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm transition-all duration-200 uppercase font-mono`}
+                  placeholder="E.g., SUMMER25"
+                />
+                {errors.code && (
+                  <p className="text-red-600 text-xs mt-2 flex items-center">
+                    <i className="ri-error-warning-line mr-1"></i>
+                    {errors.code}
+                  </p>
+                )}
+              </div>
 
-        <div>
-          <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">Expiry Date</label>
-          <input
-            type="datetime-local"
-            id="expiryDate"
-            name="expiryDate"
-            value={couponData.expiryDate}
-            onChange={handleChange}
-            className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.expiryDate ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
-          />
-          {errors.expiryDate && <p className="text-red-500 text-xs mt-1">{errors.expiryDate}</p>}
-        </div>
+              <div>
+                <label htmlFor="discountPercentage" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Discount Percentage (%)
+                </label>
+                <input
+                  type="number"
+                  id="discountPercentage"
+                  name="discountPercentage"
+                  value={couponData.discountPercentage}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 backdrop-blur-sm bg-white/70 border ${errors.discountPercentage ? 'border-red-400/70' : 'border-gray-200/50'} rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm font-numeric transition-all duration-200`}
+                  placeholder="Enter discount percentage"
+                  min="1"
+                  max="100"
+                />
+                {errors.discountPercentage && (
+                  <p className="text-red-600 text-xs mt-2 flex items-center">
+                    <i className="ri-error-warning-line mr-1"></i>
+                    {errors.discountPercentage}
+                  </p>
+                )}
+              </div>
+            </div>
 
-        <div className="flex justify-end">
-            <button
-            type="submit"
-            className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark"
-            disabled={loading}
-            >
-            {loading ? "Adding..." : "Add Coupon"}
-            </button>
-        </div>
-      </form>
+            <div>
+              <label htmlFor="expiryDate" className="block text-sm font-semibold text-gray-700 mb-2">
+                Expiry Date & Time
+              </label>
+              <input
+                type="datetime-local"
+                id="expiryDate"
+                name="expiryDate"
+                value={couponData.expiryDate}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 backdrop-blur-sm bg-white/70 border ${errors.expiryDate ? 'border-red-400/70' : 'border-gray-200/50'} rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm transition-all duration-200`}
+              />
+              {errors.expiryDate && (
+                <p className="text-red-600 text-xs mt-2 flex items-center">
+                  <i className="ri-error-warning-line mr-1"></i>
+                  {errors.expiryDate}
+                </p>
+              )}
+            </div>
 
-      {message && (
-        <p className={`mt-4 text-sm ${message.includes("Failed") ? "text-red-600" : "text-green-600"}`}>
-          {message}
-        </p>
-      )}
+            <div className="flex justify-end pt-4">
+              <button
+                type="submit"
+                className="px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Adding Coupon...
+                  </div>
+                ) : (
+                  "Add Coupon"
+                )}
+              </button>
+            </div>
+          </form>
+
+          {message && (
+            <div className={`mt-6 p-4 backdrop-blur-sm border rounded-xl ${message.includes("Failed") ? "bg-red-50/80 border-red-200/50" : "bg-green-50/80 border-green-200/50"}`}>
+              <div className="flex items-center">
+                <i className={`text-lg mr-2 ${message.includes("Failed") ? "ri-error-warning-line text-red-500" : "ri-check-line text-green-500"}`}></i>
+                <p className={`text-sm font-medium ${message.includes("Failed") ? "text-red-700" : "text-green-700"}`}>
+                  {message}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

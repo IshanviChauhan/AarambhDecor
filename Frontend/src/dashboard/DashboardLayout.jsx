@@ -1,4 +1,3 @@
-import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AdminDashboard from './AdminDashboard';
@@ -19,19 +18,20 @@ const DashboardLayout = () => {
       case 'user':
         return <UserDashboard />;
       default:
-        // Redirect if role is not recognized
         return <Navigate to="/login" replace />; 
     }
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className='container mx-auto flex flex-col md:flex-row gap-6 p-4'>
-        <aside className='lg:w-1/5 md:w-1/4 w-full'>
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/30 via-white to-primary-light/30">
+      <div className='container mx-auto flex flex-col lg:flex-row gap-6 p-4 max-w-7xl'>
+        <aside className='lg:w-1/4 xl:w-1/5 w-full order-2 lg:order-1'>
           {renderDashboard()}
         </aside>
-        <main className='flex-1 bg-white p-6 rounded-lg shadow-sm'>
-          <Outlet />
+        <main className='flex-1 order-1 lg:order-2'>
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl min-h-[600px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
