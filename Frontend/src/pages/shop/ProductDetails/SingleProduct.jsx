@@ -254,14 +254,12 @@ const SingleProduct = ({ refetchCart }) => {
             </div>
 
             {/* Rating */}
-            {singleProduct.rating && singleProduct.rating > 0 && (
-              <div className="flex items-center space-x-3 p-4 bg-white/20 backdrop-blur-md rounded-xl border border-white/30">
-                <div className="flex items-center space-x-2">
-                  <RatingStar rating={singleProduct.rating} />
-                </div>
-                <span className="text-sm text-gray-600">Based on customer reviews</span>
+            <div className="flex items-center space-x-3 p-4 bg-white/20 backdrop-blur-md rounded-xl border border-white/30">
+              <div className="flex items-center space-x-2">
+                <RatingStar rating={singleProduct.rating || 0} />
               </div>
-            )}
+              <span className="text-sm text-gray-600">Based on customer reviews</span>
+            </div>
 
             {/* Product Details Accordion */}
             <div className="space-y-3">

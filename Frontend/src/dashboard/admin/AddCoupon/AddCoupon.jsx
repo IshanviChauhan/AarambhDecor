@@ -49,18 +49,18 @@ const AddCoupon = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
+      <div className="max-w-3xl mx-auto space-y-8">
         {/* Header */}
-        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-xl">
+          <h2 className="text-3xl font-heading font-bold text-gray-900">
             Add New Coupon
           </h2>
           <p className="text-gray-600 mt-2">Create promotional discount coupons for customers</p>
         </div>
 
         {/* Coupon Form */}
-        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-8 shadow-xl">
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-8 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

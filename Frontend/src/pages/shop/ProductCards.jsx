@@ -34,9 +34,9 @@ const ProductCards = ({ products }) => {
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div className="flex flex-wrap justify-center gap-6 md:gap-8">
       {products.map((product) => (
-        <div key={product._id} className="bg-white/30 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div key={product._id} className="border bg-card text-card-foreground shadow-lg flex flex-col rounded-lg border-border/70 overflow-hidden w-[calc(50%-theme(spacing.3))] sm:flex-1 sm:min-w-[200px] sm:max-w-[300px] transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-2xl animate-pop-in">
           <div className="relative">
             <Link to={`/shop/${product._id}`}>
               <img
@@ -64,12 +64,12 @@ const ProductCards = ({ products }) => {
               )}
             </button>
           </div>
-          <div className="product__card__content">
-            <h4 className="text-base sm:text-lg md:text-xl lg:text-2xl font-heading">
+          <div className="product__card__content p-4 flex flex-col items-center text-center space-y-2">
+            <h4 className="text-base sm:text-lg md:text-xl lg:text-2xl font-heading text-center">
               {product.name}
             </h4>
-            <div className="price-section">
-              <div className="flex items-center gap-2 flex-wrap">
+            <div className="price-section w-full">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
                 <span className="text-sm sm:text-base md:text-lg lg:text-xl font-numeric font-bold text-primary">
                   Rs. {product.price?.toLocaleString()}
                 </span>
@@ -87,12 +87,14 @@ const ProductCards = ({ products }) => {
                 )}
               </div>
               {product.dealTitle && (
-                <p className="text-xs text-green-600 font-medium mt-1">
+                <p className="text-xs text-green-600 font-medium mt-1 text-center">
                   🎉 {product.dealTitle}
                 </p>
               )}
             </div>
-            <RatingStar rating={product.rating} />
+            <div className="flex justify-center">
+              <RatingStar rating={product.rating || 0} />
+            </div>
           </div>
         </div>
       ))}

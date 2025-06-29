@@ -5,7 +5,7 @@ import { getBaseUrl } from "../../../utils/baseURL";
 import UploadImage from "../AddProduct/UploadImage";
 
 const Deals = () => {
-  const { data: deal, isLoading, error } = useFetchDealQuery();
+  const { data: deal, isLoading, error, refetch } = useFetchDealQuery();
   const [updateDeal, { isLoading: isUpdating }] = useUpdateDealMutation();
   
   const [dealData, setDealData] = useState({
@@ -72,6 +72,8 @@ const Deals = () => {
     try {
       const response = await axios.post(`${getBaseUrl()}/api/deal/apply-to-products`);
       alert(`Success! Applied deal to ${response.data.affectedProducts} products.`);
+      // Refresh deal data to update product count
+      refetch();
     } catch (error) {
       console.error("Error applying deal to products:", error);
       alert("Failed to apply deal to products.");
@@ -82,6 +84,8 @@ const Deals = () => {
     try {
       await axios.post(`${getBaseUrl()}/api/deal/remove-from-products`);
       alert("Success! Removed deal from all products.");
+      // Refresh deal data to update product count
+      refetch();
     } catch (error) {
       console.error("Error removing deal from products:", error);
       alert("Failed to remove deal from products.");
@@ -96,19 +100,50 @@ const Deals = () => {
     };
 
     try {
-      await updateDeal(payload).unwrap();
-      alert("Deal updated successfully!");
+      // Update the deal - backend will automatically handle removing old deals and applying new ones
+      console.log("Updating deal...");
+      const result = await updateDeal(payload).unwrap();
+      
+      console.log("Deal updated successfully:", result);
+      
+      // Refresh deal data to ensure UI is up to date
+      refetch();
+      
+      // Provide user feedback based on deal status and categories
+      if (dealData.isActive && dealData.categories.length > 0) {
+        const productCount = result.applicableProducts || 0;
+        alert(`Deal updated successfully! 
+        
+✅ Removed previous deal from all products
+✅ Applied new deal to ${productCount} products in selected categories: ${dealData.categories.join(", ")}
+
+The deal is now active and being applied to products.`);
+      } else if (!dealData.isActive) {
+        alert(`Deal updated successfully! 
+        
+✅ Deal has been deactivated
+✅ Removed deal discounts from all products
+
+The deal is saved but not active.`);
+      } else {
+        alert(`Deal updated successfully! 
+        
+✅ Deal settings saved
+⚠️ No categories selected, so no products are affected
+
+Please select categories if you want this deal to apply to products.`);
+      }
     } catch (err) {
       console.error("Failed to update deal:", err);
-      alert("Failed to update deal.");
+      alert("Failed to update deal. Please try again.");
     }
   };
 
   if (isLoading) return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-      <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-8 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
+      <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-8 shadow-xl">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-3 text-gray-700 font-medium">Loading deal...</span>
         </div>
       </div>
@@ -116,8 +151,8 @@ const Deals = () => {
   );
   
   if (error) return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-      <div className="backdrop-blur-xl bg-red-50/80 border border-red-200/50 rounded-2xl p-8 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
+      <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-8 shadow-xl">
         <div className="text-center">
           <i className="ri-error-warning-line text-4xl text-red-500 mb-4"></i>
           <h3 className="text-lg font-semibold text-red-800 mb-2">Error Loading Deal</h3>
@@ -128,18 +163,18 @@ const Deals = () => {
   );
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-xl">
+          <h2 className="text-3xl font-heading font-bold text-gray-900 mb-2">
             Manage Deals & Banners
           </h2>
           <p className="text-gray-600 mt-2">Update promotional deals and banner content</p>
         </div>
 
         {/* Deal Form */}
-        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-8 shadow-xl">
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-8 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -152,7 +187,7 @@ const Deals = () => {
                   name="title"
                   value={dealData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm transition-all duration-200"
+                  className="w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-200"
                   placeholder="e.g., Summer Sale"
                 />
               </div>
@@ -167,7 +202,7 @@ const Deals = () => {
                   name="discount"
                   value={dealData.discount}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm font-numeric transition-all duration-200"
+                  className="w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm font-numeric transition-all duration-200"
                   placeholder="Enter discount percentage"
                 />
               </div>
@@ -182,7 +217,7 @@ const Deals = () => {
                 name="description"
                 value={dealData.description}
                 onChange={handleChange}
-                className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm transition-all duration-200"
+                className="w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-200"
                 placeholder="Briefly describe the deal"
                 rows="4"
               />
@@ -201,7 +236,7 @@ const Deals = () => {
                       type="checkbox"
                       checked={dealData.categories.includes(category)}
                       onChange={() => handleCategoryChange(category)}
-                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 focus:ring-2 mr-3"
+                      className="rounded border-gray-300 text-primary focus:ring-primary focus:ring-2 mr-3"
                     />
                     <span className="text-sm font-medium text-gray-700">{category}</span>
                   </label>
@@ -233,7 +268,7 @@ const Deals = () => {
                   onChange={handleChange}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
 
@@ -247,7 +282,7 @@ const Deals = () => {
                 name="endDate"
                 value={dealData.endDate}
                 onChange={handleChange}
-                className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm transition-all duration-200"
+                className="w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-200"
               />
             </div>
             
@@ -271,7 +306,7 @@ const Deals = () => {
 
             <div className="flex justify-between items-center pt-4">
               <div className="space-x-3">
-                <button
+                {/* <button
                   type="button"
                   onClick={handleApplyToProducts}
                   className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
@@ -284,11 +319,11 @@ const Deals = () => {
                   className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200"
                 >
                   Remove Deal from Products
-                </button>
+                </button> */}
               </div>
               <button 
                 type="submit" 
-                className="px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
+                className="px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl hover:from-primary-dark hover:to-primary shadow-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 disabled={isUpdating}
               >
                 {isUpdating ? (

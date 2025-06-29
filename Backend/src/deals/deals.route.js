@@ -151,16 +151,24 @@ router.put("/", async (req, res) => {
       deal = new Deal();
     }
 
+    // Store old categories to check for changes
+    const oldCategories = deal.categories || [];
+    const newCategories = categories || [];
+
     if (image) {
       const imageUrl = await uploadImage(image);
       deal.imageUrl = imageUrl;
     }
 
+    // Always remove existing deals from products first when updating
+    // This ensures clean state before applying new deal settings
+    await removeDealFromProducts(deal._id);
+
     deal.title = title;
     deal.description = description;
     deal.discount = discount;
     deal.endDate = new Date(endDate);
-    deal.categories = categories || [];
+    deal.categories = newCategories;
     deal.isActive = isActive !== undefined ? isActive : true;
 
     await deal.save();
@@ -178,11 +186,9 @@ router.put("/", async (req, res) => {
       applicableProducts
     };
 
-    // Apply or remove deal from products based on isActive status
-    if (deal.isActive) {
+    // Apply deal to products based on new settings if active
+    if (deal.isActive && deal.categories.length > 0) {
       await applyDealToProducts(deal);
-    } else {
-      await removeDealFromProducts(deal._id);
     }
 
     res.json(dealWithProductCount);

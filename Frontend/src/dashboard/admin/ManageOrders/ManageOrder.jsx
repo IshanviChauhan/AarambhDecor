@@ -91,10 +91,10 @@ const ManageOrders = () => {
   };
 
   if (isLoading && !data) return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-      <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-8 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
+      <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-8 shadow-xl">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-3 text-gray-700 font-medium">Loading orders...</span>
         </div>
       </div>
@@ -102,8 +102,8 @@ const ManageOrders = () => {
   );
   
   if (error) return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-      <div className="backdrop-blur-xl bg-red-50/80 border border-red-200/50 rounded-2xl p-8 shadow-xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
+      <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-8 shadow-xl">
         <div className="text-center">
           <i className="ri-error-warning-line text-4xl text-red-500 mb-4"></i>
           <h3 className="text-lg font-semibold text-red-800 mb-2">Error Loading Orders</h3>
@@ -114,7 +114,7 @@ const ManageOrders = () => {
   );
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Real-time Update Notification */}
         {showUpdateNotification && (
@@ -125,10 +125,10 @@ const ManageOrders = () => {
         )}
 
         {/* Header */}
-        <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl p-6 shadow-xl">
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-heading font-bold text-gray-900">
                 Manage Orders
               </h2>
               <p className="text-gray-600 mt-2">View and manage all customer orders</p>

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const DealsSection = () => {
   const BASE_URL = "http://localhost:4000";
+  const navigate = useNavigate();
 
   const [deal, setDeal] = useState({
     title: "",
@@ -19,6 +21,10 @@ const DealsSection = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [error, setError] = useState(null);
+
+  const handleShopNowClick = () => {
+    navigate('/shop');
+  };
 
   const startCountdown = (endDate) => {
     clearInterval(intervalId);
@@ -251,7 +257,10 @@ const DealsSection = () => {
               
               {/* CTA Button */}
               <div className="flex justify-center xs:justify-start pt-1 xs:pt-1.5 sm:pt-2">
-                <button className="group inline-flex items-center px-2.5 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-xs xs:text-sm sm:text-base rounded-lg hover:from-primary-dark hover:to-primary shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <button 
+                  onClick={handleShopNowClick}
+                  className="group inline-flex items-center px-2.5 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-xs xs:text-sm sm:text-base rounded-lg hover:from-primary-dark hover:to-primary shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                >
                   <span className="mr-1 xs:mr-1.5">Shop Now</span>
                   <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform duration-300 text-xs xs:text-sm"></i>
                 </button>

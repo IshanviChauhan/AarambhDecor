@@ -50,7 +50,7 @@ const ReviewsCard = ({ productReviews }) => {
 
                                 {/* Rating */}
                                 <div className="flex items-center mb-4">
-                                    <RatingStars rating={review.rating} />
+                                    <RatingStars rating={review.rating || 0} />
                                 </div>
 
                                 {/* Comment */}
