@@ -7,10 +7,15 @@ const router = express.Router();
 
 // Create Order
 router.post("/create-order", async (req, res) => {
-  const { products, amount, email, paymentMethod } = req.body;
+  const { products, amount, email, paymentMethod, shippingAddress } = req.body;
 
-  if (!products || !amount || !email || !paymentMethod) {
-    return res.status(400).json({ success: false, message: "All fields are required" });
+  if (!products || !amount || !email || !paymentMethod || !shippingAddress) {
+    return res.status(400).json({ success: false, message: "All fields including shipping address are required" });
+  }
+
+  // Validate shipping address fields
+  if (!shippingAddress.address || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
+    return res.status(400).json({ success: false, message: "Complete shipping address is required" });
   }
 
   try {
@@ -19,6 +24,7 @@ router.post("/create-order", async (req, res) => {
       amount,
       email,
       paymentMethod,
+      shippingAddress,
       status: paymentMethod === "COD" ? "pending" : "processing",
     });
 

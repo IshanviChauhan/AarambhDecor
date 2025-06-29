@@ -150,6 +150,70 @@ const OrderDetails = () => {
           </div>
         </div>
 
+        {/* Shipping Address Card */}
+        {order.shippingAddress && (
+          <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-heading font-bold text-gray-900">Shipping Address</h3>
+            </div>
+            
+            <div className="bg-white/30 backdrop-blur-sm border border-white/40 rounded-xl p-4">
+              <div className="space-y-2">
+                <p className="font-body text-gray-900 font-medium">{order.shippingAddress.address}</p>
+                <p className="font-body text-gray-700">{order.shippingAddress.city}, {order.shippingAddress.state}</p>
+                <p className="font-body text-gray-700">Pincode: {order.shippingAddress.pincode}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Method Card */}
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-heading font-bold text-gray-900">Payment Information</h3>
+          </div>
+          
+          <div className="bg-white/30 backdrop-blur-sm border border-white/40 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                order.paymentMethod === "COD" ? "bg-blue-100" : "bg-green-100"
+              }`}>
+                {order.paymentMethod === "COD" ? (
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <p className="font-body text-gray-900 font-semibold">
+                  {order.paymentMethod === "COD" ? "Cash on Delivery" : "UPI Payment"}
+                </p>
+                <p className="font-body text-sm text-gray-600">
+                  {order.paymentMethod === "COD" 
+                    ? "Pay when your order arrives" 
+                    : "Payment completed via UPI"
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Order Timeline */}
         <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-xl p-6">
           <h3 className="text-xl font-heading font-bold text-gray-900 mb-6">Order Progress</h3>

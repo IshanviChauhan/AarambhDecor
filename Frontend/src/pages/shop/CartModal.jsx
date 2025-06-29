@@ -1,4 +1,3 @@
-import React from "react";
 import { useSelector } from "react-redux"; // Import useSelector
 import PropTypes from "prop-types";
 import OrderSummary from "./OrderSummary";
@@ -199,7 +198,7 @@ const CartModal = ({ isOpen, onClose }) => {
               ))}
             </div>
           )}
-          {products.length > 0 && <OrderSummary userId={userId} />}
+          {products.length > 0 && <OrderSummary userId={userId} onCloseCart={onClose} />}
         </div>
       </div>
     </div>

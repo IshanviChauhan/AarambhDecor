@@ -10,7 +10,7 @@ import {
 } from "../../redux/features/cart/cartApi";
 import { getBaseUrl } from "../../../../Frontend/src/utils/baseURL";
 
-const OrderSummary = ({ userId }) => { // Pass userId as a prop
+const OrderSummary = ({ userId, onCloseCart }) => { // Add onCloseCart prop
   const navigate = useNavigate();
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState(null);
@@ -68,6 +68,13 @@ const OrderSummary = ({ userId }) => { // Pass userId as a prop
       return;
     }
 
+    // Check if user has complete shipping address
+    if (!user?.shippingAddress?.address || !user?.shippingAddress?.city || !user?.shippingAddress?.state || !user?.shippingAddress?.pincode) {
+      alert("Please complete your shipping address in your profile before placing an order.");
+      navigate("/dashboard/profile");
+      return;
+    }
+
     const orderData = {
       products: products.map((product) => ({
         productId: product._id,
@@ -76,6 +83,12 @@ const OrderSummary = ({ userId }) => { // Pass userId as a prop
       amount: grandTotal.toFixed(2),
       email: userEmail, // Use the logged-in user's email
       paymentMethod,
+      shippingAddress: {
+        address: user.shippingAddress.address,
+        city: user.shippingAddress.city,
+        state: user.shippingAddress.state,
+        pincode: user.shippingAddress.pincode
+      }
     };
 
     try {
@@ -202,6 +215,65 @@ const OrderSummary = ({ userId }) => { // Pass userId as a prop
         {/* Coupon Component */}
         <Coupon onApplyDiscount={handleApplyDiscount} />
 
+        {/* Shipping Address Section */}
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <i className="ri-map-pin-line"></i>
+            Shipping Address
+          </h2>
+          
+          {user?.shippingAddress?.address && user?.shippingAddress?.city && user?.shippingAddress?.state && user?.shippingAddress?.pincode ? (
+            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <i className="ri-check-line text-green-600"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-green-800 mb-2">Delivery Address</p>
+                  <div className="text-gray-700 space-y-1">
+                    <p>{user.shippingAddress.address}</p>
+                    <p>{user.shippingAddress.city}, {user.shippingAddress.state} - {user.shippingAddress.pincode}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (onCloseCart) onCloseCart(); // Close cart modal if available
+                      navigate("/dashboard/profile");
+                    }}
+                    className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                  >
+                    <i className="ri-edit-line"></i>
+                    Change Address
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <i className="ri-error-warning-line text-red-600"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-red-800 mb-2">Shipping Address Required</p>
+                  <p className="text-red-700 mb-3">
+                    Please add your complete shipping address to proceed with the order.
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (onCloseCart) onCloseCart(); // Close cart modal if available
+                      navigate("/dashboard/profile");
+                    }}
+                    className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <i className="ri-add-line"></i>
+                    Add Shipping Address
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Payment Method Selection */}
         <div className="bg-white rounded-lg p-4 border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -283,6 +355,18 @@ const OrderSummary = ({ userId }) => { // Pass userId as a prop
                   <p className="text-2xl font-bold text-green-800">Rs. {grandTotal.toFixed(2)}</p>
                 </div>
               </div>
+              <div className="mt-6">
+                <p className="text-center text-sm text-green-700 mb-4">
+                  After scanning the QR code and completing payment, click the button below to confirm your order.
+                </p>
+                <button
+                  onClick={handlePlaceOrder}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                >
+                  <i className="ri-check-double-line"></i>
+                  Confirm Payment & Place Order
+                </button>
+              </div>
 
             </div>
           </div>
@@ -314,6 +398,7 @@ const OrderSummary = ({ userId }) => { // Pass userId as a prop
 
 OrderSummary.propTypes = {
   userId: PropTypes.string.isRequired,
+  onCloseCart: PropTypes.func, // Optional function to close cart modal
 };
 
 export default OrderSummary;

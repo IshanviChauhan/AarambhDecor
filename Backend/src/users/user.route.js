@@ -123,8 +123,8 @@ res.status(200).send({ message: 'Logged in successfully', token, user :
     username: user.username,
     role: user.role,
     profileImage: user.profileImage,
-    bio: user.bio,
-    profession: user.profession,
+    phone: user.phone,
+    shippingAddress: user.shippingAddress,
   }
 
 });
@@ -189,14 +189,52 @@ router.put('/users/:id', async (req, res) => {
   }
 });
 
-router.patch('/edit-profile', async (req, res) => {
+router.patch('/edit-profile', verifyToken, async (req, res) => {
   try {
+      // Get userId from token payload (set by verifyToken middleware)
+      const userId = req.userId;
+      
       // Destructure fields from the request body
-      const { userId, username, profileImage, bio, profession } = req.body;
+      const { username, profileImage, phone, shippingAddress } = req.body;
 
-      // Check if userId is provided
-      if (!userId) {
-          return res.status(400).send({ message: 'User ID is required' });
+      // Validate phone number if provided
+      if (phone && phone.trim() !== '') {
+          if (!/^[6-9]\d{9}$/.test(phone)) {
+              return res.status(400).send({ 
+                  message: 'Phone number must be a 10-digit Indian mobile number starting with 6, 7, 8, or 9' 
+              });
+          }
+      }
+
+      // Validate state if provided
+      if (shippingAddress?.state && shippingAddress.state.trim() !== '') {
+          const validStates = [
+              'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+              'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+              'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+              'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+              'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+              'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+              // Union Territories
+              'Andaman and Nicobar Islands', 'Chandigarh', 
+              'Dadra and Nagar Haveli and Daman and Diu', 'Delhi',
+              'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+          ];
+          
+          if (!validStates.includes(shippingAddress.state)) {
+              return res.status(400).send({ 
+                  message: 'Please select a valid Indian state or union territory' 
+              });
+          }
+      }
+
+      // Validate pincode if provided
+      if (shippingAddress?.pincode && shippingAddress.pincode.trim() !== '') {
+          if (!/^\d{6}$/.test(shippingAddress.pincode) || shippingAddress.pincode.startsWith('0')) {
+              return res.status(400).send({ 
+                  message: 'Pincode must be exactly 6 digits and cannot start with 0' 
+              });
+          }
       }
 
       // Find user by ID
@@ -208,8 +246,14 @@ router.patch('/edit-profile', async (req, res) => {
       // Update the user's profile with provided fields
       if (username !== undefined) user.username = username;
       if (profileImage !== undefined) user.profileImage = profileImage;
-      if (bio !== undefined) user.bio = bio;
-      if (profession !== undefined) user.profession = profession;
+      if (phone !== undefined) user.phone = phone;
+      if (shippingAddress !== undefined) {
+          if (!user.shippingAddress) user.shippingAddress = {};
+          if (shippingAddress.address !== undefined) user.shippingAddress.address = shippingAddress.address;
+          if (shippingAddress.city !== undefined) user.shippingAddress.city = shippingAddress.city;
+          if (shippingAddress.state !== undefined) user.shippingAddress.state = shippingAddress.state;
+          if (shippingAddress.pincode !== undefined) user.shippingAddress.pincode = shippingAddress.pincode;
+      }
 
       // Save the updated user profile
       await user.save();
@@ -221,10 +265,10 @@ router.patch('/edit-profile', async (req, res) => {
               _id: user._id,
               username: user.username,
               email: user.email,
-              profileImage: user.profileImage,
-              bio: user.bio,
-              profession: user.profession,
               role: user.role,
+              profileImage: user.profileImage,
+              phone: user.phone,
+              shippingAddress: user.shippingAddress,
           }
       });
   } catch (error) {
